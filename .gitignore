@@ -1,47 +1,35 @@
-# Windows image file caches
-Thumbs.db
-ehthumbs.db
+#Unity Generated
+ProjectSheathe/[Tt]emp/
+ProjectSheathe/[Ll]ibrary/
+ProjectSheathe/[Bb]uild/
+ProjectSheathe/[Ee]xported[Oo]bj/
+ProjectSheathe/[Oo]bj/
+sysinfo.txt
 
-# Folder config file
-Desktop.ini
+#IDE generated
+*.csproj
+*.tmproj
+*.pidb
+*.userprefs
+*.svd
+*.suo
+*.user
+*.unityproj
+*.booproj
+*.swp
 
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
+#GIT generated
+*.orig
+*.orig.meta
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+*.MERGED.*
 
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
-
-# =========================
-# Operating System Files
-# =========================
-
-# OSX
-# =========================
-
+#OS Generated
 .DS_Store
-.AppleDouble
-.LSOverride
-
-# Thumbnails
-._*
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
+.DS_Store?
 .Trashes
-.VolumeIcon.icns
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
+ehthumbs.db
+[Tt]humbs.db
+._*
