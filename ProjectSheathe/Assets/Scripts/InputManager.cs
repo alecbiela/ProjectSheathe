@@ -9,6 +9,7 @@ public class InputManager : MonoBehaviour {
     private char osType;
     private bool dash;
     private bool slice;
+    private float sliceDuration = 0;
     private bool attack;
     private bool fire;
     private bool deflect;
@@ -31,7 +32,7 @@ public class InputManager : MonoBehaviour {
             osType = 'w';
             initialRTrigger = false;
             initialLTrigger = false;
-}
+        }
         else if (Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.OSXPlayer || Application.platform == RuntimePlatform.OSXDashboardPlayer)
         {
             osType = 'm';
@@ -73,10 +74,23 @@ public class InputManager : MonoBehaviour {
             }
             else if (controllerType != "Keyboard" && !initialRTrigger) dash = Input.GetButton(inputs["Slice"]) || Input.GetAxis(inputs["Slice2"]) > -1;
             else slice = Input.GetButton(inputs["Slice"]);
+
+            //if the button is being held still, increment the time it's being held
+            //otherwise slice (but only if the player has some juice stored up)
+            if (slice) sliceDuration += Time.deltaTime;
+            else
+            {
+                if (sliceDuration > 0)
+                {
+                    character.Slice(sliceDuration);
+                    sliceDuration = 0;
+                }
+            }
         }
         if (!attack)
         {
             attack = Input.GetButtonDown(inputs["Attack"]);
+            if (attack) character.BasicAttack();
         }
         if (!fire)
         {
@@ -85,6 +99,7 @@ public class InputManager : MonoBehaviour {
         if (!deflect) 
         {
             deflect = Input.GetButtonDown(inputs["Deflect"]);
+            if (deflect) character.Deflect();
         }
         if (!overclock)
         {
@@ -153,15 +168,19 @@ public class InputManager : MonoBehaviour {
             character.keyboardMove(hMove, vMove, mousePos);
         }
 
+        if(slice)
+        {
+
+        }
         // Pass all parameters to the character control script.
         //character.HandleInput(h, v, latestKey);
         dash = false;
-        slice = false;
         attack = false;
+        slice = false;
         fire = false;
         deflect = false;
         overclock = false;
-}
+    }
 
     private void setControlScheme() // Sets the current control scheme; http://wiki.unity3d.com/index.php?title=Xbox360Controller, https://www.reddit.com/r/Unity3D/comments/1syswe/ps4_controller_map_for_unity/
     {
