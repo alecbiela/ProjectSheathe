@@ -8,26 +8,27 @@ public class Character : MonoBehaviour {
     private GameObject deflectHitBox;
 
     Rigidbody2D rigidBody;
-    [SerializeField] private float maxSpeed = 10f; // The fastest the player can travel in any direction
-    const float SLICE_TIMESTEP = 0.8f;  //the time needed to activate each "Level" of slice hitbox
+    [SerializeField] private float maxSpeed = 8f; // The fastest the player can travel in any direction
+    const float SLICE_TIMESTEP = 0.3f;  //the time needed to activate each "Level" of slice hitbox
 
     //# of frames in animation / 60
-    private const float SLICE_PRELOAD = 0.166f;
-    private const float SLICE_ACTIVE = 0.25f;
-    private const float SLICE_AFTER = 0.166f;
+    private const float SLICE_PRELOAD = 0.166f; // start-up frames
+    private const float SLICE_ACTIVE = 0.25f; // active frames
+    private const float SLICE_AFTER = 0.166f; // recovery frames
     private const float BASIC_PRELOAD = 0.083f;
     private const float BASIC_ACTIVE = 0.2f;
-    private const float BASIC_AFTER = 0.1f;
+    private const float BASIC_AFTER = 0.083f;
     private const float DEFLECT_PRELOAD = 0.066f;
     private const float DEFLECT_ACTIVE = 0.5f;
-    private const float DEFLECT_AFTER = 0.333f;
+    private const float DEFLECT_AFTER = 0.25f;
 
     private float sliceTimer;
     private float baTimer;
     private float deflectTimer;
 
     private int sliceBoxes;
-    private bool chargingSlice;
+    public bool chargingSlice;
+    public bool slowMovement;
 
     //can look at these elsewhere (perhaps to disregard input?) but can only set in here
     public bool Slicing { get; private set; }
@@ -45,6 +46,7 @@ public class Character : MonoBehaviour {
         Attacking = false;
         Deflecting = false;
         sliceBoxes = 0;
+        slowMovement = false;
 
         //populates various arrays of gameobjects with their hitboxes
         //adds by name, so we know which is which
@@ -107,20 +109,26 @@ public class Character : MonoBehaviour {
     //handles Slice mechanic, takes DURATION OF KEYPRESS as an argument
     public void Slice(float duration)
     {
-        if (Deflecting || Attacking) return;
+        if (Deflecting || Attacking || Slicing) return;
 
         sliceBoxes = Mathf.FloorToInt(duration / SLICE_TIMESTEP);
+        if(sliceBoxes > 5)
+        {
+            sliceBoxes = 5;
+        }
 
         //Debug.Log("Accepted slice input, " + duration + " seconds.");
         //start timer for slice mechanic
         sliceTimer = SLICE_PRELOAD + SLICE_ACTIVE + SLICE_AFTER;
         chargingSlice = true;
+        // maxSpeed = 4f;
+        // Debug.Log("Changed speed to 4f");
     }
 
     //handles basic attack mechanic, takes nothing
     public void BasicAttack()
     {
-        if (chargingSlice || Deflecting) return;
+        if (chargingSlice || Deflecting || Attacking) return;
 
         //Debug.Log("Accepted basic attack input.");
         baTimer = BASIC_PRELOAD + BASIC_ACTIVE + BASIC_AFTER;
@@ -129,7 +137,7 @@ public class Character : MonoBehaviour {
     //handles deflect mechanic, takes nothing
     public void Deflect()
     {
-        if (chargingSlice || Attacking) return;
+        if (chargingSlice || Attacking || Deflecting) return;
 
         //Debug.Log("Accepted deflect input.");
         deflectTimer = DEFLECT_PRELOAD + DEFLECT_ACTIVE + DEFLECT_AFTER;
@@ -190,7 +198,11 @@ public class Character : MonoBehaviour {
                 sliceHitBoxes[i + 1].gameObject.SetActive(true);
             }
 
+            chargingSlice = false;
             Slicing = true;
+            maxSpeed = 8f;
+            slowMovement = false;
+            Debug.Log("Reset speed");
         }
 
 
@@ -207,11 +219,21 @@ public class Character : MonoBehaviour {
         }
 
 
+        if (chargingSlice == true) slowMovement = true;
 
         //un-flags any abilities that are not on a timer
         //this will allow the player to perform other actions
         if (deflectTimer == 0) Deflecting = false;
-        if (sliceTimer == 0) { Slicing = false; chargingSlice = false; }
+        if (sliceTimer == 0)
+        {
+            if (slowMovement == true)
+            {
+                maxSpeed = 4f;
+                Debug.Log("Lowered speed");
+            }
+
+            Slicing = false;
+        }
         if (baTimer == 0) Attacking = false;
     }
 }

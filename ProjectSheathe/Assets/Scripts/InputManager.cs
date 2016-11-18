@@ -77,7 +77,12 @@ public class InputManager : MonoBehaviour {
 
             //if the button is being held still, increment the time it's being held
             //otherwise slice (but only if the player has some juice stored up)
-            if (slice) sliceDuration += Time.deltaTime;
+            if (slice)
+            {
+                sliceDuration += Time.deltaTime;
+                //character.slowMovement = true;
+                character.chargingSlice = true;
+            }
             else
             {
                 if (sliceDuration > 0)
