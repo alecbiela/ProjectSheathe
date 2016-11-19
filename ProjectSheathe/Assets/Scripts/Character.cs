@@ -28,7 +28,6 @@ public class Character : MonoBehaviour {
     private float deflectTimer;
 
     private int sliceBoxes;
-    private bool chargingSlice;
     public bool slowMovement;
     public bool[] InputsThisUpdate { get; set; }
 
@@ -36,6 +35,11 @@ public class Character : MonoBehaviour {
     public bool Slicing { get; private set; }
     public bool Deflecting { get; private set; }
     public bool Attacking { get; private set; }
+
+    //private bools for key pressed, to prevent simultaneous inputs
+    private bool slicePressed;
+    private bool deflectPressed;
+    private bool baPressed;
 
     private void Awake()
     {
@@ -45,7 +49,9 @@ public class Character : MonoBehaviour {
         baTimer = 0;
         deflectTimer = 0;
         Slicing = false;
-        chargingSlice = false;
+        slicePressed = false;
+        deflectPressed = false;
+        baPressed = false;
         Attacking = false;
         Deflecting = false;
         sliceBoxes = 0;
@@ -134,16 +140,18 @@ public class Character : MonoBehaviour {
                     switch (i)
                     {
                         case 0: //slicing (hasn't released button yet)
-                            if (Deflecting || Attacking || Slicing) continue;
-                            chargingSlice = true;
+                            if (deflectPressed || baPressed || slicePressed) continue;
+                            slicePressed = true;
                             sliceHoldTime += Time.deltaTime;
                             break;
                         case 1: //attacking
-                            if (chargingSlice || Deflecting || Attacking) continue;
+                            if (slicePressed || deflectPressed || baPressed) continue;
+                            baPressed = true;
                             baTimer = BASIC_PRELOAD + BASIC_ACTIVE + BASIC_AFTER;
                             break;
                         case 2: //deflecting
-                            if (chargingSlice || Attacking || Deflecting) continue;
+                            if (slicePressed || baPressed || deflectPressed) continue;
+                            deflectPressed = true;
                             deflectTimer = DEFLECT_PRELOAD + DEFLECT_ACTIVE + DEFLECT_AFTER;
                             break;
                         case 3: //dashing
@@ -220,7 +228,6 @@ public class Character : MonoBehaviour {
                 sliceHitBoxes[i + 1].gameObject.SetActive(true);
             }
 
-            chargingSlice = false;
             Slicing = true;
             maxSpeed = 8f;
             slowMovement = false;
@@ -241,11 +248,11 @@ public class Character : MonoBehaviour {
         }
 
 
-        if (chargingSlice == true) slowMovement = true;
+        if (slicePressed) slowMovement = true;
 
         //un-flags any abilities that are not on a timer
         //this will allow the player to perform other actions
-        if (deflectTimer == 0) Deflecting = false;
+        if (deflectTimer == 0) { Deflecting = false; deflectPressed = false; }
         if (sliceTimer == 0)
         {
             if (slowMovement == true)
@@ -254,8 +261,8 @@ public class Character : MonoBehaviour {
                 Debug.Log("Lowered speed");
             }
 
-            Slicing = false;
+            Slicing = false; slicePressed = false;
         }
-        if (baTimer == 0) Attacking = false;
+        if (baTimer == 0) { Attacking = false; baPressed = false; }
     }
 }
