@@ -15,6 +15,7 @@ public class InputManager : MonoBehaviour {
     private bool deflect;
     private bool overclock;
     private bool interact;
+    private bool[] characterFlags;
     private bool initialRTrigger = true; // True until trigger has been pressed, expressly for 360 on mac
     private bool initialLTrigger = true;
     private char beforePriorPreviousLatestKey; // Nice
@@ -26,6 +27,9 @@ public class InputManager : MonoBehaviour {
 
     private void Awake()
     {
+        //INPUT FLAGS, IN ORDER: SLICE[0], ATTACK[1], DEFLECT[2], DASH[3], OVERCLOCK[4], FIRE[5], INTERACT[6]
+        characterFlags = new bool[] { false, false, false, false, false, false, false };
+
         character = GetComponent<Character>();
         if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer) // Set OS type
         {
@@ -64,6 +68,8 @@ public class InputManager : MonoBehaviour {
             }
             else if (controllerType != "Keyboard" && !initialLTrigger) dash = Input.GetButton(inputs["Dash"]) || Input.GetAxis(inputs["Dash2"]) > -1;
             else dash = Input.GetButton(inputs["Dash"]);
+
+            if (dash) characterFlags[3] = true;
         }
         if (!slice)
         {
@@ -79,42 +85,48 @@ public class InputManager : MonoBehaviour {
             //otherwise slice (but only if the player has some juice stored up)
             if (slice)
             {
-                sliceDuration += Time.deltaTime;
+                characterFlags[0] = true;
+                //sliceDuration += Time.deltaTime;
                 //character.slowMovement = true;
-                character.chargingSlice = true;
+                //character.chargingSlice = true;
             }
-            else
+            /*else
             {
                 if (sliceDuration > 0)
                 {
                     character.Slice(sliceDuration);
                     sliceDuration = 0;
                 }
-            }
+            }*/
         }
         if (!attack)
         {
             attack = Input.GetButtonDown(inputs["Attack"]);
-            if (attack) character.BasicAttack();
+            if (attack) characterFlags[1] = true;
         }
         if (!fire)
         {
             fire = Input.GetButton(inputs["Fire"]);
+            if (fire) characterFlags[5] = true;
         }
         if (!deflect) 
         {
             deflect = Input.GetButtonDown(inputs["Deflect"]);
-            if (deflect) character.Deflect();
+            if (deflect) characterFlags[2] = true;
         }
         if (!overclock)
         {
             if ((controllerType == "Xbox360B" || controllerType == "PS4B") && osType == 'w') overclock = Input.GetAxis(inputs["Overclock"]) < 0;
             else overclock = Input.GetButton(inputs["Overclock"]);
+
+            if (overclock) characterFlags[4] = true;
         }
         if (!interact)
         {
             if ((controllerType == "Xbox360A" || controllerType == "PS4A") && osType == 'w') interact = Input.GetAxis(inputs["Interact"]) < 0;
             else interact = Input.GetButton(inputs["Interact"]);
+
+            if (interact) characterFlags[6] = true;
         }
 
         if (controllerType == "Keyboard")
@@ -173,12 +185,10 @@ public class InputManager : MonoBehaviour {
             character.keyboardMove(hMove, vMove, mousePos);
         }
 
-        if(slice)
-        {
+        //sends input information, then clears it
+        character.InputsThisUpdate = characterFlags;
+        for(int i=0;i<characterFlags.Length; i++) characterFlags[i] = false;
 
-        }
-        // Pass all parameters to the character control script.
-        //character.HandleInput(h, v, latestKey);
         dash = false;
         attack = false;
         slice = false;

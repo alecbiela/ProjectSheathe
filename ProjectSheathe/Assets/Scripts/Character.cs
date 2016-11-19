@@ -22,13 +22,15 @@ public class Character : MonoBehaviour {
     private const float DEFLECT_ACTIVE = 0.5f;
     private const float DEFLECT_AFTER = 0.25f;
 
+    private float sliceHoldTime;
     private float sliceTimer;
     private float baTimer;
     private float deflectTimer;
 
     private int sliceBoxes;
-    public bool chargingSlice;
+    private bool chargingSlice;
     public bool slowMovement;
+    public bool[] InputsThisUpdate { get; set; }
 
     //can look at these elsewhere (perhaps to disregard input?) but can only set in here
     public bool Slicing { get; private set; }
@@ -38,6 +40,7 @@ public class Character : MonoBehaviour {
     private void Awake()
     {
         rigidBody = GetComponent<Rigidbody2D>();
+        sliceHoldTime = 0;
         sliceTimer = 0;
         baTimer = 0;
         deflectTimer = 0;
@@ -71,6 +74,7 @@ public class Character : MonoBehaviour {
     //your friendly neighborhood update method
     private void Update()
     {
+        ProcessInput();
         ExecuteTimedActions();
     }
 
@@ -106,41 +110,59 @@ public class Character : MonoBehaviour {
         }
     }
 
-    //handles Slice mechanic, takes DURATION OF KEYPRESS as an argument
-    public void Slice(float duration)
+    //processes the current input that the character has (sent from InputManager in its update method
+    private void ProcessInput()
     {
-        if (Deflecting || Attacking || Slicing) return;
-
-        sliceBoxes = Mathf.FloorToInt(duration / SLICE_TIMESTEP);
-        if(sliceBoxes > 5)
+        try
         {
-            sliceBoxes = 5;
+            for(int i=0; i<InputsThisUpdate.Length; i++)
+            {
+                //checks for slice release
+                if(i == 0 && sliceHoldTime > 0 && !InputsThisUpdate[0])
+                {
+                    if (Deflecting || Attacking || Slicing) continue;
+
+                    sliceBoxes = Mathf.FloorToInt(sliceHoldTime / SLICE_TIMESTEP);
+                    if (sliceBoxes > 5) sliceBoxes = 5;
+
+                    //start timer for slice mechanic
+                    sliceTimer = SLICE_PRELOAD + SLICE_ACTIVE + SLICE_AFTER;
+                    sliceHoldTime = 0;
+                }
+                if(InputsThisUpdate[i])
+                {
+                    switch (i)
+                    {
+                        case 0: //slicing (hasn't released button yet)
+                            if (Deflecting || Attacking || Slicing) continue;
+                            chargingSlice = true;
+                            sliceHoldTime += Time.deltaTime;
+                            break;
+                        case 1: //attacking
+                            if (chargingSlice || Deflecting || Attacking) continue;
+                            baTimer = BASIC_PRELOAD + BASIC_ACTIVE + BASIC_AFTER;
+                            break;
+                        case 2: //deflecting
+                            if (chargingSlice || Attacking || Deflecting) continue;
+                            deflectTimer = DEFLECT_PRELOAD + DEFLECT_ACTIVE + DEFLECT_AFTER;
+                            break;
+                        case 3: //dashing
+                            break;
+                        case 4: //overclocking
+                            break;
+                        case 5: //firing
+                            break;
+                        case 6: //interacting
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        } catch (System.Exception e)
+        {
+            Debug.Log("Error when processing input: " + e.Message);
         }
-
-        //Debug.Log("Accepted slice input, " + duration + " seconds.");
-        //start timer for slice mechanic
-        sliceTimer = SLICE_PRELOAD + SLICE_ACTIVE + SLICE_AFTER;
-        chargingSlice = true;
-        // maxSpeed = 4f;
-        // Debug.Log("Changed speed to 4f");
-    }
-
-    //handles basic attack mechanic, takes nothing
-    public void BasicAttack()
-    {
-        if (chargingSlice || Deflecting || Attacking) return;
-
-        //Debug.Log("Accepted basic attack input.");
-        baTimer = BASIC_PRELOAD + BASIC_ACTIVE + BASIC_AFTER;
-    }
-
-    //handles deflect mechanic, takes nothing
-    public void Deflect()
-    {
-        if (chargingSlice || Attacking || Deflecting) return;
-
-        //Debug.Log("Accepted deflect input.");
-        deflectTimer = DEFLECT_PRELOAD + DEFLECT_ACTIVE + DEFLECT_AFTER;
     }
 
     //executes any time-based actions (slicing, dashing, majongling, basic attacking, deflecting)

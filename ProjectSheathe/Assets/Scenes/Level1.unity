@@ -331,7 +331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1b3353596775c941a3794dbfd3b018c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controllerType: Xbox360A
+  controllerType: Keyboard
 --- !u!50 &448848514
 Rigidbody2D:
   serializedVersion: 2
@@ -361,7 +361,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 10
-  chargingSlice: 0
   slowMovement: 0
 --- !u!61 &448848516
 BoxCollider2D:
