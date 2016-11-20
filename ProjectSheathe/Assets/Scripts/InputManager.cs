@@ -7,15 +7,7 @@ public class InputManager : MonoBehaviour {
     private Character character;
     [SerializeField] private string controllerType = "Keyboard";
     private char osType;
-    private bool dash;
-    private bool slice;
-    private float sliceDuration = 0;
-    private bool attack;
-    private bool fire;
-    private bool deflect;
-    private bool overclock;
-    private bool interact;
-    private bool[] characterFlags;
+    private bool[] inputFlags;
     private bool initialRTrigger = true; // True until trigger has been pressed, expressly for 360 on mac
     private bool initialLTrigger = true;
     private char beforePriorPreviousLatestKey; // Nice
@@ -27,8 +19,8 @@ public class InputManager : MonoBehaviour {
 
     private void Awake()
     {
-        //INPUT FLAGS, IN ORDER: SLICE[0], ATTACK[1], DEFLECT[2], DASH[3], OVERCLOCK[4], FIRE[5], INTERACT[6]
-        characterFlags = new bool[] { false, false, false, false, false, false, false };
+        // INPUT FLAGS, IN ORDER: SLICE[0], ATTACK[1], DEFLECT[2], DASH[3], OVERCLOCK[4], FIRE[5], INTERACT[6]
+        inputFlags = new bool[] { false, false, false, false, false, false, false };
 
         character = GetComponent<Character>();
         if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer) // Set OS type
@@ -59,74 +51,55 @@ public class InputManager : MonoBehaviour {
 
     private void Update()
     {
-        if (!dash) // Read input for no missed presses
-        {
-            if (controllerType != "Keyboard" && (osType == 'w' || initialLTrigger)) // Mac triggers for 360 start at 0 then range from -1 to 1, Triggers are treated as axes for all controllers
-            {
-                dash = Input.GetButton(inputs["Dash"]) || Input.GetAxis(inputs["Dash2"]) > 0; // Change to get down if on press is desired rather than continuous
-                if (initialLTrigger) initialLTrigger = false;
-            }
-            else if (controllerType != "Keyboard" && !initialLTrigger) dash = Input.GetButton(inputs["Dash"]) || Input.GetAxis(inputs["Dash2"]) > -1;
-            else dash = Input.GetButton(inputs["Dash"]);
 
-            if (dash) characterFlags[3] = true;
-        }
-        if (!slice)
+
+        if (!inputFlags[0]) // Slice
         {
             if (controllerType != "Keyboard" && (osType == 'w' || initialRTrigger))
             {
-                slice = Input.GetButton(inputs["Slice"]) || Input.GetAxis(inputs["Slice2"]) > 0;
+                inputFlags[0] = Input.GetButton(inputs["Slice"]) || Input.GetAxis(inputs["Slice2"]) > 0;
                 if (initialRTrigger) initialRTrigger = false;
             }
-            else if (controllerType != "Keyboard" && !initialRTrigger) dash = Input.GetButton(inputs["Slice"]) || Input.GetAxis(inputs["Slice2"]) > -1;
-            else slice = Input.GetButton(inputs["Slice"]);
+            else if (controllerType != "Keyboard" && !initialRTrigger) inputFlags[0] = Input.GetButton(inputs["Slice"]) || Input.GetAxis(inputs["Slice2"]) > -1;
+            else inputFlags[0] = Input.GetButton(inputs["Slice"]);
+        }
 
-            //if the button is being held still, increment the time it's being held
-            //otherwise slice (but only if the player has some juice stored up)
-            if (slice)
+        if (!inputFlags[1]) // Attack
+        {
+            inputFlags[1] = Input.GetButtonDown(inputs["Attack"]);
+        }
+
+        if (!inputFlags[2]) // Deflect
+        {
+            inputFlags[2] = Input.GetButtonDown(inputs["Deflect"]);
+        }
+
+        if (!inputFlags[3]) // Dash
+        {
+            if (controllerType != "Keyboard" && (osType == 'w' || initialLTrigger)) // Mac triggers for 360 start at 0 then range from -1 to 1, Triggers are treated as axes for all controllers
             {
-                characterFlags[0] = true;
-                //sliceDuration += Time.deltaTime;
-                //character.slowMovement = true;
-                //character.chargingSlice = true;
+                inputFlags[3] = Input.GetButton(inputs["Dash"]) || Input.GetAxis(inputs["Dash2"]) > 0; // Change to get down if on press is desired rather than continuous
+                if (initialLTrigger) initialLTrigger = false;
             }
-            /*else
-            {
-                if (sliceDuration > 0)
-                {
-                    character.Slice(sliceDuration);
-                    sliceDuration = 0;
-                }
-            }*/
+            else if (controllerType != "Keyboard" && !initialLTrigger) inputFlags[3] = Input.GetButton(inputs["Dash"]) || Input.GetAxis(inputs["Dash2"]) > -1;
+            else inputFlags[3] = Input.GetButton(inputs["Dash"]);
         }
-        if (!attack)
-        {
-            attack = Input.GetButtonDown(inputs["Attack"]);
-            if (attack) characterFlags[1] = true;
-        }
-        if (!fire)
-        {
-            fire = Input.GetButton(inputs["Fire"]);
-            if (fire) characterFlags[5] = true;
-        }
-        if (!deflect) 
-        {
-            deflect = Input.GetButtonDown(inputs["Deflect"]);
-            if (deflect) characterFlags[2] = true;
-        }
-        if (!overclock)
-        {
-            if ((controllerType == "Xbox360B" || controllerType == "PS4B") && osType == 'w') overclock = Input.GetAxis(inputs["Overclock"]) < 0;
-            else overclock = Input.GetButton(inputs["Overclock"]);
 
-            if (overclock) characterFlags[4] = true;
-        }
-        if (!interact)
+        if (!inputFlags[4]) // Overclock
         {
-            if ((controllerType == "Xbox360A" || controllerType == "PS4A") && osType == 'w') interact = Input.GetAxis(inputs["Interact"]) < 0;
-            else interact = Input.GetButton(inputs["Interact"]);
+            if ((controllerType == "Xbox360B" || controllerType == "PS4B") && osType == 'w') inputFlags[4] = Input.GetAxis(inputs["Overclock"]) < 0;
+            else inputFlags[4] = Input.GetButton(inputs["Overclock"]);
+        }
 
-            if (interact) characterFlags[6] = true;
+        if (!inputFlags[5]) // Fire
+        {
+            inputFlags[5] = Input.GetButton(inputs["Fire"]);
+        }
+        
+        if (!inputFlags[6]) // Interact
+        {
+            if ((controllerType == "Xbox360A" || controllerType == "PS4A") && osType == 'w') inputFlags[6] = Input.GetAxis(inputs["Interact"]) < 0;
+            else inputFlags[6] = Input.GetButton(inputs["Interact"]);
         }
 
         if (controllerType == "Keyboard")
@@ -176,7 +149,7 @@ public class InputManager : MonoBehaviour {
         {
             float hLook = Input.GetAxis(inputs["HorizontalLook"]); // Invert stuff here
             float vLook = Input.GetAxis(inputs["VerticalLook"]);
-            if (osType == 'w' && controllerType == "Xbox360A" || controllerType == "Xbox360B") vLook = -vLook;
+            if (osType == 'w') vLook = -vLook;
             character.controllerMove(hMove, vMove, hLook, vLook);
         }
         else
@@ -184,20 +157,12 @@ public class InputManager : MonoBehaviour {
             Vector3 mousePos = Input.mousePosition;
             character.keyboardMove(hMove, vMove, mousePos);
         }
-
-        //sends input information, then clears it
-        character.InputsThisUpdate = characterFlags;
-        for(int i=0;i<characterFlags.Length; i++) characterFlags[i] = false;
-
-        dash = false;
-        attack = false;
-        slice = false;
-        fire = false;
-        deflect = false;
-        overclock = false;
+        
+        character.InputFlags = inputFlags; // Send input information, then reset it
+        for (int i=0;i<inputFlags.Length; i++) inputFlags[i] = false;
     }
 
-    private void setControlScheme() // Sets the current control scheme; http://wiki.unity3d.com/index.php?title=Xbox360Controller, https://www.reddit.com/r/Unity3D/comments/1syswe/ps4_controller_map_for_unity/
+    private void setControlScheme() // Sets the current control scheme; http://wiki.unity3d.com/index.php?title=Xbox360Controller, https://www.reddit.com/r/Unity3D/comments/1syswe/ps4_controller_map_for_unity/ (slightly wrong)
     {
         inputs.Clear(); // Empty current scheme
 
@@ -250,29 +215,29 @@ public class InputManager : MonoBehaviour {
                 else if (controllerType == "PS4A")
                 {
                     inputs.Add("HorizontalLook", "Axis3");
-                    inputs.Add("VerticalLook", "Axis4");
+                    inputs.Add("VerticalLook", "Axis6");
                     inputs.Add("Slice", "Button0");
                     inputs.Add("Attack", "Button3");
                     inputs.Add("Fire", "Button2");
                     inputs.Add("Dash", "Button1");
                     inputs.Add("Deflect", "Button5");
                     inputs.Add("Overclock", "Button4");
-                    inputs.Add("Slice2", "Axis6");
-                    inputs.Add("Dash2", "Axis5");
+                    inputs.Add("Slice2", "Axis5");
+                    inputs.Add("Dash2", "Axis4");
                     inputs.Add("Interact", "Axis8");
                 }
                 else // PS4 B
                 {
                     inputs.Add("HorizontalLook", "Axis3");
-                    inputs.Add("VerticalLook", "Axis4");
+                    inputs.Add("VerticalLook", "Axis6");
                     inputs.Add("Slice", "Button0");
                     inputs.Add("Attack", "Button3");
                     inputs.Add("Fire", "Button4");
                     inputs.Add("Dash", "Button1");
                     inputs.Add("Deflect", "Button5");
                     inputs.Add("Overclock", "Axis8");
-                    inputs.Add("Slice2", "Axis6");
-                    inputs.Add("Dash2", "Axis5");
+                    inputs.Add("Slice2", "Axis5");
+                    inputs.Add("Dash2", "Axis4");
                     inputs.Add("Interact", "Button2");
                 }
             }

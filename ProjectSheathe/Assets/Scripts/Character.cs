@@ -29,17 +29,18 @@ public class Character : MonoBehaviour {
 
     private int sliceBoxes;
     public bool slowMovement;
-    public bool[] InputsThisUpdate { get; set; }
+    private bool[] inputFlags;
 
     //can look at these elsewhere (perhaps to disregard input?) but can only set in here
     public bool Slicing { get; private set; }
     public bool Deflecting { get; private set; }
     public bool Attacking { get; private set; }
+    public bool[] InputFlags { get { return inputFlags; } set { inputFlags = value; } }
 
     //private bools for key pressed, to prevent simultaneous inputs
-    private bool slicePressed;
-    private bool deflectPressed;
-    private bool baPressed;
+    private bool sliceState;
+    private bool deflectState;
+    private bool baState;
 
     private void Awake()
     {
@@ -48,17 +49,18 @@ public class Character : MonoBehaviour {
         sliceTimer = 0;
         baTimer = 0;
         deflectTimer = 0;
-        Slicing = false;
-        slicePressed = false;
-        deflectPressed = false;
-        baPressed = false;
+        Slicing = false; // Actually actively slicing
+        sliceState = false; // Includes startup/charge and recovery frames
+        deflectState = false;
+        baState = false;
         Attacking = false;
         Deflecting = false;
         sliceBoxes = 0;
         slowMovement = false;
+        inputFlags = new bool[] { false, false, false, false, false, false, false };
 
-        //populates various arrays of gameobjects with their hitboxes
-        //adds by name, so we know which is which
+        // Populate various arrays of gameobjects with their hitboxes
+        // Add by name, so we know which is which
         sliceHitBoxes = new GameObject[6];
         for(int i=0; i<6; i++)
         {
@@ -77,19 +79,11 @@ public class Character : MonoBehaviour {
         deflectHitBox.gameObject.SetActive(false);
     }
 
-    //your friendly neighborhood update method
-    private void Update()
-    {
-        ProcessInput();
-        ExecuteTimedActions();
-    }
-
-
     public void controllerMove(float hMove, float vMove, float hLook, float vLook) // Movement and rotation with controller
     {
         if(!Attacking && !Deflecting && !Slicing)   //only move when they are not doing these actions
             rigidBody.velocity = new Vector2(hMove * maxSpeed, vMove * maxSpeed);
-        if (hLook != 0 && vLook != 0 && !Attacking && !Slicing)
+        if ((hLook != 0 || vLook != 0) && !Attacking && !Slicing)
         {
             float angle = Mathf.Atan2(vLook, hLook) * Mathf.Rad2Deg;
             rigidBody.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
@@ -116,49 +110,52 @@ public class Character : MonoBehaviour {
         }
     }
 
-    //processes the current input that the character has (sent from InputManager in its update method
-    private void ProcessInput()
+    private void Update()
+    {
+        ProcessInput();
+        ExecuteTimedActions();
+    }
+    
+    private void ProcessInput() // Processes the current input that the character has
     {
         try
         {
-            for(int i=0; i<InputsThisUpdate.Length; i++)
+            for(int i=0; i<inputFlags.Length; i++)
             {
-                //checks for slice release
-                if(i == 0 && sliceHoldTime > 0 && !InputsThisUpdate[0])
+                if(i == 0 && sliceHoldTime > 0 && !inputFlags[0]) // Checks for slice release
                 {
                     if (Deflecting || Attacking || Slicing) continue;
 
                     sliceBoxes = Mathf.FloorToInt(sliceHoldTime / SLICE_TIMESTEP);
                     if (sliceBoxes > 5) sliceBoxes = 5;
-
-                    //start timer for slice mechanic
-                    sliceTimer = SLICE_PRELOAD + SLICE_ACTIVE + SLICE_AFTER;
+                    
+                    sliceTimer = SLICE_PRELOAD + SLICE_ACTIVE + SLICE_AFTER; // Start timer for slice mechanic
                     sliceHoldTime = 0;
                 }
-                if(InputsThisUpdate[i])
+                if(inputFlags[i])
                 {
                     switch (i)
                     {
-                        case 0: //slicing (hasn't released button yet)
-                            if (deflectPressed || baPressed || slicePressed) continue;
-                            slicePressed = true;
+                        case 0: // Slicing (hasn't released button yet)
+                            if (deflectState || baState || sliceState) continue;
+                            sliceState = true;
                             sliceHoldTime += Time.deltaTime;
                             break;
-                        case 1: //attacking
-                            if (slicePressed || deflectPressed || baPressed) continue;
-                            baPressed = true;
+                        case 1: // Attacking
+                            if (sliceState || deflectState || baState) continue;
+                            baState = true;
                             baTimer = BASIC_PRELOAD + BASIC_ACTIVE + BASIC_AFTER;
                             break;
-                        case 2: //deflecting
-                            if (slicePressed || baPressed || deflectPressed) continue;
-                            deflectPressed = true;
+                        case 2: // Deflecting
+                            if (sliceState || baState || deflectState) continue;
+                            deflectState = true;
                             deflectTimer = DEFLECT_PRELOAD + DEFLECT_ACTIVE + DEFLECT_AFTER;
                             break;
-                        case 3: //dashing
+                        case 3: // Dashing
                             break;
-                        case 4: //overclocking
+                        case 4: // Overclocking
                             break;
-                        case 5: //firing
+                        case 5: // Firing
                             break;
                         case 6: //interacting
                             break;
@@ -172,25 +169,21 @@ public class Character : MonoBehaviour {
             Debug.Log("Error when processing input: " + e.Message);
         }
     }
-
-    //executes any time-based actions (slicing, dashing, majongling, basic attacking, deflecting)
-    private void ExecuteTimedActions()
+    
+    private void ExecuteTimedActions() // Executes any time-based actions (slicing, dashing, basic attacking, deflecting)
     {
-        //work the timers
-        sliceTimer = sliceTimer <= 0 ? 0 : sliceTimer - Time.deltaTime;
+        // Work the timers
+        sliceTimer = sliceTimer <= 0 ? 0 : sliceTimer - Time.deltaTime; // If sT <= 0 then sT = 0, else = sT-dT
         deflectTimer = deflectTimer <= 0 ? 0 : deflectTimer - Time.deltaTime;
         baTimer = baTimer <= 0 ? 0 : baTimer - Time.deltaTime;
-
-        //attack is over, hitboxes go away
-        if (baTimer <= BASIC_AFTER)
+        
+        if (baTimer <= BASIC_AFTER) // If attack is over, hitboxes go away
         {
             baHitBoxes[2].gameObject.SetActive(false);
         }
-        //it's time to attack (in a basic fashion)
-        else if (baTimer <= (BASIC_ACTIVE + BASIC_AFTER))
+        else if (baTimer <= (BASIC_ACTIVE + BASIC_AFTER)) // Otherwise, attack (in a basic fashion)
         {
-            //activating hitboxes based on where we are in the anim
-            if(baTimer <= (BASIC_ACTIVE/3) + BASIC_AFTER)
+            if(baTimer <= (BASIC_ACTIVE/3) + BASIC_AFTER) // Activating hitboxes based on where we are in the anim
             {
                 baHitBoxes[2].gameObject.SetActive(true);
                 baHitBoxes[1].gameObject.SetActive(false);
@@ -207,23 +200,19 @@ public class Character : MonoBehaviour {
 
             Attacking = true;
         }
-
-        //slice is over, hitboxes go away
-        if (sliceTimer <= SLICE_AFTER)
+        
+        if (sliceTimer <= SLICE_AFTER) // If slice is over, hitboxes go away
         {
             for (int i = 0; i < 6; i++)
             {
                 sliceHitBoxes[i].gameObject.SetActive(false);
             }
         }
-        //it's time to slice
-        else if (sliceTimer <= (SLICE_ACTIVE + SLICE_AFTER))
+        else if (sliceTimer <= (SLICE_ACTIVE + SLICE_AFTER)) // Otherwise, slice
         {
-            //always activate the first box
-            sliceHitBoxes[0].gameObject.SetActive(true);
-
-            //additional hitboxes
-            for (int i = 0; i < sliceBoxes; i++)
+            sliceHitBoxes[0].gameObject.SetActive(true); // Always activate the first box
+            
+            for (int i = 0; i < sliceBoxes; i++) // Additional hitboxes
             {
                 sliceHitBoxes[i + 1].gameObject.SetActive(true);
             }
@@ -233,26 +222,25 @@ public class Character : MonoBehaviour {
             slowMovement = false;
             Debug.Log("Reset speed");
         }
-
-
-        //deflect is over, hitbox goes away
-        if (deflectTimer <= DEFLECT_AFTER)
+        
+        if (deflectTimer <= DEFLECT_AFTER) // If deflect is over, hitbox goes away
         {
             deflectHitBox.gameObject.SetActive(false);
         }
-        //it's time to deflect
-        else if (deflectTimer <= (DEFLECT_ACTIVE + DEFLECT_AFTER))
+        else if (deflectTimer <= (DEFLECT_ACTIVE + DEFLECT_AFTER))// Otherwise, deflect
         {
             deflectHitBox.gameObject.SetActive(true);
             Deflecting = true;
         }
 
+        if (sliceState) slowMovement = true;
 
-        if (slicePressed) slowMovement = true;
-
-        //un-flags any abilities that are not on a timer
-        //this will allow the player to perform other actions
-        if (deflectTimer == 0) { Deflecting = false; deflectPressed = false; }
+        // Un-flag any abilities that are not on a timer, allowing the player to perform other actions
+        if (deflectTimer == 0)
+        {
+            Deflecting = false;
+            deflectState = false;
+        }
         if (sliceTimer == 0)
         {
             if (slowMovement == true)
@@ -260,9 +248,13 @@ public class Character : MonoBehaviour {
                 maxSpeed = 4f;
                 Debug.Log("Lowered speed");
             }
-
-            Slicing = false; slicePressed = false;
+            Slicing = false;
+            sliceState = false;
         }
-        if (baTimer == 0) { Attacking = false; baPressed = false; }
+        if (baTimer == 0)
+        {
+            Attacking = false;
+            baState = false;
+        }
     }
 }
