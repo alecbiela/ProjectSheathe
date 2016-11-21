@@ -74,15 +74,10 @@ public class InputManager : MonoBehaviour {
             inputFlags[2] = Input.GetButtonDown(inputs["Deflect"]);
         }
 
-        if (!inputFlags[3]) // Dash
+        if (!inputFlags[3]) // Interact
         {
-            if (controllerType != "Keyboard" && (osType == 'w' || initialLTrigger)) // Mac triggers for 360 start at 0 then range from -1 to 1, Triggers are treated as axes for all controllers
-            {
-                inputFlags[3] = Input.GetButton(inputs["Dash"]) || Input.GetAxis(inputs["Dash2"]) > 0; // Change to get down if on press is desired rather than continuous
-                if (initialLTrigger) initialLTrigger = false;
-            }
-            else if (controllerType != "Keyboard" && !initialLTrigger) inputFlags[3] = Input.GetButton(inputs["Dash"]) || Input.GetAxis(inputs["Dash2"]) > -1;
-            else inputFlags[3] = Input.GetButton(inputs["Dash"]);
+            if ((controllerType == "Xbox360A" || controllerType == "PS4A") && osType == 'w') inputFlags[3] = Input.GetAxis(inputs["Interact"]) < 0;
+            else inputFlags[3] = Input.GetButton(inputs["Interact"]);
         }
 
         if (!inputFlags[4]) // Overclock
@@ -95,11 +90,16 @@ public class InputManager : MonoBehaviour {
         {
             inputFlags[5] = Input.GetButton(inputs["Fire"]);
         }
-        
-        if (!inputFlags[6]) // Interact
+
+        if (!inputFlags[6]) // Dash
         {
-            if ((controllerType == "Xbox360A" || controllerType == "PS4A") && osType == 'w') inputFlags[6] = Input.GetAxis(inputs["Interact"]) < 0;
-            else inputFlags[6] = Input.GetButton(inputs["Interact"]);
+            if (controllerType != "Keyboard" && (osType == 'w' || initialLTrigger)) // Mac triggers for 360 start at 0 then range from -1 to 1, Triggers are treated as axes for all controllers
+            {
+                inputFlags[6] = Input.GetButton(inputs["Dash"]) || Input.GetAxis(inputs["Dash2"]) > 0; // Change to get down if on press is desired rather than continuous
+                if (initialLTrigger) initialLTrigger = false;
+            }
+            else if (controllerType != "Keyboard" && !initialLTrigger) inputFlags[6] = Input.GetButton(inputs["Dash"]) || Input.GetAxis(inputs["Dash2"]) > -1;
+            else inputFlags[6] = Input.GetButton(inputs["Dash"]);
         }
 
         if (controllerType == "Keyboard")

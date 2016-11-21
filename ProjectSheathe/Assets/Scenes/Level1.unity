@@ -401,6 +401,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 10
+  maxDashDist: 15
+  dashRate: 0.5
   slowMovement: 0
 --- !u!61 &448848516
 BoxCollider2D:

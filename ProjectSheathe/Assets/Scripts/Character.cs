@@ -9,6 +9,8 @@ public class Character : MonoBehaviour {
 
     Rigidbody2D rigidBody;
     [SerializeField] private float maxSpeed = 8f; // The fastest the player can travel in any direction
+    [SerializeField] private float maxDashDist = 14f; // Uncanceled dash distance
+    [SerializeField] private float dashRate = 1f; // Dash movement per frame
     const float SLICE_TIMESTEP = 0.3f;  //the time needed to activate each "Level" of slice hitbox
 
     //# of frames in animation / 60
@@ -21,11 +23,14 @@ public class Character : MonoBehaviour {
     private const float DEFLECT_PRELOAD = 0.066f;
     private const float DEFLECT_ACTIVE = 0.5f;
     private const float DEFLECT_AFTER = 0.25f;
+    private const float DASH_CD = 2f; // Cooldown
 
     private float sliceHoldTime;
     private float sliceTimer;
     private float baTimer;
     private float deflectTimer;
+    private float currDashDist; // Currently traveled distance of the dash
+    private float dashCooldown; // Cooldown timer
 
     private int sliceBoxes;
     public bool slowMovement;
@@ -35,6 +40,7 @@ public class Character : MonoBehaviour {
     public bool Slicing { get; private set; }
     public bool Deflecting { get; private set; }
     public bool Attacking { get; private set; }
+    public bool Dashing { get; private set; }
     public bool[] InputFlags { get { return inputFlags; } set { inputFlags = value; } }
 
     //private bools for key pressed, to prevent simultaneous inputs
@@ -49,6 +55,9 @@ public class Character : MonoBehaviour {
         sliceTimer = 0;
         baTimer = 0;
         deflectTimer = 0;
+        currDashDist = 0;
+        dashCooldown = 0;
+        Dashing = false;
         Slicing = false; // Actually actively slicing
         sliceState = false; // Includes startup/charge and recovery frames
         deflectState = false;
@@ -57,7 +66,7 @@ public class Character : MonoBehaviour {
         Deflecting = false;
         sliceBoxes = 0;
         slowMovement = false;
-        inputFlags = new bool[] { false, false, false, false, false, false, false };
+        inputFlags = new bool[] { false, false, false, false, false, false, false }; // INPUT FLAGS, IN ORDER: SLICE[0], ATTACK[1], DEFLECT[2], INTERACT[6], OVERCLOCK[4], FIRE[5], DASH[6]
 
         // Populate various arrays of gameobjects with their hitboxes
         // Add by name, so we know which is which
@@ -118,55 +127,92 @@ public class Character : MonoBehaviour {
     
     private void ProcessInput() // Processes the current input that the character has
     {
-        try
+        for(int i=0; i<inputFlags.Length; i++)
         {
-            for(int i=0; i<inputFlags.Length; i++)
+            if(i == 0 && sliceHoldTime > 0 && !inputFlags[0]) // Checks for slice release
             {
-                if(i == 0 && sliceHoldTime > 0 && !inputFlags[0]) // Checks for slice release
-                {
-                    if (Deflecting || Attacking || Slicing) continue;
+                if (Deflecting || Attacking || Slicing) continue;
 
-                    sliceBoxes = Mathf.FloorToInt(sliceHoldTime / SLICE_TIMESTEP);
-                    if (sliceBoxes > 5) sliceBoxes = 5;
+                sliceBoxes = Mathf.FloorToInt(sliceHoldTime / SLICE_TIMESTEP);
+                if (sliceBoxes > 5) sliceBoxes = 5;
                     
-                    sliceTimer = SLICE_PRELOAD + SLICE_ACTIVE + SLICE_AFTER; // Start timer for slice mechanic
-                    sliceHoldTime = 0;
-                }
-                if(inputFlags[i])
+                sliceTimer = SLICE_PRELOAD + SLICE_ACTIVE + SLICE_AFTER; // Start timer for slice mechanic
+                sliceHoldTime = 0;
+            }
+            if(inputFlags[i])
+            {
+                switch (i)
                 {
-                    switch (i)
-                    {
-                        case 0: // Slicing (hasn't released button yet)
-                            if (deflectState || baState || sliceState) continue;
-                            sliceState = true;
-                            sliceHoldTime += Time.deltaTime;
-                            break;
-                        case 1: // Attacking
-                            if (sliceState || deflectState || baState) continue;
-                            baState = true;
-                            baTimer = BASIC_PRELOAD + BASIC_ACTIVE + BASIC_AFTER;
-                            break;
-                        case 2: // Deflecting
-                            if (sliceState || baState || deflectState) continue;
-                            deflectState = true;
-                            deflectTimer = DEFLECT_PRELOAD + DEFLECT_ACTIVE + DEFLECT_AFTER;
-                            break;
-                        case 3: // Dashing
-                            break;
-                        case 4: // Overclocking
-                            break;
-                        case 5: // Firing
-                            break;
-                        case 6: //interacting
-                            break;
-                        default:
-                            break;
-                    }
+                    case 0: // Slicing (hasn't released button yet)
+                        if (deflectState || baState || sliceState) continue;
+                        //Debug.Log("Slice");
+                        sliceState = true;
+                        sliceHoldTime += Time.deltaTime;
+                        break;
+                    case 1: // Attacking
+                        if (sliceState || deflectState || baState) continue;
+                        //Debug.Log("Attack");
+                        baState = true;
+                        baTimer = BASIC_PRELOAD + BASIC_ACTIVE + BASIC_AFTER;
+                        break;
+                    case 2: // Deflecting
+                        if (sliceState || baState || deflectState) continue;
+                        //Debug.Log("deflect");
+                        deflectState = true;
+                        deflectTimer = DEFLECT_PRELOAD + DEFLECT_ACTIVE + DEFLECT_AFTER;
+                        break;
+                    case 3: // Interacting
+                        break;
+                    case 4: // Overclocking
+                        break;
+                    case 5: // Firing
+                        break;
+                    case 6: // Dashing
+                        if (Dashing && (sliceState || baState || deflectState)) // Cancel dash on other actions
+                        {
+                            //Debug.Log("Cancel");
+                            Dashing = false; // Note that canceling dash with actions mapped to mouse buttons DOES NOT WORK on most touchpads because of system-wide accidental input suppression
+                            currDashDist = 0;
+                            dashCooldown = DASH_CD;
+                            this.transform.GetComponent<SpriteRenderer>().color = Color.white;
+                        }
+                        else if (sliceState || baState || deflectState) continue; // Do not perform dash while doing other actions
+                        else
+                        {
+                            if (currDashDist == 0 && dashCooldown <= 0 && rigidBody.velocity != Vector2.zero) // Only dash if moving
+                            {
+                                Dashing = true;
+                                //Debug.Log("Dash");
+                                this.transform.GetComponent<SpriteRenderer>().color = Color.blue;
+                            }
+                            if (Dashing && currDashDist < maxDashDist)
+                            {
+                                currDashDist += dashRate;
+                                rigidBody.transform.position += new Vector3(rigidBody.velocity.normalized.x * dashRate, rigidBody.velocity.normalized.y * dashRate, rigidBody.transform.position.z);
+                            }
+                            else if (currDashDist >= maxDashDist)
+                            {
+                                Dashing = false;
+                                currDashDist = 0;
+                                dashCooldown = DASH_CD;
+                                //Debug.Log("End");
+                                this.transform.GetComponent<SpriteRenderer>().color = Color.white;
+                            }
+                        }
+                        break;
+                    default:
+                        break;
                 }
             }
-        } catch (System.Exception e)
-        {
-            Debug.Log("Error when processing input: " + e.Message);
+
+            if (!inputFlags[6] && Dashing)
+            {
+                Debug.Log("Release");
+                Dashing = false;
+                currDashDist = 0;
+                dashCooldown = DASH_CD;
+                this.transform.GetComponent<SpriteRenderer>().color = Color.white;
+            }
         }
     }
     
@@ -220,7 +266,7 @@ public class Character : MonoBehaviour {
             Slicing = true;
             maxSpeed = 8f;
             slowMovement = false;
-            Debug.Log("Reset speed");
+            //Debug.Log("Reset speed");
         }
         
         if (deflectTimer <= DEFLECT_AFTER) // If deflect is over, hitbox goes away
@@ -235,6 +281,11 @@ public class Character : MonoBehaviour {
 
         if (sliceState) slowMovement = true;
 
+        if (!Dashing && dashCooldown > 0) // Increment dash cooldown based on delta time
+        {
+            dashCooldown -= Time.deltaTime;
+        }
+
         // Un-flag any abilities that are not on a timer, allowing the player to perform other actions
         if (deflectTimer == 0)
         {
@@ -246,7 +297,7 @@ public class Character : MonoBehaviour {
             if (slowMovement == true)
             {
                 maxSpeed = 4f;
-                Debug.Log("Lowered speed");
+                //Debug.Log("Lowered speed");
             }
             Slicing = false;
             sliceState = false;
