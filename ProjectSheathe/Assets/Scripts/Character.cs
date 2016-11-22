@@ -23,7 +23,7 @@ public class Character : MonoBehaviour {
     private const float DEFLECT_PRELOAD = 0.066f;
     private const float DEFLECT_ACTIVE = 0.5f;
     private const float DEFLECT_AFTER = 0.25f;
-    private const float DASH_CD = 2f; // Cooldown
+    private const float DASH_CD = .5833f; // Cooldown
 
     private float sliceHoldTime;
     private float sliceTimer;
@@ -168,7 +168,7 @@ public class Character : MonoBehaviour {
                     case 5: // Firing
                         break;
                     case 6: // Dashing
-                        if (Dashing && (sliceState || baState || deflectState)) // Cancel dash on other actions
+                        if (Dashing && (Slicing || baState || deflectState)) // Cancel dash on other actions
                         {
                             //Debug.Log("Cancel");
                             Dashing = false; // Note that canceling dash with actions mapped to mouse buttons DOES NOT WORK on most touchpads because of system-wide accidental input suppression
@@ -176,11 +176,12 @@ public class Character : MonoBehaviour {
                             dashCooldown = DASH_CD;
                             this.transform.GetComponent<SpriteRenderer>().color = Color.white;
                         }
-                        else if (sliceState || baState || deflectState) continue; // Do not perform dash while doing other actions
+                        else if (Slicing || baState || deflectState) continue; // Do not perform dash while doing other actions //sliceState ||
                         else
                         {
                             if (currDashDist == 0 && dashCooldown <= 0 && rigidBody.velocity != Vector2.zero) // Only dash if moving
                             {
+                                slowMovement = false;
                                 Dashing = true;
                                 //Debug.Log("Dash");
                                 this.transform.GetComponent<SpriteRenderer>().color = Color.blue;
@@ -264,7 +265,8 @@ public class Character : MonoBehaviour {
             }
 
             Slicing = true;
-            maxSpeed = 8f;
+            maxSpeed = 7f;
+            dashRate = .5f;
             slowMovement = false;
             //Debug.Log("Reset speed");
         }
@@ -297,6 +299,7 @@ public class Character : MonoBehaviour {
             if (slowMovement == true)
             {
                 maxSpeed = 4f;
+                dashRate = .3f;
                 //Debug.Log("Lowered speed");
             }
             Slicing = false;

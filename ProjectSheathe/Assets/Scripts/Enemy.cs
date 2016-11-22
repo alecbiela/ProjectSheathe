@@ -9,8 +9,11 @@ public class Enemy : MonoBehaviour {
     Vector3 vecToPlayer = new Vector3(0, 0, 0);
     bool firing = false;
     int timer = 0;
+    const float flashTime = 1.1666f; // how long the enemy flashes for before they shoot
+    float currFlashTime;
     bool active = false;
     System.Random rand = new System.Random();
+
 	void Start () {
         Bullet = new GameObject();
         Player = GameObject.FindGameObjectWithTag("Player");
@@ -41,23 +44,34 @@ public class Enemy : MonoBehaviour {
             float angle = Mathf.Atan2(vecToPlayer.y, vecToPlayer.x) * Mathf.Rad2Deg;
             Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
             this.transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * 0.9f); //Quaternion.LookRotation(this.transform.position - Player.transform.position);
-            if(timer>600)
+            if(timer>600) // fire first at 600 frames
             {
-                firing = true;
-                timer = rand.Next(0,300);
+                firing = true; // for purposes of this build, call Shoot here. After this build, when an enemy shoots will be determined by EnemyHandler.
+                timer = rand.Next(0,300); // next shot will be between 600 and 300 frames from now?
+                currFlashTime = flashTime;
             }
         }
-        else
+        else // firing
         {
-            if (timer % 3 == 0)
+            currFlashTime = currFlashTime - Time.deltaTime;
+            if (timer % 3 == 0) // flash
             {
-                this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 0);
+                if (currFlashTime > .20)
+                {
+                    this.GetComponent<SpriteRenderer>().color = new Color(255, 200, 0); // yellow/gold
+                }
+                else // flash red just before firing
+                {
+                    this.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0); // red
+                }
             }
             else
             {
-                this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
+                this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255); // white
             }
-            if(timer >=100)
+
+            //if(timer >=100)
+            if(currFlashTime <= 0)
             {
                 Bullet.SetActive(true);
                 active = true;
