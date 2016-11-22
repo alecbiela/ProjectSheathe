@@ -3,9 +3,9 @@ using System.Collections;
 
 public class Character : MonoBehaviour {
 
-    private GameObject[] sliceHitBoxes;
-    private GameObject[] baHitBoxes;
-    private GameObject deflectHitBox;
+    public GameObject[] sliceHitBoxes;//setting all hitboxes to public, so enemyhandler can have access to them -Simon
+    public GameObject[] baHitBoxes;//why are these called bahitboxes? basic attack?
+    public GameObject deflectHitBox;
 
     Rigidbody2D rigidBody;
     [SerializeField] private float maxSpeed = 8f; // The fastest the player can travel in any direction

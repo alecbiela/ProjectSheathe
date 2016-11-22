@@ -7,8 +7,13 @@ public class EnemyHandler : MonoBehaviour {
     List<GameObject> Enemies = new List<GameObject>();
     // Use this for initialization
     System.Random rand = new System.Random();
-    void Start () {
-	}
+    private GameObject Player;
+    private Character PlayerScript;
+    void Awake()
+    {
+        Player = GameObject.FindGameObjectWithTag("Player");
+        PlayerScript = Player.GetComponent<Character>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -16,8 +21,66 @@ public class EnemyHandler : MonoBehaviour {
         {
             CreateEnemy();
         }
-        
-	}
+
+        if (PlayerScript.Slicing)
+        {
+            for (int i = 0; i < Enemies.Count; i++)
+            {
+                for (int j = 0; j < PlayerScript.sliceHitBoxes.Length; j++)
+                {
+                    if (Enemies[i].GetComponent<BoxCollider2D>().IsTouching(
+                        PlayerScript.sliceHitBoxes[j].GetComponent<BoxCollider2D>()))
+                    {
+                        GameObject.DestroyObject(Enemies[i]);
+                        Enemies.RemoveAt(i);
+                        --i;
+                    }
+                }
+            }
+        }
+        else if (PlayerScript.Attacking)
+        {
+            for (int i = 0; i < Enemies.Count; i++)
+            {
+                for (int j = 0; j < PlayerScript.baHitBoxes.Length; j++)
+                {
+                    if (Enemies[i].GetComponent<BoxCollider2D>().IsTouching(
+                        PlayerScript.baHitBoxes[j].GetComponent<BoxCollider2D>()))
+                    {
+                        GameObject.DestroyObject(Enemies[i]);
+                        Enemies.RemoveAt(i);//if they're colliding remove the enemy
+                        --i;//decrement to avoid skipping an enemy
+                    }
+                }
+            }
+        }
+        else if (PlayerScript.Deflecting)
+        {
+            for (int i = 0; i < Enemies.Count; i++)
+            {
+                if(Enemies[i].GetComponent<Enemy>().Bullet.GetComponent<BoxCollider2D>().IsTouching
+                    (PlayerScript.deflectHitBox.GetComponent<BoxCollider2D>()))
+                {
+                    Enemies[i].GetComponent<Enemy>().deflected = true;
+                    Enemies[i].GetComponent<Enemy>().Bullet.GetComponent<Rigidbody2D>().velocity =
+                        -Enemies[i].GetComponent<Enemy>().Bullet.GetComponent<Rigidbody2D>().velocity;
+                    Enemies[i].GetComponent<Enemy>().force = -Enemies[i].GetComponent<Enemy>().force;
+                    Enemies[i].GetComponent<Enemy>().Bullet.GetComponent<Rigidbody2D>().AddForce(Enemies[i].GetComponent<Enemy>().force);
+                }
+            }
+        }
+        for (int i = 0; i < Enemies.Count; i++)
+        {
+            if(Enemies[i].GetComponent<Enemy>().Deflected())
+            {
+                GameObject.DestroyObject(Enemies[i]);
+                Enemies.RemoveAt(i);
+                --i;
+            }
+        }
+
+
+   }
 
     void CreateEnemy()
     {
