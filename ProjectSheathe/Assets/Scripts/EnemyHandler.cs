@@ -34,6 +34,7 @@ public class EnemyHandler : MonoBehaviour {
                         GameObject.DestroyObject(Enemies[i]);
                         Enemies.RemoveAt(i);
                         --i;
+                        break;
                     }
                 }
             }
@@ -50,6 +51,7 @@ public class EnemyHandler : MonoBehaviour {
                         GameObject.DestroyObject(Enemies[i]);
                         Enemies.RemoveAt(i);//if they're colliding remove the enemy
                         --i;//decrement to avoid skipping an enemy
+                        break;
                     }
                 }
             }
@@ -76,6 +78,7 @@ public class EnemyHandler : MonoBehaviour {
                 GameObject.DestroyObject(Enemies[i]);
                 Enemies.RemoveAt(i);
                 --i;
+                break;
             }
         }
 

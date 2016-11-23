@@ -114,8 +114,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 85283376}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.518, y: 0.054, z: 0}
-  m_LocalScale: {x: 0.02879099, y: 0.06341404, z: 1}
+  m_LocalPosition: {x: 4.5203815, y: 0.569878, z: 0}
+  m_LocalScale: {x: 0.29857394, y: 0.5533901, z: 7}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448848512}
@@ -129,7 +129,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
@@ -234,8 +234,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 205711658}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.18, y: -0.145, z: 0}
-  m_LocalScale: {x: 0.011152014, y: 0.12604085, z: 1}
+  m_LocalPosition: {x: 1.5707897, y: -1.4938279, z: 0}
+  m_LocalScale: {x: 0.11565085, y: 1.0999104, z: 7}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448848512}
@@ -249,7 +249,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
@@ -408,7 +408,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300000, guid: d8f2b8e467f64e342944ad1ae00811a6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -418,10 +418,10 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 448848510}
-  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 5.25, y: 5.25, z: 5.25}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.005, y: 0, z: 0}
+  m_LocalScale: {x: 0.60160863, y: 0.50624967, z: 0.75}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 789895280}
   - {fileID: 1764859096}
@@ -446,7 +446,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1b3353596775c941a3794dbfd3b018c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controllerType: PS4A
+  controllerType: Xbox360A
 --- !u!50 &448848514
 Rigidbody2D:
   serializedVersion: 2
@@ -475,6 +475,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec1144e9b6819cb4eab9fc57182ad8d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sliceHitBoxes: []
+  baHitBoxes: []
+  deflectHitBox: {fileID: 0}
   maxSpeed: 7
   maxDashDist: 3
   dashRate: 0.5
@@ -490,9 +493,9 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0.021523422, y: 0.011866102}
   serializedVersion: 2
-  m_Size: {x: 0.19999999, y: 0.19999999}
+  m_Size: {x: 1.509858, y: 2.9186974}
 --- !u!1 &473829075
 GameObject:
   m_ObjectHideFlags: 0
@@ -517,8 +520,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 473829075}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.997, y: 0.054, z: 0}
-  m_LocalScale: {x: 0.02879099, y: 0.06341404, z: 1}
+  m_LocalPosition: {x: 8.700425, y: 0.5698794, z: 0}
+  m_LocalScale: {x: 0.29857394, y: 0.5533901, z: 7}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448848512}
@@ -532,7 +535,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
@@ -594,8 +597,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 511746392}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.228, y: -0.001, z: 0}
-  m_LocalScale: {x: 0.016952729, y: 0.11203633, z: 1}
+  m_LocalPosition: {x: 1.9896661, y: -0.00049332075, z: 0}
+  m_LocalScale: {x: 0.17580643, y: 0.9776985, z: 7}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448848512}
@@ -609,7 +612,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
@@ -714,8 +717,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 789895279}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.097, y: 0.054, z: 0}
-  m_LocalScale: {x: 0.02879099, y: 0.14412144, z: 1}
+  m_LocalPosition: {x: 0.8464806, y: 0.5698774, z: 0}
+  m_LocalScale: {x: 0.29857394, y: 1.2576938, z: 7}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448848512}
@@ -729,7 +732,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
@@ -834,8 +837,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 963952819}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.081, y: -0.001, z: 0}
-  m_LocalScale: {x: 0.029134644, y: 0.05154256, z: 1}
+  m_LocalPosition: {x: 0.70685506, y: -0.0004936151, z: 0}
+  m_LocalScale: {x: 0.3021378, y: 0.44979241, z: 7}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448848512}
@@ -849,7 +852,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
@@ -998,8 +1001,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1163517317}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.131, y: 0.142, z: 0}
-  m_LocalScale: {x: 0.011655003, y: 0.17180888, z: 1}
+  m_LocalPosition: {x: 1.1431849, y: 1.4824709, z: 0}
+  m_LocalScale: {x: 0.12086703, y: 1.4993112, z: 7}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448848512}
@@ -1013,7 +1016,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
@@ -1075,8 +1078,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1175035178}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.679, y: 0.054, z: 0}
-  m_LocalScale: {x: 0.02879099, y: 0.06341404, z: 1}
+  m_LocalPosition: {x: 5.9253664, y: 0.56987894, z: 0}
+  m_LocalScale: {x: 0.29857394, y: 0.5533901, z: 7}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448848512}
@@ -1090,7 +1093,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
@@ -1214,8 +1217,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1379047972}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.837, y: 0.054, z: 0}
-  m_LocalScale: {x: 0.02879099, y: 0.06341404, z: 1}
+  m_LocalPosition: {x: 7.3041687, y: 0.5698794, z: 0}
+  m_LocalScale: {x: 0.29857394, y: 0.5533901, z: 7}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448848512}
@@ -1229,7 +1232,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
@@ -1334,8 +1337,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1764859095}
   m_LocalRotation: {x: -0, y: -0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0.359, y: 0.054, z: 0}
-  m_LocalScale: {x: 0.02879099, y: 0.06341404, z: 1}
+  m_LocalPosition: {x: 3.1328518, y: 0.569878, z: 0}
+  m_LocalScale: {x: 0.29857394, y: 0.5533901, z: 7}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 448848512}
@@ -1349,7 +1352,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
