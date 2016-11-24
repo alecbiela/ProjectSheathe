@@ -9,10 +9,12 @@ public class EnemyHandler : MonoBehaviour {
     System.Random rand = new System.Random();
     private GameObject Player;
     private Character PlayerScript;
+    public float speedMod; // Enemy and bullet speed modifier
     void Awake()
     {
         Player = GameObject.FindGameObjectWithTag("Player");
         PlayerScript = Player.GetComponent<Character>();
+        speedMod = 1f;
     }
 	
 	// Update is called once per frame

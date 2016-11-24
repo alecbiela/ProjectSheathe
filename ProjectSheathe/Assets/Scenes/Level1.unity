@@ -100,7 +100,7 @@ GameObject:
   - 4: {fileID: 85283377}
   - 212: {fileID: 85283379}
   - 61: {fileID: 85283378}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SliceHitbox3
   m_TagString: PlayerWeapon
   m_Icon: {fileID: 0}
@@ -220,7 +220,7 @@ GameObject:
   - 4: {fileID: 205711659}
   - 212: {fileID: 205711661}
   - 61: {fileID: 205711660}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BAHitbox3
   m_TagString: BAHitbox
   m_Icon: {fileID: 0}
@@ -328,9 +328,9 @@ GameObject:
   m_Component:
   - 4: {fileID: 408454245}
   - 114: {fileID: 408454244}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: EnemyHandler
-  m_TagString: Untagged
+  m_TagString: EnemyHandler
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -346,6 +346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9f00ede67e3a97a42b93cd937f8bbb3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speedMod: 0
 --- !u!4 &408454245
 Transform:
   m_ObjectHideFlags: 0
@@ -372,7 +373,7 @@ GameObject:
   - 114: {fileID: 448848515}
   - 50: {fileID: 448848514}
   - 61: {fileID: 448848516}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -446,7 +447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1b3353596775c941a3794dbfd3b018c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controllerType: Xbox360A
+  controllerType: Keyboard
 --- !u!50 &448848514
 Rigidbody2D:
   serializedVersion: 2
@@ -481,6 +482,7 @@ MonoBehaviour:
   maxSpeed: 7
   maxDashDist: 3
   dashRate: 0.5
+  overclockMod: 1
   slowMovement: 0
 --- !u!61 &448848516
 BoxCollider2D:
@@ -506,7 +508,7 @@ GameObject:
   - 4: {fileID: 473829076}
   - 212: {fileID: 473829078}
   - 61: {fileID: 473829077}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SliceHitbox6
   m_TagString: PlayerWeapon
   m_Icon: {fileID: 0}
@@ -583,7 +585,7 @@ GameObject:
   - 4: {fileID: 511746393}
   - 212: {fileID: 511746395}
   - 61: {fileID: 511746394}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BAHitbox2
   m_TagString: BAHitbox
   m_Icon: {fileID: 0}
@@ -703,7 +705,7 @@ GameObject:
   - 4: {fileID: 789895280}
   - 212: {fileID: 789895282}
   - 61: {fileID: 789895281}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SliceHitbox1
   m_TagString: PlayerWeapon
   m_Icon: {fileID: 0}
@@ -823,7 +825,7 @@ GameObject:
   - 4: {fileID: 963952820}
   - 212: {fileID: 963952822}
   - 61: {fileID: 963952821}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: DeflectHitbox
   m_TagString: DeflectHitbox
   m_Icon: {fileID: 0}
@@ -987,7 +989,7 @@ GameObject:
   - 4: {fileID: 1163517318}
   - 212: {fileID: 1163517320}
   - 61: {fileID: 1163517319}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BAHitbox1
   m_TagString: BAHitbox
   m_Icon: {fileID: 0}
@@ -1064,7 +1066,7 @@ GameObject:
   - 4: {fileID: 1175035179}
   - 212: {fileID: 1175035181}
   - 61: {fileID: 1175035180}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SliceHitbox4
   m_TagString: PlayerWeapon
   m_Icon: {fileID: 0}
@@ -1203,7 +1205,7 @@ GameObject:
   - 4: {fileID: 1379047973}
   - 212: {fileID: 1379047975}
   - 61: {fileID: 1379047974}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SliceHitbox5
   m_TagString: PlayerWeapon
   m_Icon: {fileID: 0}
@@ -1323,7 +1325,7 @@ GameObject:
   - 4: {fileID: 1764859096}
   - 212: {fileID: 1764859098}
   - 61: {fileID: 1764859097}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SliceHitbox2
   m_TagString: PlayerWeapon
   m_Icon: {fileID: 0}

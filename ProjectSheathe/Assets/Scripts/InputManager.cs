@@ -10,6 +10,7 @@ public class InputManager : MonoBehaviour {
     private bool[] inputFlags;
     private bool initialRTrigger = true; // True until trigger has been pressed, expressly for 360 on mac
     private bool initialLTrigger = true;
+    private bool overclockAxisInUse = false; // Toggle, not hold
     private char beforePriorPreviousLatestKey; // Nice
     private char priorPreviousLatestKey;
     private char previousLatestKey;
@@ -82,8 +83,19 @@ public class InputManager : MonoBehaviour {
 
         if (!inputFlags[4]) // Overclock
         {
-            if ((controllerType == "Xbox360B" || controllerType == "PS4B") && osType == 'w') inputFlags[4] = Input.GetAxis(inputs["Overclock"]) < 0;
-            else inputFlags[4] = Input.GetButton(inputs["Overclock"]);
+            if ((controllerType == "Xbox360B" || controllerType == "PS4B") && osType == 'w')
+            {
+                if (Input.GetAxis(inputs["Overclock"]) < 0) // This is the code for using getaxis the same way as getbuttondown
+                {
+                    if (overclockAxisInUse == false)
+                    {
+                        inputFlags[4] = Input.GetAxis(inputs["Overclock"]) < 0;
+                        overclockAxisInUse = true;
+                    }
+                }
+                else overclockAxisInUse = false;
+            }
+            else inputFlags[4] = Input.GetButtonDown(inputs["Overclock"]);
         }
 
         if (!inputFlags[5]) // Fire

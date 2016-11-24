@@ -4,6 +4,7 @@ using System.Collections;
 public class Enemy : MonoBehaviour {
     // Use this for initialization
     private GameObject Player;
+    private EnemyHandler Handler;
     private Vector3 vecToPlayer = new Vector3(0, 0, 0);
     private bool firing = false;
     private int timer = 0;
@@ -20,14 +21,19 @@ public class Enemy : MonoBehaviour {
     void Start () {
         Bullet = new GameObject();
         Player = GameObject.FindGameObjectWithTag("Player");
+        Handler = GameObject.FindGameObjectWithTag("EnemyHandler").GetComponent<EnemyHandler>();
         Bullet.AddComponent<SpriteRenderer>();
         Bullet.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Bullet");
         Bullet.AddComponent<BoxCollider2D>();
         Bullet.GetComponent<BoxCollider2D>().isTrigger = true;
         Bullet.AddComponent<Rigidbody2D>();
         Bullet.GetComponent<Rigidbody2D>().gravityScale = 0;
+        Bullet.tag = "Bullet";
+        Bullet.layer = 11; // Bullets
         Bullet.transform.SetParent(this.transform);
         Bullet.SetActive(false);
+        this.gameObject.tag = "Enemy";
+        this.gameObject.layer = 9; // Enemies
     }
 
     // Update is called once per frame
@@ -49,7 +55,7 @@ public class Enemy : MonoBehaviour {
             vecToPlayer = (Player.transform.position - this.transform.position);
             float angle = Mathf.Atan2(vecToPlayer.y, vecToPlayer.x) * Mathf.Rad2Deg;
             Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
-            this.transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * 0.9f); //Quaternion.LookRotation(this.transform.position - Player.transform.position);
+            this.transform.rotation = Quaternion.Slerp(transform.rotation, q, Handler.speedMod * Time.deltaTime * 0.9f); //Quaternion.LookRotation(this.transform.position - Player.transform.position);
             if (timer > 400) // fire first at 600 frames
             {
                 Fire(); //firing = true; // for purposes of this build, call Shoot here. After this build, when an enemy shoots will be determined by EnemyHandler.
@@ -82,7 +88,7 @@ public class Enemy : MonoBehaviour {
             active = true;
             this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
             Bullet.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            Vector3 temp = (Player.transform.position - this.transform.position).normalized * 5000 * Time.deltaTime;
+            Vector3 temp = (Player.transform.position - this.transform.position).normalized * 5000 * Time.deltaTime * Handler.speedMod;
             force = temp;
             Bullet.transform.position = this.transform.position;
             firing = false;

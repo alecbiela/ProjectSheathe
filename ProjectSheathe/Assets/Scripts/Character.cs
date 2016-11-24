@@ -6,11 +6,13 @@ public class Character : MonoBehaviour {
     public GameObject[] sliceHitBoxes;//setting all hitboxes to public, so enemyhandler can have access to them -Simon
     public GameObject[] baHitBoxes;//why are these called bahitboxes? basic attack?
     public GameObject deflectHitBox;
+    private EnemyHandler enemyHandler;
 
     Rigidbody2D rigidBody;
     [SerializeField] private float maxSpeed = 8f; // The fastest the player can travel in any direction
     [SerializeField] private float maxDashDist = 14f; // Uncanceled dash distance
     [SerializeField] private float dashRate = 1f; // Dash movement per frame
+    [SerializeField] private float overclockMod = .5f; // Speed modifier for overcock
     const float SLICE_TIMESTEP = 0.3f;  //the time needed to activate each "Level" of slice hitbox
 
     //# of frames in animation / 60
@@ -24,6 +26,10 @@ public class Character : MonoBehaviour {
     private const float DEFLECT_ACTIVE = 0.5f;
     private const float DEFLECT_AFTER = 0.25f;
     private const float DASH_CD = .5833f; // Cooldown
+    private const float OVERCLOCK_PRELOAD = 0.066f;
+    private const float OVERCLOCK_AFTER = 0.05f;
+    private const float OVERCLOCK_CD = 0.25f;
+
 
     private float sliceHoldTime;
     private float sliceTimer;
@@ -31,6 +37,8 @@ public class Character : MonoBehaviour {
     private float deflectTimer;
     private float currDashDist; // Currently traveled distance of the dash
     private float dashCooldown; // Cooldown timer
+    private float overclockCooldown;
+    private float overclockTimer; // Times startup and recovery for overclock
 
     private int sliceBoxes;
     public bool slowMovement;
@@ -41,26 +49,32 @@ public class Character : MonoBehaviour {
     public bool Deflecting { get; private set; }
     public bool Attacking { get; private set; }
     public bool Dashing { get; private set; }
+    public bool Overclocking { get; private set; }
     public bool[] InputFlags { get { return inputFlags; } set { inputFlags = value; } }
 
     //private bools for key pressed, to prevent simultaneous inputs
     private bool sliceState;
     private bool deflectState;
     private bool baState;
+    private bool overclockState;
 
     private void Awake()
     {
         rigidBody = GetComponent<Rigidbody2D>();
+        enemyHandler = GameObject.FindGameObjectWithTag("EnemyHandler").GetComponent<EnemyHandler>();
         sliceHoldTime = 0;
         sliceTimer = 0;
         baTimer = 0;
         deflectTimer = 0;
         currDashDist = 0;
         dashCooldown = 0;
+        overclockCooldown = -42;
+        Overclocking = false;
         Dashing = false;
         Slicing = false; // Actually actively slicing
         sliceState = false; // Includes startup/charge and recovery frames
         deflectState = false;
+        overclockState = false;
         baState = false;
         Attacking = false;
         Deflecting = false;
@@ -164,6 +178,19 @@ public class Character : MonoBehaviour {
                     case 3: // Interacting
                         break;
                     case 4: // Overclocking
+                        if (!Overclocking && overclockCooldown <= 0)
+                        {
+                            Overclocking = true;
+                            overclockTimer = OVERCLOCK_PRELOAD;
+                            overclockState = true;
+                            this.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+                        }
+                        else if (Overclocking)
+                        {
+                            Overclocking = false;
+                            overclockTimer = OVERCLOCK_AFTER;
+                            this.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
+                        }
                         break;
                     case 5: // Firing
                         break;
@@ -286,6 +313,29 @@ public class Character : MonoBehaviour {
         if (!Dashing && dashCooldown > 0) // Increment dash cooldown based on delta time
         {
             dashCooldown -= Time.deltaTime;
+        }
+
+        if (overclockTimer >= 0)
+        {
+            overclockTimer -= Time.deltaTime;
+        }
+        else if (Overclocking && overclockTimer <= 0 && overclockTimer > -42) // Startup frames
+        {
+            Debug.Log("ZA WARUDO");
+            overclockTimer = -42;
+            enemyHandler.speedMod -= overclockMod; // Slow enemies
+        }
+        else if (!Overclocking && overclockTimer <= 0 && overclockTimer > -42 && overclockState) // Ending frames
+        {
+            Debug.Log("WRYYYYYY");
+            overclockTimer = -42; // Set timer to avoid 0 based screw ups
+            overclockState = false;
+            enemyHandler.speedMod += overclockMod; // Respeed enemies
+        }
+
+        if (!Overclocking && overclockCooldown > 0) // Increment oveclock cooldown
+        {
+            overclockCooldown -= Time.deltaTime;
         }
 
         // Un-flag any abilities that are not on a timer, allowing the player to perform other actions
