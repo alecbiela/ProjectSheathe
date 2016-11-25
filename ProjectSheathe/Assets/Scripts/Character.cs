@@ -1,18 +1,23 @@
 using UnityEngine;
 using System.Collections;
 
-public class Character : MonoBehaviour {
+public class Character : MonoBehaviour
+{
 
     public GameObject[] sliceHitBoxes;//setting all hitboxes to public, so enemyhandler can have access to them -Simon
     public GameObject[] baHitBoxes;//why are these called bahitboxes? basic attack?
     public GameObject deflectHitBox;
-    private EnemyHandler enemyHandler;
+    private EncounterManager enemyHandler;
 
     Rigidbody2D rigidBody;
-    [SerializeField] private float maxSpeed = 8f; // The fastest the player can travel in any direction
-    [SerializeField] private float maxDashDist = 14f; // Uncanceled dash distance
-    [SerializeField] private float dashRate = 1f; // Dash movement per frame
-    [SerializeField] private float overclockMod = .5f; // Speed modifier for overcock
+    [SerializeField]
+    private float maxSpeed = 8f; // The fastest the player can travel in any direction
+    [SerializeField]
+    private float maxDashDist = 14f; // Uncanceled dash distance
+    [SerializeField]
+    private float dashRate = 1f; // Dash movement per frame
+    [SerializeField]
+    public float overclockMod { get; private set; } // Speed modifier for overcock
     const float SLICE_TIMESTEP = 0.3f;  //the time needed to activate each "Level" of slice hitbox
 
     //# of frames in animation / 60
@@ -27,8 +32,9 @@ public class Character : MonoBehaviour {
     private const float DEFLECT_AFTER = 0.25f;
     private const float DASH_CD = .5833f; // Cooldown
     private const float OVERCLOCK_PRELOAD = 0.066f;
+    // Overclock needs active frames
     private const float OVERCLOCK_AFTER = 0.05f;
-    private const float OVERCLOCK_CD = 0.25f;
+    private const float OVERCLOCK_CD = .25f; // cooldown should be around 20 seconds
 
 
     private float sliceHoldTime;
@@ -39,6 +45,7 @@ public class Character : MonoBehaviour {
     private float dashCooldown; // Cooldown timer
     private float overclockCooldown;
     private float overclockTimer; // Times startup and recovery for overclock
+    private float oldSpeed;
 
     private int sliceBoxes;
     public bool slowMovement;
@@ -58,10 +65,16 @@ public class Character : MonoBehaviour {
     private bool baState;
     private bool overclockState;
 
+    [SerializeField] public int health;
+    private bool hitRecently; // variable for future use with attacks that persist in the player's hurtbox
+    public bool playerHit; // variable that tells the encounter manager the player has been hit
+    public bool killStunnedEnemies;
+    public int score;
+
     private void Awake()
     {
         rigidBody = GetComponent<Rigidbody2D>();
-        enemyHandler = GameObject.FindGameObjectWithTag("EnemyHandler").GetComponent<EnemyHandler>();
+        enemyHandler = GameObject.FindGameObjectWithTag("EncounterManager").GetComponent<EncounterManager>();
         sliceHoldTime = 0;
         sliceTimer = 0;
         baTimer = 0;
@@ -69,6 +82,7 @@ public class Character : MonoBehaviour {
         currDashDist = 0;
         dashCooldown = 0;
         overclockCooldown = -42;
+        overclockMod = .7f;
         Overclocking = false;
         Dashing = false;
         Slicing = false; // Actually actively slicing
@@ -81,18 +95,22 @@ public class Character : MonoBehaviour {
         sliceBoxes = 0;
         slowMovement = false;
         inputFlags = new bool[] { false, false, false, false, false, false, false }; // INPUT FLAGS, IN ORDER: SLICE[0], ATTACK[1], DEFLECT[2], INTERACT[6], OVERCLOCK[4], FIRE[5], DASH[6]
+        health = 7;
+        playerHit = false;
+        killStunnedEnemies = false;
+        score = 0;
 
         // Populate various arrays of gameobjects with their hitboxes
         // Add by name, so we know which is which
         sliceHitBoxes = new GameObject[6];
-        for(int i=0; i<6; i++)
+        for (int i = 0; i < 6; i++)
         {
             sliceHitBoxes[i] = GameObject.Find("SliceHitbox" + (i + 1));
             sliceHitBoxes[i].gameObject.SetActive(false);
         }
 
         baHitBoxes = new GameObject[3];
-        for(int i=0; i<3; i++)
+        for (int i = 0; i < 3; i++)
         {
             baHitBoxes[i] = GameObject.Find("BAHitbox" + (i + 1));
             baHitBoxes[i].gameObject.SetActive(false);
@@ -104,7 +122,7 @@ public class Character : MonoBehaviour {
 
     public void controllerMove(float hMove, float vMove, float hLook, float vLook) // Movement and rotation with controller
     {
-        if(!Attacking && !Deflecting && !Slicing)   //only move when they are not doing these actions
+        if (!Attacking && !Deflecting && !Slicing)   //only move when they are not doing these actions
             rigidBody.velocity = new Vector2(hMove * maxSpeed, vMove * maxSpeed);
         if ((hLook != 0 || vLook != 0) && !Attacking && !Slicing)
         {
@@ -120,7 +138,7 @@ public class Character : MonoBehaviour {
 
     public void keyboardMove(float hMove, float vMove, Vector3 mousePos) // Movement and rotation with keyboard and mouse
     {
-        if(!Attacking && !Deflecting && !Slicing)   //only move when they are not doing these actions
+        if (!Attacking && !Deflecting && !Slicing)   //only move when they are not doing these actions
             rigidBody.velocity = new Vector2(hMove * maxSpeed, vMove * maxSpeed);
         Vector3 playerPos = Camera.main.WorldToScreenPoint(rigidBody.transform.position);
         mousePos.x = mousePos.x - playerPos.x;
@@ -138,22 +156,22 @@ public class Character : MonoBehaviour {
         ProcessInput();
         ExecuteTimedActions();
     }
-    
+
     private void ProcessInput() // Processes the current input that the character has
     {
-        for(int i=0; i<inputFlags.Length; i++)
+        for (int i = 0; i < inputFlags.Length; i++)
         {
-            if(i == 0 && sliceHoldTime > 0 && !inputFlags[0]) // Checks for slice release
+            if (i == 0 && sliceHoldTime > 0 && !inputFlags[0]) // Checks for slice release
             {
                 if (Deflecting || Attacking || Slicing) continue;
 
                 sliceBoxes = Mathf.FloorToInt(sliceHoldTime / SLICE_TIMESTEP);
                 if (sliceBoxes > 5) sliceBoxes = 5;
-                    
+
                 sliceTimer = SLICE_PRELOAD + SLICE_ACTIVE + SLICE_AFTER; // Start timer for slice mechanic
                 sliceHoldTime = 0;
             }
-            if(inputFlags[i])
+            if (inputFlags[i])
             {
                 switch (i)
                 {
@@ -183,7 +201,7 @@ public class Character : MonoBehaviour {
                             Overclocking = true;
                             overclockTimer = OVERCLOCK_PRELOAD;
                             overclockState = true;
-                            this.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+                            this.gameObject.GetComponent<SpriteRenderer>().color = Color.yellow;
                         }
                         else if (Overclocking)
                         {
@@ -235,7 +253,7 @@ public class Character : MonoBehaviour {
 
             if (!inputFlags[6] && Dashing)
             {
-                Debug.Log("Release");
+                //Debug.Log("Release");
                 Dashing = false;
                 currDashDist = 0;
                 dashCooldown = DASH_CD;
@@ -243,26 +261,26 @@ public class Character : MonoBehaviour {
             }
         }
     }
-    
+
     private void ExecuteTimedActions() // Executes any time-based actions (slicing, dashing, basic attacking, deflecting)
     {
         // Work the timers
         sliceTimer = sliceTimer <= 0 ? 0 : sliceTimer - Time.deltaTime; // If sT <= 0 then sT = 0, else = sT-dT
         deflectTimer = deflectTimer <= 0 ? 0 : deflectTimer - Time.deltaTime;
         baTimer = baTimer <= 0 ? 0 : baTimer - Time.deltaTime;
-        
+
         if (baTimer <= BASIC_AFTER) // If attack is over, hitboxes go away
         {
             baHitBoxes[2].gameObject.SetActive(false);
         }
         else if (baTimer <= (BASIC_ACTIVE + BASIC_AFTER)) // Otherwise, attack (in a basic fashion)
         {
-            if(baTimer <= (BASIC_ACTIVE/3) + BASIC_AFTER) // Activating hitboxes based on where we are in the anim
+            if (baTimer <= (BASIC_ACTIVE / 3) + BASIC_AFTER) // Activating hitboxes based on where we are in the anim
             {
                 baHitBoxes[2].gameObject.SetActive(true);
                 baHitBoxes[1].gameObject.SetActive(false);
             }
-            else if(baTimer <= (2*BASIC_ACTIVE/3) + BASIC_AFTER)
+            else if (baTimer <= (2 * BASIC_ACTIVE / 3) + BASIC_AFTER)
             {
                 baHitBoxes[1].gameObject.SetActive(true);
                 baHitBoxes[0].gameObject.SetActive(false);
@@ -274,7 +292,7 @@ public class Character : MonoBehaviour {
 
             Attacking = true;
         }
-        
+
         if (sliceTimer <= SLICE_AFTER) // If slice is over, hitboxes go away
         {
             for (int i = 0; i < 6; i++)
@@ -285,7 +303,7 @@ public class Character : MonoBehaviour {
         else if (sliceTimer <= (SLICE_ACTIVE + SLICE_AFTER)) // Otherwise, slice
         {
             sliceHitBoxes[0].gameObject.SetActive(true); // Always activate the first box
-            
+
             for (int i = 0; i < sliceBoxes; i++) // Additional hitboxes
             {
                 sliceHitBoxes[i + 1].gameObject.SetActive(true);
@@ -297,7 +315,7 @@ public class Character : MonoBehaviour {
             slowMovement = false;
             //Debug.Log("Reset speed");
         }
-        
+
         if (deflectTimer <= DEFLECT_AFTER) // If deflect is over, hitbox goes away
         {
             deflectHitBox.gameObject.SetActive(false);
@@ -318,19 +336,29 @@ public class Character : MonoBehaviour {
         if (overclockTimer >= 0)
         {
             overclockTimer -= Time.deltaTime;
+            //Debug.Log("Doing something");
         }
         else if (Overclocking && overclockTimer <= 0 && overclockTimer > -42) // Startup frames
         {
-            Debug.Log("ZA WARUDO");
+            //Debug.Log("ZA WARUDO");
             overclockTimer = -42;
-            enemyHandler.speedMod -= overclockMod; // Slow enemies
+            //enemyHandler.speedMod = enemyHandler.slowSpeed; // Slow enemies
+            enemyHandler.speedMod -= overclockMod;
+            Debug.Log("Slow");
+            killStunnedEnemies = true;
         }
         else if (!Overclocking && overclockTimer <= 0 && overclockTimer > -42 && overclockState) // Ending frames
         {
-            Debug.Log("WRYYYYYY");
+            //Debug.Log("WRYYYYYY");
             overclockTimer = -42; // Set timer to avoid 0 based screw ups
+            //enemyHandler.speedMod = enemyHandler.baseSpeed; // Respeed enemies
+            enemyHandler.speedMod += overclockMod;
+            if(enemyHandler.speedMod < 1)
+            {
+                enemyHandler.speedMod = enemyHandler.baseSpeed;
+            }
             overclockState = false;
-            enemyHandler.speedMod += overclockMod; // Respeed enemies
+            Debug.Log("Respeed");
         }
 
         if (!Overclocking && overclockCooldown > 0) // Increment oveclock cooldown
@@ -360,5 +388,26 @@ public class Character : MonoBehaviour {
             Attacking = false;
             baState = false;
         }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "Bullet")
+        {
+            health--;
+            //Debug.Log("Got em. Health: " + health);
+            //this.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            if (health <= 0)
+            {
+                health = 0;
+                //Debug.Log("GAME OVER");
+            }
+            playerHit = true;
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+
     }
 }

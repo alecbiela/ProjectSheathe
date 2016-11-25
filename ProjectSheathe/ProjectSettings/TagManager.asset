@@ -9,7 +9,7 @@ TagManager:
   - DeflectHitbox
   - PlayerWeapon
   - Enemy
-  - EnemyHandler
+  - EncounterManager
   - Bullet
   layers:
   - Default
