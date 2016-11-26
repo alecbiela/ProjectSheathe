@@ -18,14 +18,14 @@ public class Character : MonoBehaviour
     private float dashRate = 1f; // Dash movement per frame
     [SerializeField]
     public float overclockMod { get; private set; } // Speed modifier for overcock
-    const float SLICE_TIMESTEP = 0.3f;  //the time needed to activate each "Level" of slice hitbox
+    const float SLICE_TIMESTEP = 0.5f;  //the time needed to activate each "Level" of slice hitbox
 
     //# of frames in animation / 60
     private const float SLICE_PRELOAD = 0.166f; // start-up frames
-    private const float SLICE_ACTIVE = 0.25f; // active frames
+    private const float SLICE_ACTIVE = 0.11666f; // active frames // used to be .25
     private const float SLICE_AFTER = 0.166f; // recovery frames
     private const float BASIC_PRELOAD = 0.083f;
-    private const float BASIC_ACTIVE = 0.2f;
+    private const float BASIC_ACTIVE = 0.133333f; // used to be .2
     private const float BASIC_AFTER = 0.083f;
     private const float DEFLECT_PRELOAD = 0.066f;
     private const float DEFLECT_ACTIVE = 0.5f;
@@ -221,7 +221,7 @@ public class Character : MonoBehaviour
                             dashCooldown = DASH_CD;
                             this.transform.GetComponent<SpriteRenderer>().color = Color.white;
                         }
-                        else if (Slicing || baState || deflectState) continue; // Do not perform dash while doing other actions //sliceState ||
+                        else if (Slicing || baState || deflectState) continue; // Do not perform dash while doing other actions
                         else
                         {
                             if (currDashDist == 0 && dashCooldown <= 0 && rigidBody.velocity != Vector2.zero) // Only dash if moving
@@ -312,6 +312,7 @@ public class Character : MonoBehaviour
             Slicing = true;
             maxSpeed = 7f;
             dashRate = .5f;
+            maxDashDist = 3;
             slowMovement = false;
             //Debug.Log("Reset speed");
         }
@@ -376,8 +377,9 @@ public class Character : MonoBehaviour
         {
             if (slowMovement == true)
             {
-                maxSpeed = 4f;
+                maxSpeed = 2f;
                 dashRate = .3f;
+                maxDashDist = 2;
                 //Debug.Log("Lowered speed");
             }
             Slicing = false;
@@ -395,8 +397,9 @@ public class Character : MonoBehaviour
         if (other.tag == "Bullet")
         {
             health--;
-            //Debug.Log("Got em. Health: " + health);
-            //this.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            Cancel(); // ends active attacks when hit. This may need to be commented out if we can't get the animations to stop too
+                      //Debug.Log("Got em. Health: " + health);
+                      //this.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
             if (health <= 0)
             {
                 health = 0;
@@ -404,10 +407,17 @@ public class Character : MonoBehaviour
             }
             playerHit = true;
         }
+
     }
 
-    void OnTriggerExit2D(Collider2D other)
+    void Cancel()
     {
+        baTimer = 0;
+        baHitBoxes[0].gameObject.SetActive(false);
+        baHitBoxes[1].gameObject.SetActive(false);
+        baHitBoxes[2].gameObject.SetActive(false);
 
+        sliceTimer = 0;
     }
+    
 }
