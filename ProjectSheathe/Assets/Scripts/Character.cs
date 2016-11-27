@@ -10,14 +10,10 @@ public class Character : MonoBehaviour
     private EncounterManager enemyHandler;
 
     Rigidbody2D rigidBody;
-    [SerializeField]
-    private float maxSpeed = 8f; // The fastest the player can travel in any direction
-    [SerializeField]
-    private float maxDashDist = 14f; // Uncanceled dash distance
-    [SerializeField]
-    private float dashRate = 1f; // Dash movement per frame
-    [SerializeField]
-    public float overclockMod { get; private set; } // Speed modifier for overcock
+    [SerializeField] private float maxSpeed = 8f; // The fastest the player can travel in any direction
+    [SerializeField] private float maxDashDist = 14f; // Uncanceled dash distance
+    [SerializeField] private float dashRate = 1f; // Dash movement per frame
+    [SerializeField] public float overclockMod { get; private set; } // Speed modifier for overcock
     const float SLICE_TIMESTEP = 0.5f;  //the time needed to activate each "Level" of slice hitbox
 
     //# of frames in animation / 60
@@ -32,19 +28,19 @@ public class Character : MonoBehaviour
     private const float DEFLECT_AFTER = 0.25f;
     private const float DASH_CD = .5833f; // Cooldown
     private const float OVERCLOCK_PRELOAD = 0.066f;
-    // Overclock needs active frames
+    private const float OVERCLOCK_ACTIVE = 3f; // Overclock needs active frames
     private const float OVERCLOCK_AFTER = 0.05f;
     private const float OVERCLOCK_CD = .25f; // cooldown should be around 20 seconds
 
 
     private float sliceHoldTime;
-    private float sliceTimer;
+    private float sliceTimer; // Timers for frames
     private float baTimer;
     private float deflectTimer;
+    private float overclockTimer;
     private float currDashDist; // Currently traveled distance of the dash
     private float dashCooldown; // Cooldown timer
     private float overclockCooldown;
-    private float overclockTimer; // Times startup and recovery for overclock
     private float oldSpeed;
 
     private int sliceBoxes;
@@ -64,6 +60,7 @@ public class Character : MonoBehaviour
     private bool deflectState;
     private bool baState;
     private bool overclockState;
+    private bool timeSlow; // A third variable is needed to separate startup from ending in overclock
 
     [SerializeField] public int health;
     private bool hitRecently; // variable for future use with attacks that persist in the player's hurtbox
@@ -79,10 +76,12 @@ public class Character : MonoBehaviour
         sliceTimer = 0;
         baTimer = 0;
         deflectTimer = 0;
+        overclockTimer = 0;
         currDashDist = 0;
         dashCooldown = 0;
         overclockCooldown = -42;
         overclockMod = .7f;
+        timeSlow = false;
         Overclocking = false;
         Dashing = false;
         Slicing = false; // Actually actively slicing
@@ -196,18 +195,16 @@ public class Character : MonoBehaviour
                     case 3: // Interacting
                         break;
                     case 4: // Overclocking
-                        if (!Overclocking && overclockCooldown <= 0)
+                        if (!overclockState && overclockCooldown <= 0)
                         {
-                            Overclocking = true;
-                            overclockTimer = OVERCLOCK_PRELOAD;
+                            Debug.Log("Press");
                             overclockState = true;
-                            this.gameObject.GetComponent<SpriteRenderer>().color = Color.yellow;
+                            overclockTimer = OVERCLOCK_PRELOAD + OVERCLOCK_ACTIVE + OVERCLOCK_AFTER;
                         }
-                        else if (Overclocking)
+                        else if (overclockState)
                         {
+                            Debug.Log("Unpress");
                             Overclocking = false;
-                            overclockTimer = OVERCLOCK_AFTER;
-                            this.gameObject.GetComponent<SpriteRenderer>().color = Color.white;
                         }
                         break;
                     case 5: // Firing
@@ -268,6 +265,7 @@ public class Character : MonoBehaviour
         sliceTimer = sliceTimer <= 0 ? 0 : sliceTimer - Time.deltaTime; // If sT <= 0 then sT = 0, else = sT-dT
         deflectTimer = deflectTimer <= 0 ? 0 : deflectTimer - Time.deltaTime;
         baTimer = baTimer <= 0 ? 0 : baTimer - Time.deltaTime;
+        overclockTimer = overclockTimer <= 0 ? 0 : overclockTimer - Time.deltaTime;
 
         if (baTimer <= BASIC_AFTER) // If attack is over, hitboxes go away
         {
@@ -334,32 +332,26 @@ public class Character : MonoBehaviour
             dashCooldown -= Time.deltaTime;
         }
 
-        if (overclockTimer >= 0)
+        if (overclockState && !Overclocking && !timeSlow) // On activation
         {
-            overclockTimer -= Time.deltaTime;
-            //Debug.Log("Doing something");
-        }
-        else if (Overclocking && overclockTimer <= 0 && overclockTimer > -42) // Startup frames
-        {
-            //Debug.Log("ZA WARUDO");
-            overclockTimer = -42;
-            //enemyHandler.speedMod = enemyHandler.slowSpeed; // Slow enemies
-            enemyHandler.speedMod -= overclockMod;
-            Debug.Log("Slow");
+            Overclocking = true;
+            timeSlow = true;
+            enemyHandler.speedMod -= overclockMod; // Slow enemies
             killStunnedEnemies = true;
+            Debug.Log("ZA WARUDO: " + enemyHandler.speedMod);
         }
-        else if (!Overclocking && overclockTimer <= 0 && overclockTimer > -42 && overclockState) // Ending frames
+        else if ((!Overclocking && timeSlow) || (Overclocking && overclockTimer <= 0 && timeSlow)) // On end trigger or after ending frames
         {
-            //Debug.Log("WRYYYYYY");
-            overclockTimer = -42; // Set timer to avoid 0 based screw ups
-            //enemyHandler.speedMod = enemyHandler.baseSpeed; // Respeed enemies
-            enemyHandler.speedMod += overclockMod;
-            if(enemyHandler.speedMod < 1)
-            {
-                enemyHandler.speedMod = enemyHandler.baseSpeed;
-            }
+            enemyHandler.speedMod += overclockMod;// Respeed enemies
+            //if (enemyHandler.speedMod < 1)
+            //{
+            //    enemyHandler.speedMod = enemyHandler.baseSpeed;
+            //}
+            timeSlow = false;
+            Overclocking = false;
             overclockState = false;
-            Debug.Log("Respeed");
+            overclockTimer = 0;
+            Debug.Log("WRYYYYYY: " + enemyHandler.speedMod);
         }
 
         if (!Overclocking && overclockCooldown > 0) // Increment oveclock cooldown

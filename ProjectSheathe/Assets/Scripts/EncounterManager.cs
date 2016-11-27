@@ -2,14 +2,15 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class EncounterManager : MonoBehaviour {
+public class EncounterManager : MonoBehaviour
+{
 
     List<GameObject> Enemies = new List<GameObject>();
     // Use this for initialization
     System.Random rand = new System.Random();
     private GameObject Player;
     private Character PlayerScript;
-    public float speedMod; // Enemy and bullet speed modifier
+    [HideInInspector] public float speedMod; // Enemy and bullet speed modifier
     public float baseSpeed { get; private set; }
     public float slowSpeed { get; private set; }
     private int maxEnemyNumber;
@@ -182,9 +183,9 @@ public class EncounterManager : MonoBehaviour {
         // faster enemies
         if (PlayerScript.Overclocking == false && speedMod < 2)
         {
-            //speedMod = speedMod + .1f * Mathf.Floor(PlayerScript.score / 800);
-            //baseSpeed = speedMod;
-            //slowSpeed = baseSpeed - PlayerScript.overclockMod;
+            speedMod = speedMod + .1f * Mathf.Floor(PlayerScript.score / 800);
+            baseSpeed = speedMod;
+            slowSpeed = baseSpeed - PlayerScript.overclockMod;
         }
         if (speedMod > 1.8)
         {
@@ -251,7 +252,7 @@ public class EncounterManager : MonoBehaviour {
         if (time <= 0)
         {
             int attackPattern = rand2.Next(0, 0); // choose attack pattern
-            switch(attackPattern)
+            switch (attackPattern)
             {
                 case 0: // Single Attack
                     {
@@ -264,7 +265,7 @@ public class EncounterManager : MonoBehaviour {
                         }
 
                         Enemies[randomEnemy].GetComponent<Enemy>().Fire();
-                        Debug.Log("Fire");
+                        //Debug.Log("Fire");
                         break;
                     }
             }
