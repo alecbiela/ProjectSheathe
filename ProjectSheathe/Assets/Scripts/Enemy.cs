@@ -10,35 +10,20 @@ public class Enemy : MonoBehaviour {
     private int timer = 0;
     private const float FLASH_TIME = 1.1666f; // how long the enemy flashes for before they shoot
     private float currFlashTime = FLASH_TIME;
-    private bool active = false;
     private System.Random rand = new System.Random();
     private GameObject deflectHitBox;
     public int health;
     public bool stunned; // if enemy is stunned
     public bool secondWind; // if enemy has received a second wind by having any enemy hit a player
-    public GameObject Bullet;
+    public GameObject BulletPrefab;
     public Vector3 force = new Vector3(0, 0, 0);
-    public bool deflected = false;
     public bool hitRecently;
     private bool trackPlayer;
 
 
     void Start() {
-        Bullet = new GameObject();
         Player = GameObject.FindGameObjectWithTag("Player");
         Handler = GameObject.FindGameObjectWithTag("EncounterManager").GetComponent<EncounterManager>();
-        Bullet.AddComponent<SpriteRenderer>();
-        Bullet.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Bullet");
-        Bullet.AddComponent<BoxCollider2D>();
-        Bullet.GetComponent<BoxCollider2D>().isTrigger = true;
-        Bullet.AddComponent<Rigidbody2D>();
-        Bullet.GetComponent<Rigidbody2D>().gravityScale = 0;
-        Bullet.tag = "Bullet";
-        Bullet.layer = 11; // Bullets
-        Bullet.transform.SetParent(this.transform);
-        Bullet.SetActive(false);
-        this.gameObject.tag = "Enemy";
-        this.gameObject.layer = 9; // Enemies
         health = 3;
         stunned = false;
         secondWind = false;
@@ -65,24 +50,16 @@ public class Enemy : MonoBehaviour {
             this.GetComponent<SpriteRenderer>().color = Color.white;
             // add code here to give the enemy class it's special attributes if they have been lost. Like if the shield enemy has lost their shield, give it back.
         }
-        
-        if (active)
-        {
-            Bullet.GetComponent<Rigidbody2D>().AddForce(force);
-            if (Bullet.GetComponent<BoxCollider2D>().IsTouching(Player.GetComponent<BoxCollider2D>()))
-            {
-                Bullet.SetActive(false);
-                active = false;
-                //Bullet.GetComponent<SpriteRenderer>
-            }            
-        }/**/
+
+        //Looking for bullet movement?  It's in the bullet script now!
 
         if (!stunned)
         {
             //++timer;
+            //if the enemy is currently monitoring the player
             if (trackPlayer)
-            {//tracks the player
-                vecToPlayer = (Player.transform.position - this.transform.position);
+            {
+                vecToPlayer = (Player.transform.position - this.transform.position);    //this is correct - the bullet fires on this path and it's directly into the character
                 float angle = Mathf.Atan2(vecToPlayer.y, vecToPlayer.x) * Mathf.Rad2Deg;
                 Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
                 this.transform.rotation = Quaternion.Slerp(transform.rotation, q, Handler.speedMod * Time.deltaTime * 0.9f); //Quaternion.LookRotation(this.transform.position - Player.transform.position);
@@ -95,6 +72,8 @@ public class Enemy : MonoBehaviour {
             }
         }
     }
+
+    //Called when the enemy is going to fire a bullet
     public void Fire()
     {
         timer++;
@@ -118,31 +97,66 @@ public class Enemy : MonoBehaviour {
             this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255); // white
         }
 
-        //if(timer >=100)
+        //we fire the actual bullet here
         if (currFlashTime <= 0)
         {
             //Debug.Log("Bullet fired");
-            Bullet.SetActive(true);
-            active = true;
+
+            //instantiate a new bullet prefab at this location
+            GameObject newBullet = (GameObject)Instantiate(BulletPrefab);
+            newBullet.GetComponent<Bullet>().Initialize(this.transform.position, vecToPlayer);  //uses the enemy's last known location of player
+
+            //after attacking, reset color and flags
             this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
-            Bullet.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            Vector3 temp = (Player.transform.position - this.transform.position).normalized * 4000 * Time.deltaTime * Handler.speedMod;
-            force = temp;
-            Bullet.transform.position = this.transform.position;
             attacking = false;
             trackPlayer = true;
+
             timer = rand.Next(0, 300); //used to stagger each enemy's firing time because they're all spawned at the same time
             currFlashTime = FLASH_TIME;
-            deflected = false;
             timer = 0;
         }
     }
-    public bool Deflected()
+
+    //Handles collision of enemy with other objects
+    void OnTriggerEnter2D(Collider2D col)
     {
-        if (deflected && Bullet.GetComponent<BoxCollider2D>().IsTouching(this.GetComponent<BoxCollider2D>()))
+        //if a bullet is hitting it
+        if(col.tag == "Bullet")
         {
-            return true;
+            //Debug.Log("Bullet is hitting enemy now");
+            if(col.gameObject.GetComponent<Bullet>().CanHurtEnemies)
+            {
+                //destroy the bullet and subtract enemy health or do whatever you gotta do
+                health--;
+                Destroy(col.gameObject);
+            }
         }
-        return false;
+
+        //if it's a slice hitbox
+        if (col.tag.Contains("SliceHitbox"))
+        {
+            Debug.Log("Hit by slice");
+
+            if (!this.hitRecently)
+            {
+                health--;
+                this.hitRecently = true;
+            }
+
+            return;
+        }
+
+        //if it's a basic attack hitbox
+        if(col.tag.Contains("BAHitbox"))
+        {
+            if(!this.hitRecently)
+            {
+                if (Player.GetComponent<Character>().Overclocking) health -= 2;
+                else health--;
+                this.hitRecently = true;
+            }
+
+            return;
+        }
     }
 }

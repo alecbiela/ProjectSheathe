@@ -70,7 +70,7 @@ public class Character : MonoBehaviour
 
     private void Awake()
     {
-        rigidBody = GetComponent<Rigidbody2D>();
+        rigidBody = this.GetComponentInParent<Rigidbody2D>();
         enemyHandler = GameObject.FindGameObjectWithTag("EncounterManager").GetComponent<EncounterManager>();
         sliceHoldTime = 0;
         sliceTimer = 0;
@@ -388,6 +388,7 @@ public class Character : MonoBehaviour
     {
         if (other.tag == "Bullet")
         {
+            //Debug.Log("Player got hit");
             health--;
             Cancel(); // ends active attacks when hit. This may need to be commented out if we can't get the animations to stop too
                       //Debug.Log("Got em. Health: " + health);
@@ -398,9 +399,14 @@ public class Character : MonoBehaviour
                 //Debug.Log("GAME OVER");
             }
             playerHit = true;
+
+            //get rid of the bullet that was fired
+            Destroy(other.gameObject);
+            return;
         }
 
     }
+
 
     void Cancel()
     {

@@ -11,6 +11,8 @@ TagManager:
   - Enemy
   - EncounterManager
   - Bullet
+  - Boundary
+  - PlayerHitbox
   layers:
   - Default
   - TransparentFX

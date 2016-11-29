@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class EncounterManager : MonoBehaviour
 {
-
+    public GameObject enemyPrefab;
     List<GameObject> Enemies = new List<GameObject>();
     // Use this for initialization
     System.Random rand = new System.Random();
@@ -29,7 +29,7 @@ public class EncounterManager : MonoBehaviour
         baseSpeed = speedMod;
         //slowSpeed = baseSpeed - PlayerScript.overclockMod;
         slowSpeed = .3f;
-        Debug.Log("done");
+        //Debug.Log("done");
         maxEnemyNumber = BASE_ENEMY_COUNT;
         extraEnemies = 0;
     }
@@ -41,80 +41,10 @@ public class EncounterManager : MonoBehaviour
         DynamicDifficulty();
         ManageAttacks();
 
-        if (PlayerScript.Slicing)
-        {
-            for (int i = 0; i < Enemies.Count; i++)
-            {
-                for (int j = 0; j < PlayerScript.sliceHitBoxes.Length; j++)
-                {
-                    if (Enemies[i].GetComponent<BoxCollider2D>().IsTouching(
-                        PlayerScript.sliceHitBoxes[j].GetComponent<BoxCollider2D>()))
-                    {
-                        if (Enemies[i].GetComponent<Enemy>().hitRecently == false)
-                        {
-                            Enemies[i].GetComponent<Enemy>().health--;
-                        }
-                        //--i;
-                        Enemies[i].GetComponent<Enemy>().hitRecently = true;
-                        break;
-                    }
-                }
-            }
-        }
-        else if (PlayerScript.Attacking)
-        {
-            for (int i = 0; i < Enemies.Count; i++)
-            {
-                for (int j = 0; j < PlayerScript.baHitBoxes.Length; j++)
-                {
-                    if (Enemies[i].GetComponent<BoxCollider2D>().IsTouching(
-                        PlayerScript.baHitBoxes[j].GetComponent<BoxCollider2D>()))
-                    {
-                        if (Enemies[i].GetComponent<Enemy>().hitRecently == false)
-                        {
-                            //Debug.Log("Hit");
-                            if (PlayerScript.Overclocking == false)
-                            {
-                                Enemies[i].GetComponent<Enemy>().health--;
-                                //Debug.Log("BA: 1 HP lost");
-                            }
-                            else
-                            {
-                                Enemies[i].GetComponent<Enemy>().health = Enemies[i].GetComponent<Enemy>().health - 2;
-                                //Debug.Log("BA: 2 HP lost");
-                            }
-                            Enemies[i].GetComponent<Enemy>().hitRecently = true;
-                            //--i;//decrement to avoid skipping an enemy
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        else if (PlayerScript.Deflecting)
-        {
-            for (int i = 0; i < Enemies.Count; i++)
-            {
-                if (Enemies[i].GetComponent<Enemy>().Bullet.GetComponent<BoxCollider2D>().IsTouching
-                    (PlayerScript.deflectHitBox.GetComponent<BoxCollider2D>()))
-                {
-                    Enemies[i].GetComponent<Enemy>().deflected = true;
-                    Enemies[i].GetComponent<Enemy>().Bullet.GetComponent<Rigidbody2D>().velocity =
-                        -Enemies[i].GetComponent<Enemy>().Bullet.GetComponent<Rigidbody2D>().velocity;
-                    Enemies[i].GetComponent<Enemy>().force = -Enemies[i].GetComponent<Enemy>().force;
-                    Enemies[i].GetComponent<Enemy>().Bullet.GetComponent<Rigidbody2D>().AddForce(Enemies[i].GetComponent<Enemy>().force);
-                }
-            }
-        }
-        for (int i = 0; i < Enemies.Count; i++)
-        {
-            if (Enemies[i].GetComponent<Enemy>().Deflected())
-            {
-                Enemies[i].GetComponent<Enemy>().health--;
-                //--i;
-                break;
-            }
-        }
+        //Slice Box collision moved to Enemy.cs
+        //Basic Attack collision moved to Enemy.cs
+        //Deflection Handling moved to Bullet.cs
+        //Enemy getting hit by own bullet moved to Enemy.cs
 
         // update enemies
         for (int i = 0; i < Enemies.Count; i++)
@@ -217,19 +147,12 @@ public class EncounterManager : MonoBehaviour
         }
     }
 
+    //Instantiates a new Enemy
     void CreateEnemy()
     {
-        GameObject E = new GameObject();
-        E.AddComponent<SpriteRenderer>();
-        E.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/Enemy");
-        E.transform.SetParent(this.transform);
-        //E.transform.Translate(new Vector2(rand.Next(-23, 0), 2+rand.Next(-5, 6)));
+        GameObject E = (GameObject)Instantiate(enemyPrefab);
+        E.transform.SetParent(this.transform);  //kind of get why this is here, but can it be avoided?
         E.transform.position = new Vector2(rand.Next(-11, 11), rand2.Next(-4, 6));
-        E.AddComponent<Enemy>();
-        E.AddComponent<BoxCollider2D>();
-        E.GetComponent<Enemy>().health = 3;
-        E.GetComponent<Enemy>().secondWind = false;
-        E.GetComponent<Enemy>().stunned = false;
         Enemies.Add(E);
     }
 
