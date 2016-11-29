@@ -121,8 +121,12 @@ public class Character : MonoBehaviour
 
     public void controllerMove(float hMove, float vMove, float hLook, float vLook) // Movement and rotation with controller
     {
-        if (!Attacking && !Deflecting && !Slicing)   //only move when they are not doing these actions
+        //only move when they are not doing these actions
+        if (!Attacking && !Deflecting && !Slicing)
+        {   
             rigidBody.velocity = new Vector2(hMove * maxSpeed, vMove * maxSpeed);
+        }
+
         if ((hLook != 0 || vLook != 0) && !Attacking && !Slicing)
         {
             float angle = Mathf.Atan2(vLook, hLook) * Mathf.Rad2Deg;
@@ -131,7 +135,7 @@ public class Character : MonoBehaviour
         else if ((rigidBody.velocity != Vector2.zero) && !Attacking && !Slicing)
         {
             float angle = Mathf.Atan2(rigidBody.velocity.y, rigidBody.velocity.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            rigidBody.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
     }
 
