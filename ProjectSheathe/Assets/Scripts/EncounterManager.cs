@@ -10,7 +10,7 @@ public class EncounterManager : MonoBehaviour
     System.Random rand = new System.Random();
     private GameObject Player;
     private Character PlayerScript;
-    [HideInInspector] public float speedMod; // Enemy and bullet speed modifier
+    [SerializeField] public float speedMod; // Enemy and bullet speed modifier
     public float baseSpeed { get; private set; }
     public float slowSpeed { get; private set; }
     private int maxEnemyNumber;
@@ -19,6 +19,8 @@ public class EncounterManager : MonoBehaviour
     private int extraEnemies;
     private float time = 0;
     private int randomEnemy;
+    private int notStunnedEnemyCount;
+    private int stunnedEnemyCount;
     System.Random rand2 = new System.Random();
 
     void Awake()
@@ -83,7 +85,6 @@ public class EncounterManager : MonoBehaviour
             {
                 if (PlayerScript.killStunnedEnemies == true)
                 {
-
                     //Debug.Log("OC RIP");
                     GameObject.DestroyObject(Enemies[i]);
                     Enemies.RemoveAt(i);
@@ -95,7 +96,6 @@ public class EncounterManager : MonoBehaviour
                 }
             }
         }
-
     }
 
     void DynamicDifficulty()
@@ -111,15 +111,17 @@ public class EncounterManager : MonoBehaviour
         maxEnemyNumber = BASE_ENEMY_COUNT + extraEnemies;
 
         // faster enemies
-        if (PlayerScript.Overclocking == false && speedMod < 2)
+        if (PlayerScript.Overclocking == false && speedMod < 3.0)
         {
-            speedMod = speedMod + .1f * Mathf.Floor(PlayerScript.score / 800);
+            //float speedBonus = Mathf.Floor(PlayerScript.score / 1200);
+            //speedMod = 1 + .1f * Mathf.Floor(PlayerScript.score / 1200); // this should probably scale by stunned enemy count, not score // the second this gets incremented once, it hits max
+            speedMod = 1 + .1f * Mathf.Floor(stunnedEnemyCount / 2);
             baseSpeed = speedMod;
             slowSpeed = baseSpeed - PlayerScript.overclockMod;
         }
-        if (speedMod > 1.8)
+        if (speedMod > 3.0)
         {
-            speedMod = 1.8f;
+            speedMod = 3.0f;
         }
         //Debug.Log(baseSpeed);
         //Debug.Log(slowSpeed);
@@ -128,7 +130,9 @@ public class EncounterManager : MonoBehaviour
 
     void Spawn()
     {
-        int notStunnedEnemyCount = 0;
+        notStunnedEnemyCount = 0;
+        stunnedEnemyCount = 0;
+
         if (Enemies.Count != 0)
         {
             for (int x = 0; x < Enemies.Count; x++)
@@ -136,6 +140,10 @@ public class EncounterManager : MonoBehaviour
                 if (Enemies[x].GetComponent<Enemy>().stunned == false)
                 {
                     notStunnedEnemyCount++;
+                }
+                else
+                {
+                    stunnedEnemyCount++;
                 }
             }
         }
@@ -174,7 +182,7 @@ public class EncounterManager : MonoBehaviour
 
         if (time <= 0)
         {
-            int attackPattern = rand2.Next(0, 0); // choose attack pattern
+            int attackPattern = rand2.Next(0, 2); // choose attack pattern
             switch (attackPattern)
             {
                 case 0: // Single Attack
@@ -191,8 +199,32 @@ public class EncounterManager : MonoBehaviour
                         //Debug.Log("Fire");
                         break;
                     }
+                case 1: // Double Attack
+                    {
+                        //Debug.Log("Double called");
+                        // keep choosing a random enemy until one that isn't stunned is found
+                        randomEnemy = rand.Next(0, Enemies.Count);
+                        int randomEnemy2 = rand2.Next(0, Enemies.Count);
+
+                        while (Enemies[randomEnemy].GetComponent<Enemy>().stunned == true)
+                        {
+                            randomEnemy = rand.Next(0, Enemies.Count);
+                        }
+
+                        if (Enemies.Count > 1)
+                        {
+                            while (Enemies[randomEnemy].GetComponent<Enemy>().stunned == true || Enemies[randomEnemy] == Enemies[randomEnemy2])
+                            {
+                                randomEnemy2 = rand2.Next(0, Enemies.Count);
+                            }
+                            Enemies[randomEnemy2].GetComponent<Enemy>().Fire();
+                        }
+                        Enemies[randomEnemy].GetComponent<Enemy>().Fire();
+                        //Debug.Log("Fire");
+                        break;
+                    }
             }
-            // wait some time before firing again. This value MUST at least be 1.1666f since that is how long it takes for an enemy to fire.
+            // wait some time before firing again. This value should at least be 1.1666f since that is how long it takes for an enemy to fire.
             time = rand.Next(2, 3) + 1.1666f;
         }
     }

@@ -201,13 +201,13 @@ public class Character : MonoBehaviour
                     case 4: // Overclocking
                         if (!overclockState && overclockCooldown <= 0)
                         {
-                            Debug.Log("Press");
+                            //Debug.Log("Press");
                             overclockState = true;
                             overclockTimer = OVERCLOCK_PRELOAD + OVERCLOCK_ACTIVE + OVERCLOCK_AFTER;
                         }
                         else if (overclockState)
                         {
-                            Debug.Log("Unpress");
+                            //Debug.Log("Unpress");
                             Overclocking = false;
                         }
                         break;
@@ -342,7 +342,7 @@ public class Character : MonoBehaviour
             timeSlow = true;
             enemyHandler.speedMod -= overclockMod; // Slow enemies
             killStunnedEnemies = true;
-            Debug.Log("ZA WARUDO: " + enemyHandler.speedMod);
+            //Debug.Log("ZA WARUDO: " + enemyHandler.speedMod);
         }
         else if ((!Overclocking && timeSlow) || (Overclocking && overclockTimer <= 0 && timeSlow)) // On end trigger or after ending frames
         {
@@ -355,7 +355,7 @@ public class Character : MonoBehaviour
             Overclocking = false;
             overclockState = false;
             overclockTimer = 0;
-            Debug.Log("WRYYYYYY: " + enemyHandler.speedMod);
+            //Debug.Log("WRYYYYYY: " + enemyHandler.speedMod);
         }
 
         if (!Overclocking && overclockCooldown > 0) // Increment oveclock cooldown

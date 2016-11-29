@@ -439,7 +439,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyPrefab: {fileID: 1000010486928228, guid: bdb1e977583592f459a548869bdd0103,
     type: 2}
-  speedMod: 1
+  speedMod: 4
 --- !u!4 &408454245
 Transform:
   m_ObjectHideFlags: 0
@@ -530,7 +530,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1b3353596775c941a3794dbfd3b018c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controllerType: Keyboard
+  controllerType: PS4B
 --- !u!61 &448848514
 BoxCollider2D:
   m_ObjectHideFlags: 0
