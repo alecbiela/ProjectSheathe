@@ -30,7 +30,7 @@ public class Character : MonoBehaviour
     private const float OVERCLOCK_PRELOAD = 0.066f;
     private const float OVERCLOCK_ACTIVE = 3f; // Overclock needs active frames
     private const float OVERCLOCK_AFTER = 0.05f;
-    private const float OVERCLOCK_CD = .25f; // cooldown should be around 20 seconds
+    private const float OVERCLOCK_CD = 20f; // cooldown should be around 20 seconds
 
 
     private float sliceHoldTime;
