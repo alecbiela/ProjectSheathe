@@ -161,6 +161,9 @@ public class EncounterManager : MonoBehaviour
         GameObject E = (GameObject)Instantiate(enemyPrefab);
         E.transform.SetParent(this.transform);  //kind of get why this is here, but can it be avoided?
         E.transform.position = new Vector2(rand.Next(-11, 11), rand2.Next(-4, 6));
+        E.GetComponent<Enemy>().lineRendererComponent = E.GetComponent<LineRenderer>();
+        //E.GetComponent<Enemy>().origin = E.transform;
+        //E.GetComponent<Enemy>().destination = Player.transform;
         Enemies.Add(E);
     }
 
@@ -228,4 +231,6 @@ public class EncounterManager : MonoBehaviour
             time = rand.Next(2, 3) + 1.1666f;
         }
     }
+
+
 }

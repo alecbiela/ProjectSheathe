@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Enemy : MonoBehaviour {
     // Use this for initialization
-    private GameObject Player;
+    public GameObject Player;
     private EncounterManager Handler;
     private Vector3 vecToPlayer = new Vector3(0, 0, 0);
     public bool attacking { get; private set; }
@@ -20,8 +21,18 @@ public class Enemy : MonoBehaviour {
     public bool hitRecently;
     private bool trackPlayer;
 
+    // Line rendering stuff
+    public LineRenderer lineRendererComponent;
+    private float counter;
+    private float dist;
+    public Transform origin;
+    public Transform destination;
+    public float lineDrawSpeed = 600f;
+    //private int timer;
+    public bool running;
 
-    void Start() {
+    void Start()
+    {
         Player = GameObject.FindGameObjectWithTag("Player");
         Handler = GameObject.FindGameObjectWithTag("EncounterManager").GetComponent<EncounterManager>();
         health = 3;
@@ -30,14 +41,25 @@ public class Enemy : MonoBehaviour {
         hitRecently = false;
         attacking = false;
         trackPlayer = true;
+
+        origin = this.transform;
+        destination = GetComponentInParent<Enemy>().Player.transform;
+        lineRendererComponent = GetComponent<LineRenderer>();
+        lineRendererComponent.SetPosition(0, origin.position);
+        //lineRendererComponent.SetColors(Color.red, Color.red);
+        lineRendererComponent.SetWidth(.15f, .15f);
+        lineRendererComponent.enabled = false;
+
+        dist = Vector3.Distance(origin.position, destination.position);
         //Debug.Log("Enemy start called");
     }
 
     // Update is called once per frame
     void Update()
     {
+        lineRendererComponent.enabled = false;
         //Debug.Log(health);
-        if(secondWind == false && health <= 1) // stun enemies once their health reaches a certain value
+        if (secondWind == false && health <= 1) // stun enemies once their health reaches a certain value
         {
             stunned = true;
             this.GetComponent<SpriteRenderer>().color = Color.black; // once you go black...
@@ -63,11 +85,17 @@ public class Enemy : MonoBehaviour {
                 float angle = Mathf.Atan2(vecToPlayer.y, vecToPlayer.x) * Mathf.Rad2Deg;
                 Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
                 this.transform.rotation = Quaternion.Slerp(transform.rotation, q, Handler.speedMod * Time.deltaTime * 0.9f); //Quaternion.LookRotation(this.transform.position - Player.transform.position);
+
+                // line render
+                origin = this.gameObject.transform;
+                destination = GetComponentInParent<Enemy>().Player.transform; // don't update this here if the enemy ever needs to draw a line to somewhere else and the player
+                destination.transform.TransformPoint(Player.transform.position);
+                dist = Vector3.Distance(origin.position, destination.position);
             }
 
             if (timer != 0) // fire first at 600 frames
             {
-                Fire(); //firing = true; // for purposes of this build, call Shoot here. After this build, when an enemy shoots will be determined by EncounterManager.
+                Fire();
                 //Debug.Log("Fire call");
             }
         }
@@ -82,19 +110,35 @@ public class Enemy : MonoBehaviour {
         currFlashTime = currFlashTime - Time.deltaTime;
         if (timer % 3 == 0) // flash
         {
+            // render line
+
+            //counter += .3f / lineDrawSpeed;
+            counter += 1f;
+            float x = Mathf.Lerp(0, dist, counter);
+            Vector3 pointA = origin.position;
+            Vector3 pointB = destination.position;
+
+            // Get the unit vector in the desired direction, multiply by the desired length and add the starting point.
+            Vector3 pointAlongLine = x * Vector3.Normalize(pointB - pointA) + pointA;
+            lineRendererComponent.enabled = true;
             if (currFlashTime > .20)
             {
-                this.GetComponent<SpriteRenderer>().color = new Color(255, 200, 0); // yellow/gold
+                //this.GetComponent<SpriteRenderer>().color = new Color(255, 200, 0); // yellow/gold
+                lineRendererComponent.SetColors(new Color(242, 190, 0, 172), new Color(242, 190, 0, 172));
+                lineRendererComponent.SetPosition(1, pointAlongLine);
             }
             else // flash red just before firing
             {
-                this.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0); // red
+                //this.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0); // red
+                lineRendererComponent.SetColors(Color.red, Color.black);
+                lineRendererComponent.SetPosition(1, pointAlongLine);
                 trackPlayer = false;
             }
         }
         else
         {
             this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255); // white
+            lineRendererComponent.enabled = false;
         }
 
         //we fire the actual bullet here
@@ -110,6 +154,8 @@ public class Enemy : MonoBehaviour {
             this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
             attacking = false;
             trackPlayer = true;
+            //LineRenderers[lrInUse].GetComponent<DrawLine>().running = false;
+            //LineRenderers[lrInUse].GetComponent<DrawLine>().lineRendererComponent.enabled = false;
 
             timer = rand.Next(0, 300); //used to stagger each enemy's firing time because they're all spawned at the same time
             currFlashTime = FLASH_TIME;

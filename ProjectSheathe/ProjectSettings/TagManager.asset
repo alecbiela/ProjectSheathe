@@ -13,6 +13,9 @@ TagManager:
   - Bullet
   - Boundary
   - PlayerHitbox
+  - LineRenderer
+  - LineStart
+  - LineEnd
   layers:
   - Default
   - TransparentFX

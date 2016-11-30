@@ -397,6 +397,24 @@ public class Character : MonoBehaviour
             Cancel(); // ends active attacks when hit. This may need to be commented out if we can't get the animations to stop too
                       //Debug.Log("Got em. Health: " + health);
                       //this.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+
+            /*
+            // Hitstop
+            if (playerHit == false)
+            {
+                //float pauseDelay = .7f;
+                float pauseDelay = 25.0f / 60.0f;
+                //Time.timeScale = .0000001f;
+                while (pauseDelay > 0)
+                {
+                    pauseDelay -= Time.deltaTime;
+                    Debug.Log("hitstop");
+                }
+                //Debug.Log("Out");
+                Time.timeScale = 1.0f;
+            }
+            */
+
             if (health <= 0)
             {
                 health = 0;
@@ -421,5 +439,20 @@ public class Character : MonoBehaviour
 
         sliceTimer = 0;
     }
-    
+
+    public void Hitstop(float pauseDelay)
+    {
+        //float pauseDelay = .7f;
+        pauseDelay /= 60.0f;
+        Time.timeScale = .0000001f;
+        while (pauseDelay > 0)
+        {
+            pauseDelay -= Time.deltaTime;
+            //Debug.Log("hitstop");
+            //GameObject.FindGameObjectWithTag("Hitspark").SetActive(true);
+        }
+        //Debug.Log("Out");
+        Time.timeScale = 1.0f;
+        //GameObject.FindGameObjectWithTag("Hitspark").SetActive(false);
+    }
 }
