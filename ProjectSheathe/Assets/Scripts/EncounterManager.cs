@@ -4,8 +4,14 @@ using System.Collections.Generic;
 
 public class EncounterManager : MonoBehaviour
 {
+    //PREFABS
     public GameObject enemyPrefab;
-    List<GameObject> Enemies = new List<GameObject>();
+    public GameObject yourEnemyPrefabHere;  //after you add it here, make sure to head down to the array to include it
+    
+    List<GameObject> enemies = new List<GameObject>();
+    List<int> activeEnemies = new List<int>();
+    Dictionary<string, GameObject> enemyPrefabs = new Dictionary<string, GameObject>();
+
     // Use this for initialization
     System.Random rand = new System.Random();
     private GameObject Player;
@@ -20,11 +26,16 @@ public class EncounterManager : MonoBehaviour
     private float time = 0;
     private int randomEnemy;
     private int notStunnedEnemyCount;
-    private int stunnedEnemyCount;
+    private int stunnedEnemyCount = 0;
+    private int[] quadrantCounts;
     System.Random rand2 = new System.Random();
 
     void Awake()
-    {
+    {       
+        //add your prefab to the dictionary here
+        enemyPrefabs.Add("basic", enemyPrefab);   
+
+
         Player = GameObject.FindGameObjectWithTag("Player");
         PlayerScript = Player.GetComponent<Character>();
         speedMod = 1f;
@@ -34,12 +45,13 @@ public class EncounterManager : MonoBehaviour
         //Debug.Log("done");
         maxEnemyNumber = BASE_ENEMY_COUNT;
         extraEnemies = 0;
+        quadrantCounts = new int[] { 0, 0, 0, 0 };
     }
 
     // Update is called once per frame
     void Update()
     {
-        Spawn();
+        if(enemies.Count <= 0) Spawn();
         DynamicDifficulty();
         ManageAttacks();
 
@@ -49,47 +61,36 @@ public class EncounterManager : MonoBehaviour
         //Enemy getting hit by own bullet moved to Enemy.cs
 
         // update enemies
-        for (int i = 0; i < Enemies.Count; i++)
+        for (int i = 0; i < enemies.Count; i++)
         {
             // enable enemies to be hit again once the player isn't using basic attack or actively slicing
             if (PlayerScript.Attacking == false && PlayerScript.Slicing == false)
             {
-                Enemies[i].GetComponent<Enemy>().hitRecently = false;
+                enemies[i].GetComponent<Enemy>().hitRecently = false;
             }
 
-            // give enemies their second wind if the player has been hit
-            if (PlayerScript.playerHit == true)
-            {
-                if (Enemies[i].GetComponent<Enemy>().stunned == true)
-                {
-                    Enemies[i].GetComponent<Enemy>().secondWind = true;
-                }
-                if (i == Enemies.Count - 1)
-                {
-                    PlayerScript.playerHit = false;
-                }
-            }
-
-            // kill enemies if at 0 health or lower or if they are stunned when the player enters Overclock
-            if (Enemies[i].GetComponent<Enemy>().health <= 0)
+            // kill enemies if at 0 health or lower
+            if (enemies[i].GetComponent<Enemy>().health <= 0)
             {
                 //Debug.Log("RIP");
-                GameObject.DestroyObject(Enemies[i]);
-                Enemies.RemoveAt(i);
+                UpdateQuadrants(enemies[i].transform.position);
+                GameObject.DestroyObject(enemies[i]);
+                enemies.RemoveAt(i);
                 PlayerScript.score += 25;
-                //--i;
                 break;
             }
 
-            if (PlayerScript.Overclocking == true && Enemies[i].GetComponent<Enemy>().stunned == true)
+            // if the player is overclocking, then kill all stunned enemies
+            if (PlayerScript.Overclocking == true && enemies[i].GetComponent<Enemy>().stunned == true)
             {
                 if (PlayerScript.killStunnedEnemies == true)
                 {
                     //Debug.Log("OC RIP");
-                    GameObject.DestroyObject(Enemies[i]);
-                    Enemies.RemoveAt(i);
+                    UpdateQuadrants(enemies[i].transform.position);
+                    GameObject.DestroyObject(enemies[i]);
+                    enemies.RemoveAt(i);
                     PlayerScript.score += 100;
-                    if (i == Enemies.Count - 1)
+                    if (i == enemies.Count - 1)
                     {
                         PlayerScript.killStunnedEnemies = false;
                     }
@@ -98,18 +99,9 @@ public class EncounterManager : MonoBehaviour
         }
     }
 
+    //scales the speed based on how many enemies are alive/stunned
     void DynamicDifficulty()
     {
-        // more enemies
-        extraEnemies = (int)Mathf.Floor(PlayerScript.score / 1000);
-
-        if (extraEnemies > 5)
-        {
-            extraEnemies = 5;
-        }
-
-        maxEnemyNumber = BASE_ENEMY_COUNT + extraEnemies;
-
         // faster enemies
         if (PlayerScript.Overclocking == false && speedMod < 3.0)
         {
@@ -128,109 +120,177 @@ public class EncounterManager : MonoBehaviour
         // other enemy types
     }
 
+    //spawns a new wave of enemies once all have been defeated
     void Spawn()
     {
-        notStunnedEnemyCount = 0;
-        stunnedEnemyCount = 0;
+        //calculates number of enemies to spawn (only does this when needed now, as opposed to every frame)
+        maxEnemyNumber = BASE_ENEMY_COUNT + (int)(PlayerScript.score / 300);
 
-        if (Enemies.Count != 0)
+        for(int i = 0; i < maxEnemyNumber; i++)
         {
-            for (int x = 0; x < Enemies.Count; x++)
-            {
-                if (Enemies[x].GetComponent<Enemy>().stunned == false)
-                {
-                    notStunnedEnemyCount++;
-                }
-                else
-                {
-                    stunnedEnemyCount++;
-                }
-            }
+            CreateEnemy("basic");
         }
 
-        if (notStunnedEnemyCount < maxEnemyNumber)
-        {
-            //Debug.Log("In here fam");
-            CreateEnemy();
-        }
+        //update attack time so that enemies do not attack immediately
+        time = rand.Next(2, 4) + 1.1666f;
+
+        //if we ever have a wave variable, increment it here
     }
 
     //Instantiates a new Enemy
-    void CreateEnemy()
+    //Takes a string for the enemy name (MUST match a Dictionary key for the prefab you want)
+    void CreateEnemy(string name)
     {
-        GameObject E = (GameObject)Instantiate(enemyPrefab);
-        E.transform.SetParent(this.transform);  //kind of get why this is here, but can it be avoided?
-        E.transform.position = new Vector2(rand.Next(-11, 11), rand2.Next(-4, 6));
+        GameObject E = (GameObject)Instantiate(enemyPrefabs[name]);
+        //E.transform.SetParent(this.transform);  //kind of get why this is here, but can it be avoided?
+
+        //finds the quadrant with the least enemies
+        int targetQuadrant = LeastPopulatedQuadrant();
+        Vector2 targetPos = new Vector2();
+
+        //finds a random position for the enemy 
+        switch(targetQuadrant)
+        {
+            case 0: //Q1, X(0,10) Y(0,8)
+                targetPos.x = (float)(10 * rand.NextDouble());
+                targetPos.y = (float)(8 * rand.NextDouble());
+                break;
+            case 1: //Q2, X(-10,0) Y(0,8)
+                targetPos.x = (float)(10 * rand.NextDouble()) - 10;
+                targetPos.y = (float)(8 * rand.NextDouble());
+                break;
+            case 2: //Q3, X(-10,0) Y(-8,0)
+                targetPos.x = (float)(10 * rand.NextDouble()) - 10;
+                targetPos.y = (float)(8 * rand.NextDouble()) - 8;
+                break;
+            case 3: //Q4, X(0,10) Y(-8,0)
+                targetPos.x = (float)(10 * rand.NextDouble());
+                targetPos.y = (float)(8 * rand.NextDouble()) - 8;
+                break;
+            default:
+                Debug.Log("Target Quadrant index out of bounds.");
+                break;
+        }
+
+
+        quadrantCounts[targetQuadrant]++;
+        E.transform.position = targetPos;
         E.GetComponent<Enemy>().lineRendererComponent = E.GetComponent<LineRenderer>();
         //E.GetComponent<Enemy>().origin = E.transform;
         //E.GetComponent<Enemy>().destination = Player.transform;
-        Enemies.Add(E);
+        enemies.Add(E);
     }
 
+
+    //returns the lowest-populated quadrant
+    int LeastPopulatedQuadrant()
+    {
+        int lpq = 0;
+        int lpqv = quadrantCounts[0];
+
+        for(int i=1; i<4; i++)
+        {
+            if (quadrantCounts[i] < lpqv)
+            {
+                lpqv = quadrantCounts[i];
+                lpq = i;
+            }
+        }
+
+        return lpq;
+    }
+
+    //decrement the quadrant the enemy was in (called when enemy is being destroyed)
+    void UpdateQuadrants(Vector2 pos)
+    {
+        if(pos.x >= 0)
+        {
+            if(pos.y >= 0) { quadrantCounts[0]--; }
+            else { quadrantCounts[3]--; }
+        }
+        else
+        {
+            if(pos.y >= 0) { quadrantCounts[1]--; }
+            else { quadrantCounts[2]--; }
+        }
+    }
+
+    //Decides when enemies should attack
     void ManageAttacks()
     {
-        if (time != 0) // decrement time for anything that may need it
-        {
-            time -= Time.deltaTime;
-        }
+        time -= Time.deltaTime * speedMod;
 
-        // check if any enemy is currently attacking. If so, exit the method
-        for (int x = 0; x < Enemies.Count; x++)
+        if (time <= 0 && (activeEnemies = GetActiveEnemies()).Count >= 1)
         {
-            if (Enemies[x].GetComponent<Enemy>().stunned == false && Enemies[x].GetComponent<Enemy>().attacking == true)
+                    
+            //choose a random active enemy
+            randomEnemy = activeEnemies[rand.Next(activeEnemies.Count)];
+
+            //if there is more than 1 enemy left, have a chance of 2 attacking at the same time
+            if (activeEnemies.Count > 1 && rand.Next(2) == 1)
             {
-                return;
+                int randomEnemy2 = activeEnemies[rand2.Next(activeEnemies.Count)];
+
+                //ensure no duplicates
+                while (randomEnemy == randomEnemy2)
+                {
+                   randomEnemy2 = activeEnemies[rand2.Next(activeEnemies.Count)];
+                }
+
+                enemies[randomEnemy2].GetComponent<Enemy>().Fire();
             }
-        }
+            enemies[randomEnemy].GetComponent<Enemy>().Fire();
 
-        if (time <= 0)
-        {
-            int attackPattern = rand2.Next(0, 2); // choose attack pattern
-            switch (attackPattern)
-            {
-                case 0: // Single Attack
-                    {
-                        // keep choosing a random enemy until one that isn't stunned is found
-                        randomEnemy = rand.Next(0, Enemies.Count);
-
-                        while (Enemies[randomEnemy].GetComponent<Enemy>().stunned == true)
-                        {
-                            randomEnemy = rand.Next(0, Enemies.Count);
-                        }
-
-                        Enemies[randomEnemy].GetComponent<Enemy>().Fire();
-                        //Debug.Log("Fire");
-                        break;
-                    }
-                case 1: // Double Attack
-                    {
-                        //Debug.Log("Double called");
-                        // keep choosing a random enemy until one that isn't stunned is found
-                        randomEnemy = rand.Next(0, Enemies.Count);
-                        int randomEnemy2 = rand2.Next(0, Enemies.Count);
-
-                        while (Enemies[randomEnemy].GetComponent<Enemy>().stunned == true)
-                        {
-                            randomEnemy = rand.Next(0, Enemies.Count);
-                        }
-
-                        if (Enemies.Count > 1)
-                        {
-                            while (Enemies[randomEnemy].GetComponent<Enemy>().stunned == true || Enemies[randomEnemy] == Enemies[randomEnemy2])
-                            {
-                                randomEnemy2 = rand2.Next(0, Enemies.Count);
-                            }
-                            Enemies[randomEnemy2].GetComponent<Enemy>().Fire();
-                        }
-                        Enemies[randomEnemy].GetComponent<Enemy>().Fire();
-                        //Debug.Log("Fire");
-                        break;
-                    }
-            }
             // wait some time before firing again. This value should at least be 1.1666f since that is how long it takes for an enemy to fire.
-            time = rand.Next(2, 3) + 1.1666f;
+            time = rand.Next(2, 4) + 1.1666f;
         }
     }
 
+    //gives stunned enemies second wind when the player is hit (called from Player script)
+    public void SecondWind()
+    {
+        Enemy e;
 
+        for(int i=0; i<enemies.Count; i++)
+        {
+            e = enemies[i].GetComponent<Enemy>();
+            if(e.stunned)
+            {
+                e.secondWind = true;
+            }
+        }
+    }
+
+    //gets a list of indices of active enemies
+    private List<int> GetActiveEnemies()
+    {
+        List<int> activeIndicies = new List<int>();
+
+        //add the indices of the enemies that aren't stunned
+        for(int i=0; i < enemies.Count; i++)
+        {
+            if (!enemies[i].GetComponent<Enemy>().stunned) activeIndicies.Add(i);
+        }
+
+        return activeIndicies;
+    }
+
+    
+    
+    //future method to be used to Introduce new enemies
+    //introduces a new enemy and displays a tooltip on how to defeat it
+    //takes the name of the enemy to introduce
+    private void Introduce(int id)
+    {
+        switch(id)
+        {
+            case 0: //your enemy name here
+                break;
+            case 1:
+                break;
+            default:
+                Debug.Log("Tried to introduce enemy " + id + " but case didn't exist.");
+                break;
+        }
+    }
 }

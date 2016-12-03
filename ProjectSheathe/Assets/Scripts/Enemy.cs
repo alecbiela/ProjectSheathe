@@ -166,6 +166,7 @@ public class Enemy : MonoBehaviour {
     //Handles collision of enemy with other objects
     void OnTriggerEnter2D(Collider2D col)
     {
+
         //if a bullet is hitting it
         if(col.tag == "Bullet")
         {
@@ -203,6 +204,15 @@ public class Enemy : MonoBehaviour {
             }
 
             return;
+        }
+    }
+
+    //if by chance we spawn on top of another enemy, die so we can respawn
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.tag == "Enemy")
+        {
+            this.health = -1;
         }
     }
 }

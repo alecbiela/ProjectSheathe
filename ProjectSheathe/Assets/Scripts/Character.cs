@@ -420,7 +420,8 @@ public class Character : MonoBehaviour
                 health = 0;
                 //Debug.Log("GAME OVER");
             }
-            playerHit = true;
+
+            enemyHandler.SecondWind();
 
             //get rid of the bullet that was fired
             Destroy(other.gameObject);
