@@ -16,6 +16,10 @@ TagManager:
   - LineRenderer
   - LineStart
   - LineEnd
+  - Rocket
+  - Laser
+  - SlowBullet
+  - Shield
   layers:
   - Default
   - TransparentFX
@@ -29,7 +33,7 @@ TagManager:
   - Enemies
   - Hitboxes
   - Bullets
-  - 
+  - Laser
   - 
   - 
   - 

@@ -24,7 +24,7 @@ GameObject:
   - 114: {fileID: 114000010888501414}
   - 120: {fileID: 120000013409706114}
   m_Layer: 9
-  m_Name: Enemy
+  m_Name: Lock
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -37,8 +37,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.733383, y: -0.24282467, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 4.62, y: 0.09, z: 0}
+  m_LocalScale: {x: 0.17383349, y: 0.17383353, z: 0.17383353}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
@@ -54,9 +54,9 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.13034512, y: -0.0000017144173}
   serializedVersion: 2
-  m_Size: {x: 0.5, y: 0.5}
+  m_Size: {x: 9.177381, y: 8.060096}
 --- !u!114 &114000010888501414
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -72,7 +72,7 @@ MonoBehaviour:
   health: 3
   stunned: 0
   secondWind: 0
-  BulletPrefab: {fileID: 1000010294456066, guid: f6e35da97fc23624390de68bc1a85016,
+  BulletPrefab: {fileID: 1000010294456066, guid: fb3b5b112847cdd46b58b4f966892b5b,
     type: 2}
   force: {x: 0, y: 0, z: 0}
   hitRecently: 0
@@ -152,7 +152,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 29e86a32ff9e2f94caec01168d16d3ef, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 15fde34c397bacd4e86f024ccb99c282, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

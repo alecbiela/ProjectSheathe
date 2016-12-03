@@ -5,9 +5,11 @@ using System.Collections.Generic;
 public class EncounterManager : MonoBehaviour
 {
     //PREFABS
-    public GameObject enemyPrefab;
-    public GameObject yourEnemyPrefabHere;  //after you add it here, make sure to head down to the array to include it
-    
+    public GameObject b451cPrefab;
+    public GameObject lockPrefab;  //after you add it here, make sure to head down to the array to include it
+    public GameObject lightPrefab;
+    public GameObject lunkPrefab;
+
     List<GameObject> enemies = new List<GameObject>();
     List<int> activeEnemies = new List<int>();
     Dictionary<string, GameObject> enemyPrefabs = new Dictionary<string, GameObject>();
@@ -28,12 +30,16 @@ public class EncounterManager : MonoBehaviour
     private int notStunnedEnemyCount;
     private int stunnedEnemyCount = 0;
     private int[] quadrantCounts;
+    private int secondWindCounter = 0;
     System.Random rand2 = new System.Random();
 
     void Awake()
     {       
         //add your prefab to the dictionary here
-        enemyPrefabs.Add("basic", enemyPrefab);   
+        enemyPrefabs.Add("b451c", b451cPrefab);
+        enemyPrefabs.Add("lock", lockPrefab);
+        enemyPrefabs.Add("light", lightPrefab);
+        enemyPrefabs.Add("lunk", lunkPrefab);
 
 
         Player = GameObject.FindGameObjectWithTag("Player");
@@ -128,7 +134,7 @@ public class EncounterManager : MonoBehaviour
 
         for(int i = 0; i < maxEnemyNumber; i++)
         {
-            CreateEnemy("basic");
+            CreateEnemy("lunk");
         }
 
         //update attack time so that enemies do not attack immediately
@@ -249,15 +255,23 @@ public class EncounterManager : MonoBehaviour
     //gives stunned enemies second wind when the player is hit (called from Player script)
     public void SecondWind()
     {
-        Enemy e;
-
-        for(int i=0; i<enemies.Count; i++)
+        if (secondWindCounter < 3) // 3rd hit second wind
         {
-            e = enemies[i].GetComponent<Enemy>();
-            if(e.stunned)
+            secondWindCounter++;
+        }
+        else
+        {
+            Enemy e;
+
+            for (int i = 0; i < enemies.Count; i++)
             {
-                e.secondWind = true;
+                e = enemies[i].GetComponent<Enemy>();
+                if (e.stunned)
+                {
+                    e.secondWind = true;
+                }
             }
+            secondWindCounter = 0;
         }
     }
 

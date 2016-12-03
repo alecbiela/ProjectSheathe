@@ -42,6 +42,7 @@ public class Character : MonoBehaviour
     private float dashCooldown; // Cooldown timer
     private float overclockCooldown;
     private float oldSpeed;
+    private bool hitByLaser; // Tracks if being actively hit by laser
 
     private int sliceBoxes;
     public bool slowMovement;
@@ -94,7 +95,7 @@ public class Character : MonoBehaviour
         sliceBoxes = 0;
         slowMovement = false;
         inputFlags = new bool[] { false, false, false, false, false, false, false }; // INPUT FLAGS, IN ORDER: SLICE[0], ATTACK[1], DEFLECT[2], INTERACT[6], OVERCLOCK[4], FIRE[5], DASH[6]
-        health = 7;
+        health = 9;
         playerHit = false;
         killStunnedEnemies = false;
         score = 0;
@@ -342,7 +343,7 @@ public class Character : MonoBehaviour
             timeSlow = true;
             enemyHandler.speedMod -= overclockMod; // Slow enemies
             killStunnedEnemies = true;
-            //Debug.Log("ZA WARUDO: " + enemyHandler.speedMod);
+            Debug.Log("ZA WARUDO: " + enemyHandler.speedMod);
         }
         else if ((!Overclocking && timeSlow) || (Overclocking && overclockTimer <= 0 && timeSlow)) // On end trigger or after ending frames
         {
@@ -355,7 +356,8 @@ public class Character : MonoBehaviour
             Overclocking = false;
             overclockState = false;
             overclockTimer = 0;
-            //Debug.Log("WRYYYYYY: " + enemyHandler.speedMod);
+            overclockCooldown = OVERCLOCK_CD;
+            Debug.Log("WRYYYYYY: " + enemyHandler.speedMod);
         }
 
         if (!Overclocking && overclockCooldown > 0) // Increment oveclock cooldown
@@ -390,7 +392,7 @@ public class Character : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Bullet")
+        if (other.gameObject.layer == 11) // All bullet types, can use tag for specific actions based on bullet type
         {
             //Debug.Log("Player got hit");
             health--;
@@ -427,7 +429,25 @@ public class Character : MonoBehaviour
             Destroy(other.gameObject);
             return;
         }
+        else if (other.gameObject.layer == 12 && !hitByLaser) // Laser first hit
+        {
+            //Debug.Log("LASERED");
+            health--;
+            Cancel();
+            if (health <= 0)
+            {
+                health = 0;
+                //Debug.Log("GAME OVER");
+            }
+            hitByLaser = true;
+            enemyHandler.SecondWind();
+        }
 
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject.layer == 12) hitByLaser = false;
     }
 
 
