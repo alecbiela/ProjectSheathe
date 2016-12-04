@@ -67,8 +67,17 @@ public class EncounterManager : MonoBehaviour
         //Enemy getting hit by own bullet moved to Enemy.cs
 
         // update enemies
+
+        stunnedEnemyCount = 0;
         for (int i = 0; i < enemies.Count; i++)
         {
+            
+            // count stunned enemies
+            if (enemies[i].GetComponent<Enemy>().stunned == true)
+            {
+                stunnedEnemyCount++;
+            }
+            
             // enable enemies to be hit again once the player isn't using basic attack or actively slicing
             if (PlayerScript.Attacking == false && PlayerScript.Slicing == false)
             {
@@ -82,7 +91,7 @@ public class EncounterManager : MonoBehaviour
                 UpdateQuadrants(enemies[i].transform.position);
                 GameObject.DestroyObject(enemies[i]);
                 enemies.RemoveAt(i);
-                PlayerScript.score += 25;
+                PlayerScript.score += 50;
                 break;
             }
 
@@ -102,6 +111,7 @@ public class EncounterManager : MonoBehaviour
                     }
                 }
             }
+
         }
     }
 
@@ -114,6 +124,7 @@ public class EncounterManager : MonoBehaviour
             //float speedBonus = Mathf.Floor(PlayerScript.score / 1200);
             //speedMod = 1 + .1f * Mathf.Floor(PlayerScript.score / 1200); // this should probably scale by stunned enemy count, not score // the second this gets incremented once, it hits max
             speedMod = 1 + .1f * Mathf.Floor(stunnedEnemyCount / 2);
+            //Debug.Log("SEC: " + stunnedEnemyCount);
             baseSpeed = speedMod;
             slowSpeed = baseSpeed - PlayerScript.overclockMod;
         }
@@ -129,12 +140,30 @@ public class EncounterManager : MonoBehaviour
     //spawns a new wave of enemies once all have been defeated
     void Spawn()
     {
+        // reset the chunk or "secondWindCounter"
+        secondWindCounter = 0;
+
         //calculates number of enemies to spawn (only does this when needed now, as opposed to every frame)
-        maxEnemyNumber = BASE_ENEMY_COUNT + (int)(PlayerScript.score / 300);
+        maxEnemyNumber = BASE_ENEMY_COUNT + (int)(PlayerScript.score / 250);
 
         for(int i = 0; i < maxEnemyNumber; i++)
         {
-            CreateEnemy("lunk");
+            int enemyType = rand.Next(0, 5);
+            switch(enemyType)
+            {
+                case 0:
+                    CreateEnemy("b451c");
+                    break;
+                case 1:
+                    CreateEnemy("lunk");
+                    break;
+                case 2:
+                    CreateEnemy("light");
+                    break;
+                case 3:
+                    CreateEnemy("lock");
+                    break;
+            }
         }
 
         //update attack time so that enemies do not attack immediately
@@ -228,24 +257,40 @@ public class EncounterManager : MonoBehaviour
 
         if (time <= 0 && (activeEnemies = GetActiveEnemies()).Count >= 1)
         {
-                    
-            //choose a random active enemy
-            randomEnemy = activeEnemies[rand.Next(activeEnemies.Count)];
-
-            //if there is more than 1 enemy left, have a chance of 2 attacking at the same time
-            if (activeEnemies.Count > 1 && rand.Next(2) == 1)
+            int attackPattern = rand.Next(0, 2); // make the max a variable that is determined by the dynamic difficulty in the future?
+            switch(attackPattern)
             {
-                int randomEnemy2 = activeEnemies[rand2.Next(activeEnemies.Count)];
+                case 0: // Single Attack
+                    //choose a random active enemy
+                    randomEnemy = activeEnemies[rand.Next(activeEnemies.Count)];
+                    enemies[randomEnemy].GetComponent<Enemy>().Fire();
+                    break;
+                case 1: // Double Attack
+                    //Debug.Log("Double");
+                    //choose a random active enemy
+                    randomEnemy = activeEnemies[rand.Next(activeEnemies.Count)];
 
-                //ensure no duplicates
-                while (randomEnemy == randomEnemy2)
-                {
-                   randomEnemy2 = activeEnemies[rand2.Next(activeEnemies.Count)];
-                }
+                    //if there is more than 1 enemy left, 2 attack at the same time
+                    if (activeEnemies.Count > 1)
+                    {
+                        int randomEnemy2 = activeEnemies[rand2.Next(activeEnemies.Count)];
 
-                enemies[randomEnemy2].GetComponent<Enemy>().Fire();
+                        //ensure no duplicates
+                        while (randomEnemy == randomEnemy2)
+                        {
+                            randomEnemy2 = activeEnemies[rand2.Next(activeEnemies.Count)];
+                        }
+
+                        enemies[randomEnemy].GetComponent<Enemy>().Fire();
+                        enemies[randomEnemy2].GetComponent<Enemy>().Fire();
+                    }
+                    else
+                    {
+                        enemies[randomEnemy].GetComponent<Enemy>().Fire();
+                    }
+                    break;
             }
-            enemies[randomEnemy].GetComponent<Enemy>().Fire();
+            
 
             // wait some time before firing again. This value should at least be 1.1666f since that is how long it takes for an enemy to fire.
             time = rand.Next(2, 4) + 1.1666f;
@@ -255,9 +300,10 @@ public class EncounterManager : MonoBehaviour
     //gives stunned enemies second wind when the player is hit (called from Player script)
     public void SecondWind()
     {
-        if (secondWindCounter < 3) // 3rd hit second wind
+        if (secondWindCounter < 2) // 3rd hit second wind
         {
-            secondWindCounter++;
+            secondWindCounter++; // may want to move this to Character.cs in the future since the UI will need both player health and this
+            //Debug.Log("SWC: " + secondWindCounter);
         }
         else
         {

@@ -36,7 +36,7 @@ public class Enemy : MonoBehaviour {
     private string type;
 
     // Laser stuff
-    private const float LASER_TIME = 3f; // Time laser is actively dealing damage
+    private const float LASER_TIME = 2f; // Time laser is actively dealing damage
     private float fireTime; // Laser timer and is it firing
     private bool firing; 
 
@@ -56,7 +56,7 @@ public class Enemy : MonoBehaviour {
         if (BulletPrefab.tag == "Laser")
         {
             type = "Light";
-            FLASH_TIME = 3f; // MODIFY CHARGE FOR LASER HERE
+            FLASH_TIME = 2.322222f; // MODIFY CHARGE FOR LASER HERE
             rotSpeed = 100f; // MAKE THIS LOW ENOUGH THAT OVERCLOCK AFFECTS LASER ENEMIES
             special = (GameObject)Instantiate(BulletPrefab);
             special.SetActive(false);
@@ -265,7 +265,7 @@ public class Enemy : MonoBehaviour {
         //if it's a slice hitbox
         if (col.tag.Contains("SliceHitbox"))
         {
-            Debug.Log("Hit by slice");
+            //Debug.Log("Hit by slice");
 
             if (type == "Lunk" && special.activeSelf) // If shield is up
             {
@@ -282,14 +282,20 @@ public class Enemy : MonoBehaviour {
         }
 
         //if a bullet is hitting it
-        if (col.tag == "Bullet")
+        if (col.tag == "Bullet" || col.tag == "SlowBullet")
         {
             //Debug.Log("Bullet is hitting enemy now");
             if (col.gameObject.GetComponent<Bullet>().CanHurtEnemies)
             {
                 //destroy the bullet and subtract enemy health or do whatever you gotta do
-                if (type == "Lunk" && special.activeSelf) { } // If shield is up
-                else health--;
+                if (type == "Lunk" && special.activeSelf)  // If shield is up
+                {
+                    // /Do nothing
+                }
+                else
+                {
+                    health--;
+                }
                 Destroy(col.gameObject);
             }
         }

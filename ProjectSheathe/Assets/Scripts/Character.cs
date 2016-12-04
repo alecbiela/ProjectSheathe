@@ -30,7 +30,8 @@ public class Character : MonoBehaviour
     private const float OVERCLOCK_PRELOAD = 0.066f;
     private const float OVERCLOCK_ACTIVE = 3f; // Overclock needs active frames
     private const float OVERCLOCK_AFTER = 0.05f;
-    private const float OVERCLOCK_CD = 20f; // cooldown should be around 20 seconds
+    private const float OVERCLOCK_CD = 10f; // cooldown should be around 20 seconds
+    private const int CHUNK = 3; // health chunk used to determine when to call second wind
 
 
     private float sliceHoldTime;
@@ -43,6 +44,7 @@ public class Character : MonoBehaviour
     private float overclockCooldown;
     private float oldSpeed;
     private bool hitByLaser; // Tracks if being actively hit by laser
+    private int hpHit; // number of times the player has been hit. Used with CHUNK
 
     private int sliceBoxes;
     public bool slowMovement;
@@ -99,6 +101,7 @@ public class Character : MonoBehaviour
         playerHit = false;
         killStunnedEnemies = false;
         score = 0;
+        hpHit = 0;
 
         // Populate various arrays of gameobjects with their hitboxes
         // Add by name, so we know which is which
@@ -343,7 +346,7 @@ public class Character : MonoBehaviour
             timeSlow = true;
             enemyHandler.speedMod -= overclockMod; // Slow enemies
             killStunnedEnemies = true;
-            Debug.Log("ZA WARUDO: " + enemyHandler.speedMod);
+            //Debug.Log("ZA WARUDO: " + enemyHandler.speedMod);
         }
         else if ((!Overclocking && timeSlow) || (Overclocking && overclockTimer <= 0 && timeSlow)) // On end trigger or after ending frames
         {
@@ -357,7 +360,7 @@ public class Character : MonoBehaviour
             overclockState = false;
             overclockTimer = 0;
             overclockCooldown = OVERCLOCK_CD;
-            Debug.Log("WRYYYYYY: " + enemyHandler.speedMod);
+            //Debug.Log("WRYYYYYY: " + enemyHandler.speedMod);
         }
 
         if (!Overclocking && overclockCooldown > 0) // Increment oveclock cooldown
@@ -396,6 +399,8 @@ public class Character : MonoBehaviour
         {
             //Debug.Log("Player got hit");
             health--;
+            hpHit++;
+            //Debug.Log(hpHit);
             Cancel(); // ends active attacks when hit. This may need to be commented out if we can't get the animations to stop too
                       //Debug.Log("Got em. Health: " + health);
                       //this.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
@@ -431,8 +436,10 @@ public class Character : MonoBehaviour
         }
         else if (other.gameObject.layer == 12 && !hitByLaser) // Laser first hit
         {
-            //Debug.Log("LASERED");
+            Debug.Log("LASERED");
             health--;
+            hpHit++;
+            //Debug.Log(hpHit);
             Cancel();
             if (health <= 0)
             {
@@ -440,6 +447,7 @@ public class Character : MonoBehaviour
                 //Debug.Log("GAME OVER");
             }
             hitByLaser = true;
+
             enemyHandler.SecondWind();
         }
 
