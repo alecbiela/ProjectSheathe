@@ -20,12 +20,12 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000011689309876}
   - 212: {fileID: 212000011471941138}
-  - 114: {fileID: 114000011127172652}
   - 61: {fileID: 61000010382421982}
   - 50: {fileID: 50000010624753390}
+  - 114: {fileID: 114000013653166600}
   m_Layer: 11
-  m_Name: SlowBullet
-  m_TagString: SlowBullet
+  m_Name: Medic_Bullet
+  m_TagString: MedicBullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -37,8 +37,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010294456066}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.8517966, y: -2.3229275, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -4.6845407, y: 4.015746, z: 0}
+  m_LocalScale: {x: 0.46499717, y: 0.23627728, z: 0.14106101}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
@@ -71,10 +71,10 @@ BoxCollider2D:
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_UsedByEffector: 0
-  m_Offset: {x: 0.4240832, y: -0.0769666}
+  m_Offset: {x: 0.61948836, y: 0.075547054}
   serializedVersion: 2
-  m_Size: {x: 1.0081912, y: 0.7043769}
---- !u!114 &114000011127172652
+  m_Size: {x: 1.0367888, y: 0.70437855}
+--- !u!114 &114000013653166600
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -85,7 +85,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fb4180e17c6131469777d9b63e0c1c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 5
+  bulletSpeed: 10
   slowMod: 0
 --- !u!212 &212000011471941138
 SpriteRenderer:
@@ -116,7 +116,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: bc15686ee2f655642b7b7b9a85fbbb2d, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 21300000, guid: 151f397890a78f546855e243978c2bb8, type: 3}
+  m_Color: {r: 0.10399985, g: 1, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0

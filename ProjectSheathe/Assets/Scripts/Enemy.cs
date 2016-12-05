@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour {
     private System.Random rand = new System.Random();
     private GameObject deflectHitBox;
     public int health;
+    public int MAX_HEALTH;
     public bool stunned; // if enemy is stunned
     public bool unstunned; // Has enemy been saved by secondwind
     public bool secondWind; // if enemy has received a second wind by having any enemy hit a player
@@ -27,13 +28,14 @@ public class Enemy : MonoBehaviour {
     private List<Explosion> slowFields = new List<Explosion>();
     private List<BigShield> bigShields = new List<BigShield>();
     public bool guarded; // Covered by a shield without a player in it
+    private bool active = true; //this enemy is actively doing its thang
 
     // Line rendering stuff
     public LineRenderer lineRendererComponent;
     private float counter;
     private float dist;
-    public Transform origin;
-    public Transform destination;
+    public Vector3 origin;
+    public Vector3 destination;
     public float lineDrawSpeed = 600f;
     //private int timer;
     public bool running;
@@ -48,7 +50,7 @@ public class Enemy : MonoBehaviour {
     {
         Player = GameObject.FindGameObjectWithTag("Player");
         Handler = GameObject.FindGameObjectWithTag("EncounterManager").GetComponent<EncounterManager>();
-        health = 3;
+        health = MAX_HEALTH;
         stunned = false;
         secondWind = false;
         hitRecently = false;
@@ -85,19 +87,23 @@ public class Enemy : MonoBehaviour {
                 bigShields.Add(special.GetComponent<BigShield>()); // Is behind its own shield
             }
         }
+        else if (BulletPrefab.tag == "MedicBullet")
+        {
+            type = "Medic";
+            FLASH_TIME = 0.5f;  //how long medic flashes before they shoot (lower since it's 1sec per shot)
+        }
         else if (BulletPrefab.tag == "Rocket") type = "Lock";
-        else type = "B45-1C";
+        else type = "B451C";
         currFlashTime = FLASH_TIME;
-
-        origin = this.transform;
-        destination = GetComponentInParent<Enemy>().Player.transform;
+        origin = this.transform.position;
+        destination = GetComponentInParent<Enemy>().Player.transform.position;
         lineRendererComponent = GetComponent<LineRenderer>();
-        lineRendererComponent.SetPosition(0, origin.position);
+        lineRendererComponent.SetPosition(0, origin);
         //lineRendererComponent.SetColors(Color.red, Color.red);
         lineRendererComponent.SetWidth(.15f, .15f);
         lineRendererComponent.enabled = false;
 
-        dist = Vector3.Distance(origin.position, destination.position);
+        dist = Vector3.Distance(origin, destination);
         //Debug.Log("Enemy start called");
     }
 
@@ -126,9 +132,30 @@ public class Enemy : MonoBehaviour {
 
         if (!stunned)
         {
-            //++timer;
-            //if the enemy is currently monitoring the player
-            if (trackPlayer)
+            //medics will track enemies instead of player
+            //variables could use some renaming, we'll talk about that later.
+            if(type == "Medic" && trackPlayer)
+            {
+                //get a random stunned enemy
+                List<Vector3> positions = Handler.stunnedEnemyPositions;
+                if (positions.Count != 0)
+                {
+                    active = true;
+
+                    Vector3 randomStunnedEnemy = Handler.stunnedEnemyPositions[rand.Next(Handler.stunnedEnemyPositions.Count)];
+                    vecToPlayer = (randomStunnedEnemy - this.transform.position);    //this is correct - the bullet fires on this path and it's directly into the character
+                    float angle = Mathf.Atan2(vecToPlayer.y, vecToPlayer.x) * Mathf.Rad2Deg;
+                    Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
+                    this.transform.rotation = Quaternion.Slerp(transform.rotation, q, (Handler.speedMod - slowMod) * Time.deltaTime * 0.9f * rotSpeed);
+
+                    // line render
+                    origin = this.transform.position;
+                    destination = randomStunnedEnemy;
+                    dist = Vector3.Distance(origin, destination);
+                }
+                else active = false;
+            }
+            else if (trackPlayer)
             {
                 vecToPlayer = (Player.transform.position - this.transform.position);    //this is correct - the bullet fires on this path and it's directly into the character
                 float angle = Mathf.Atan2(vecToPlayer.y, vecToPlayer.x) * Mathf.Rad2Deg;
@@ -137,10 +164,9 @@ public class Enemy : MonoBehaviour {
                 else this.transform.rotation = Quaternion.Slerp(transform.rotation, q, (Handler.speedMod-slowMod) * Time.deltaTime * 0.9f * rotSpeed); //Quaternion.LookRotation(this.transform.position - Player.transform.position);
 
                 // line render
-                origin = this.gameObject.transform;
-                destination = GetComponentInParent<Enemy>().Player.transform; // don't update this here if the enemy ever needs to draw a line to somewhere else and the player
-                destination.transform.TransformPoint(Player.transform.position);
-                dist = Vector3.Distance(origin.position, destination.position);
+                origin = this.transform.position;
+                destination = GetComponentInParent<Enemy>().Player.transform.position; // don't update this here if the enemy ever needs to draw a line to somewhere else and the player
+                dist = Vector3.Distance(origin, destination);
             }
 
             if (timer != 0) // fire first at 600 frames
@@ -187,6 +213,8 @@ public class Enemy : MonoBehaviour {
     //Called when the enemy is going to fire a bullet
     public void Fire()
     {
+        if (!active) return;    //used for medics when no stunned enemies, but could apply to other enemy types later
+
         timer++;
         //Debug.Log(timer);
         attacking = true;
@@ -198,8 +226,8 @@ public class Enemy : MonoBehaviour {
             //counter += .3f / lineDrawSpeed;
             counter += 1f;
             float x = Mathf.Lerp(0, dist, counter);
-            Vector3 pointA = origin.position;
-            Vector3 pointB = destination.position;
+            Vector3 pointA = origin;
+            Vector3 pointB = destination;
             Vector3 direction = Vector3.Normalize(pointB - pointA);
             Vector3 pointAlongLine;
             if (type == "Light") // Laser gets wider as it charges, and goes off infinitely
@@ -226,7 +254,12 @@ public class Enemy : MonoBehaviour {
                 {
                     lineRendererComponent.SetColors(new Color(255, 153, 0, 128 + counter/2), new Color(255, 1153, 0, 128 + counter/2)); // Red + more opaque as charged
                 }
-                else lineRendererComponent.SetColors(new Color(242, 190, 0, 172), new Color(242, 190, 0, 172)); // Yellow
+                else if(type == "Medic")
+                {
+                    lineRendererComponent.SetColors(new Color(0, 155, 0, 172), new Color(0, 155, 0, 172));  //Medics flash green
+                }
+                else lineRendererComponent.SetColors(new Color(242, 190, 0, 172), new Color(242, 190, 0, 172)); // Yellow (For basic enemies)
+
                 if (type == "SLOB") special.GetComponent<SpriteRenderer>().color = new Color(242, 190, 0, 172);
                 lineRendererComponent.SetPosition(1, pointAlongLine);
             }
@@ -253,7 +286,7 @@ public class Enemy : MonoBehaviour {
 
             if (type == "Light") // Fire laser
             {
-                Vector3 pointA = origin.position;
+                Vector3 pointA = origin;
                 lineRendererComponent.enabled = true;
                 lineRendererComponent.SetWidth(.43f, .43f);
                 lineRendererComponent.SetColors(Color.red, Color.black);
@@ -264,7 +297,7 @@ public class Enemy : MonoBehaviour {
                     //after attacking, reset color and flags
                     //Debug.Log("End Laser");
                     special.SetActive(false);
-                    this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
+                    //this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
                     attacking = false;
                     trackPlayer = true;
                     firing = false;
@@ -305,6 +338,7 @@ public class Enemy : MonoBehaviour {
                 }
                 else
                 {
+                    //this case includes medic as well, since we are using vecToPlayer to point to the enemy
                     newBullet.GetComponent<Bullet>().Initialize(this.transform.position, vecToPlayer);  //uses the enemy's last known location of player
                 }
 
@@ -338,6 +372,15 @@ public class Enemy : MonoBehaviour {
         if (col.gameObject.tag == "BigShield")
         {
             bigShields.Add(col.gameObject.GetComponent<BigShield>());
+        }
+
+        //medic bullets heal and apply second wind
+        if(col.gameObject.tag == "MedicBullet" && this.stunned)
+        {
+            health = (health >= MAX_HEALTH) ? MAX_HEALTH : (health + 1);    //futureproof for later, if we heal unstunned enemies
+            secondWind = true;
+            Destroy(col.gameObject);
+            return;
         }
 
         if (!guarded)
@@ -402,6 +445,7 @@ public class Enemy : MonoBehaviour {
         if (other.gameObject.tag == "Enemy")
         {
             this.health = -1;
+            Handler.Respawn(this.type.ToLower());
         }
     }
 

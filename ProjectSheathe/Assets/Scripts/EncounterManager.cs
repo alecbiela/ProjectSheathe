@@ -11,10 +11,12 @@ public class EncounterManager : MonoBehaviour
     public GameObject lunkPrefab;
     public GameObject slobPrefab;
     public GameObject guardianPrefab;
+    public GameObject medicPrefab;
 
     List<GameObject> enemies = new List<GameObject>();
     List<int> activeEnemies = new List<int>();
     Dictionary<string, GameObject> enemyPrefabs = new Dictionary<string, GameObject>();
+    public List<Vector3> stunnedEnemyPositions { get; private set; }
 
     // Use this for initialization
     System.Random rand = new System.Random();
@@ -44,6 +46,7 @@ public class EncounterManager : MonoBehaviour
         enemyPrefabs.Add("lunk", lunkPrefab);
         enemyPrefabs.Add("slob", slobPrefab);
         enemyPrefabs.Add("guardian", guardianPrefab);
+        enemyPrefabs.Add("medic", medicPrefab);
 
 
         Player = GameObject.FindGameObjectWithTag("Player");
@@ -61,6 +64,8 @@ public class EncounterManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //update active enemy list as well as stunned enemy position list
+        UpdateEnemyLists();
         if(enemies.Count <= 0) Spawn();
         DynamicDifficulty();
         ManageAttacks();
@@ -103,24 +108,30 @@ public class EncounterManager : MonoBehaviour
                 PlayerScript.score += 50;
                 break;
             }
+        }
+    }
 
-            // if the player is overclocking, then kill all stunned enemies
-            if (PlayerScript.Overclocking == true && enemies[i].GetComponent<Enemy>().stunned == true)
+    //kills all stunned enemies, called when the player overclocks (from character.cs)
+    public void KillStunnedEnemies()
+    {
+        List<int> enemiesToKill = new List<int>();
+
+        //find out which enemies we should kill
+        for(int i=0; i<enemies.Count; i++)
+        {
+            if(enemies[i].GetComponent<Enemy>().stunned)
             {
-                if (PlayerScript.killStunnedEnemies == true)
-                {
-                    //Debug.Log("OC RIP");
-                    UpdateQuadrants(enemies[i].transform.position);
-                    GameObject.DestroyObject(enemies[i]);
-                    enemies.RemoveAt(i);
-                    PlayerScript.score += 100;
-                    if (i == enemies.Count - 1)
-                    {
-                        PlayerScript.killStunnedEnemies = false;
-                    }
-                }
+                enemiesToKill.Add(i);
             }
+        }
 
+        //once we have the list of enemies to kill, actually kill them
+        for(int i = (enemiesToKill.Count - 1); i >= 0; i--)
+        {
+            UpdateQuadrants(enemies[enemiesToKill[i]].transform.position);
+            GameObject.DestroyObject(enemies[enemiesToKill[i]]);
+            enemies.RemoveAt(enemiesToKill[i]);
+            PlayerScript.score += 100;
         }
     }
 
@@ -155,22 +166,26 @@ public class EncounterManager : MonoBehaviour
         //calculates number of enemies to spawn (only does this when needed now, as opposed to every frame)
         maxEnemyNumber = BASE_ENEMY_COUNT + (int)(PlayerScript.score / 250);
 
+        //spawns the required amount of enemies (type is random)
         for(int i = 0; i < maxEnemyNumber; i++)
         {
-            int enemyType = rand.Next(0, 5);
+            int enemyType = rand.Next(0, 2);
             switch(enemyType)
             {
+                //case 0:
+                    //CreateEnemy("guardian");
+                    //break;
+                //case 1:
+                    //CreateEnemy("slob");
+                    //break;
                 case 0:
-                    CreateEnemy("guardian");
-                    break;
-                case 1:
-                    CreateEnemy("slob");
-                    break;
-                case 2:
                     CreateEnemy("b451c");
                     break;
-                case 3:
-                    CreateEnemy("light");
+                //case 3:
+                   // CreateEnemy("light");
+                    //break;
+                case 1:
+                    CreateEnemy("medic");
                     break;
             }
         }
@@ -264,7 +279,7 @@ public class EncounterManager : MonoBehaviour
     {
         time -= Time.deltaTime * speedMod;
 
-        if (time <= 0 && (activeEnemies = GetActiveEnemies()).Count >= 1)
+        if (time <= 0 && activeEnemies.Count >= 1)
         {
             int attackPattern = rand.Next(0, 2); // make the max a variable that is determined by the dynamic difficulty in the future?
             switch(attackPattern)
@@ -330,22 +345,34 @@ public class EncounterManager : MonoBehaviour
         }
     }
 
-    //gets a list of indices of active enemies
-    private List<int> GetActiveEnemies()
+    //update the bins of enemies for handling in other methods and scripts
+    public void UpdateEnemyLists()
     {
+        //loop through all enemies
         List<int> activeIndicies = new List<int>();
+        List<Vector3> positions = new List<Vector3>();
 
-        //add the indices of the enemies that aren't stunned
-        for(int i=0; i < enemies.Count; i++)
+        //if stunned, add positions to stunned enemies list, otherwise they are active
+        for (int i = 0; i < enemies.Count; i++)
         {
+            //if we wanted to get all damaged enemies, not just stunned (for medics),
+            //we check HERE based on health, and not stunned flag
             if (!enemies[i].GetComponent<Enemy>().stunned) activeIndicies.Add(i);
+            else positions.Add(enemies[i].transform.position);
         }
 
-        return activeIndicies;
+        //update the actual lists
+        activeEnemies = activeIndicies;
+        stunnedEnemyPositions = positions;
     }
 
-    
-    
+    //respawns an enemy if it landed on top of another one when it was spawned
+    //takes the type of enemy, passed from enemy.cs
+    public void Respawn(string type)
+    {
+        CreateEnemy(type);
+    }
+
     //future method to be used to Introduce new enemies
     //introduces a new enemy and displays a tooltip on how to defeat it
     //takes the name of the enemy to introduce

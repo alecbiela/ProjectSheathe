@@ -361,7 +361,7 @@ public class Character : MonoBehaviour
             Overclocking = true;
             timeSlow = true;
             enemyHandler.speedMod -= overclockMod; // Slow enemies
-            killStunnedEnemies = true;
+            enemyHandler.KillStunnedEnemies();
             //Debug.Log("ZA WARUDO: " + enemyHandler.speedMod);
         }
         else if ((!Overclocking && timeSlow) || (Overclocking && overclockTimer <= 0 && timeSlow)) // On end trigger or after ending frames
@@ -414,41 +414,48 @@ public class Character : MonoBehaviour
         //Debug.Log("Collide");
         if (other.gameObject.layer == 11) // All bullet types, can use tag for specific actions based on bullet type
         {
-            //Debug.Log("Player got hit");
-            health--;
-            hpHit++;
-            //Debug.Log(hpHit);
-            Cancel(); // ends active attacks when hit. This may need to be commented out if we can't get the animations to stop too
-                      //Debug.Log("Got em. Health: " + health);
-                      //this.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+            //trying to prevent accidental collision w/ basic bullets, not sure what other bullets can be deflected
+            if ((other.tag == "Bullet" || other.tag == "SlowBullet") && other.GetComponent<Bullet>().CanHurtEnemies) return;
 
-            /*
-            // Hitstop
-            if (playerHit == false)
+            if (other.tag != "MedicBullet")
             {
-                //float pauseDelay = .7f;
-                float pauseDelay = 25.0f / 60.0f;
-                //Time.timeScale = .0000001f;
-                while (pauseDelay > 0)
+                //Debug.Log("Collided w/ non-medic bullet");
+                //Debug.Log("Player got hit");
+                health--;
+                hpHit++;
+                //Debug.Log(hpHit);
+                Cancel(); // ends active attacks when hit. This may need to be commented out if we can't get the animations to stop too
+                          //Debug.Log("Got em. Health: " + health);
+                          //this.gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+
+                /*
+                // Hitstop
+                if (playerHit == false)
                 {
-                    pauseDelay -= Time.deltaTime;
-                    Debug.Log("hitstop");
+                    //float pauseDelay = .7f;
+                    float pauseDelay = 25.0f / 60.0f;
+                    //Time.timeScale = .0000001f;
+                    while (pauseDelay > 0)
+                    {
+                        pauseDelay -= Time.deltaTime;
+                        Debug.Log("hitstop");
+                    }
+                    //Debug.Log("Out");
+                    Time.timeScale = 1.0f;
                 }
-                //Debug.Log("Out");
-                Time.timeScale = 1.0f;
+                */
+
+                if (health <= 0)
+                {
+                    health = 0;
+                    //Debug.Log("GAME OVER");
+                }
+
+                enemyHandler.SecondWind();
+
+                //get rid of the bullet that was fired
+                Destroy(other.gameObject);
             }
-            */
-
-            if (health <= 0)
-            {
-                health = 0;
-                //Debug.Log("GAME OVER");
-            }
-
-            enemyHandler.SecondWind();
-
-            //get rid of the bullet that was fired
-            Destroy(other.gameObject);
             return;
         }
         else if (other.gameObject.layer == 12 && !hitByLaser) // Laser first hit
@@ -479,7 +486,7 @@ public class Character : MonoBehaviour
 
         if (other.gameObject.tag == "BigShield")
         {
-            Debug.Log("Player in");
+            //Debug.Log("Player in");
             other.GetComponent<BigShield>().playerInside = true;
         }
         
@@ -487,6 +494,13 @@ public class Character : MonoBehaviour
 
     void OnTriggerExit2D(Collider2D other)
     {
+        //if the medic bullet passed through us, give us 1 health
+        if(other.tag == "MedicBullet")
+        {
+            health++;
+            return;
+        }
+
         if (other.gameObject.layer == 12) hitByLaser = false;
         if (other.gameObject.layer == 13)
         {

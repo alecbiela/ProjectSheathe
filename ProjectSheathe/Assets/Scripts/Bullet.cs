@@ -47,6 +47,12 @@ public class Bullet : MonoBehaviour {
         //bullet collides with the deflect hitbox
         if(col.tag == "DeflectHitbox" && !CanHurtEnemies)
         {
+            //if it's a medic bullet, give the player 2 health (any better way to do this?)
+            if(this.tag == "MedicBullet")
+            {
+                GameObject.Find("Player").GetComponent<Character>().health += 2;
+                Destroy(this.gameObject);
+            }
             CanHurtEnemies = true;
             desiredVelocity *= -1;
         }

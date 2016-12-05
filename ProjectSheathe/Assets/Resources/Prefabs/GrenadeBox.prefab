@@ -52,7 +52,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000012712559032}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.9317029, y: -3.14438, z: 0}
+  m_LocalPosition: {x: -10.134749, y: -3.0579166, z: 0}
   m_LocalScale: {x: 3.4027367, y: 3.4027388, z: 3.4027388}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -113,6 +113,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explodeTime: 2
   slowFactor: 0.5
+  id: 0
+  isTrigger: 0
+  canHurtEnemies: 0
 --- !u!212 &212000012959171610
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -446,6 +446,8 @@ MonoBehaviour:
   slobPrefab: {fileID: 1000014094969076, guid: 91a22dc5f914a2b4bad8bc91f2c5e6de, type: 2}
   guardianPrefab: {fileID: 1000012591825258, guid: 83705f8ddb82857438a3995b4571b743,
     type: 2}
+  medicPrefab: {fileID: 1000010486928228, guid: 8a6594cf694cf284db82fc82b6b7ae31,
+    type: 2}
   speedMod: 4
 --- !u!4 &408454245
 Transform:
@@ -537,7 +539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c1b3353596775c941a3794dbfd3b018c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  controllerType: Xbox360A
+  controllerType: Keyboard
 --- !u!61 &448848514
 BoxCollider2D:
   m_ObjectHideFlags: 0

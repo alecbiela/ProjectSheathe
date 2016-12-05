@@ -62,12 +62,12 @@ Transform:
   m_RootOrder: 0
 --- !u!4 &4000013017386786
 Transform:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.82, y: -1.56, z: 0}
+  m_LocalPosition: {x: -7.9787803, y: -3.2539139, z: 0}
   m_LocalScale: {x: 0.19486503, y: 0.1948651, z: 0.1948651}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -82,7 +82,7 @@ Rigidbody2D:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 100000
   m_LinearDrag: 5
   m_AngularDrag: 1000
   m_GravityScale: 0
@@ -93,7 +93,7 @@ Rigidbody2D:
   m_Constraints: 0
 --- !u!61 &61000013196159160
 BoxCollider2D:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
@@ -107,7 +107,7 @@ BoxCollider2D:
   m_Size: {x: 6.9138103, y: 9.551132}
 --- !u!114 &114000010888501414
 MonoBehaviour:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
@@ -118,6 +118,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 0}
   health: 3
+  MAX_HEALTH: 3
   stunned: 0
   unstunned: 0
   secondWind: 0
@@ -129,14 +130,14 @@ MonoBehaviour:
   slowMod: 0
   guarded: 0
   lineRendererComponent: {fileID: 0}
-  origin: {fileID: 0}
-  destination: {fileID: 0}
+  origin: {x: 0, y: 0, z: 0}
+  destination: {x: 0, y: 0, z: 0}
   lineDrawSpeed: 600
   running: 0
   type: 
 --- !u!120 &120000013409706114
 LineRenderer:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
@@ -211,7 +212,7 @@ SpriteRenderer:
   m_FlipY: 0
 --- !u!212 &212000011771433516
 SpriteRenderer:
-  m_ObjectHideFlags: 0
+  m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
