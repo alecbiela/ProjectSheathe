@@ -357,7 +357,11 @@ public class EncounterManager : MonoBehaviour
         {
             //if we wanted to get all damaged enemies, not just stunned (for medics),
             //we check HERE based on health, and not stunned flag
-            if (!enemies[i].GetComponent<Enemy>().stunned) activeIndicies.Add(i);
+            if (!enemies[i].GetComponent<Enemy>().stunned)
+            {
+                if(enemies[i].GetComponent<Enemy>().type != "Medic")
+                    activeIndicies.Add(i);
+            }
             else positions.Add(enemies[i].transform.position);
         }
 

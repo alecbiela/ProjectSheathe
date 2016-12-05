@@ -90,7 +90,6 @@ public class Enemy : MonoBehaviour {
         else if (BulletPrefab.tag == "MedicBullet")
         {
             type = "Medic";
-            FLASH_TIME = 0.5f;  //how long medic flashes before they shoot (lower since it's 1sec per shot)
         }
         else if (BulletPrefab.tag == "Rocket") type = "Lock";
         else type = "B451C";
@@ -442,11 +441,11 @@ public class Enemy : MonoBehaviour {
     //if by chance we spawn on top of another enemy, die so we can respawn
     void OnCollisionEnter2D(Collision2D other)
     {
-        if (other.gameObject.tag == "Enemy")
+        /*if (other.gameObject.tag == "Enemy")
         {
             this.health = -1;
             Handler.Respawn(this.type.ToLower());
-        }
+        }*/
     }
 
     void OnTriggerExit2D(Collider2D other)
