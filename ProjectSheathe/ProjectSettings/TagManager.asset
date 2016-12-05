@@ -20,6 +20,9 @@ TagManager:
   - Laser
   - SlowBullet
   - Shield
+  - Grenade
+  - GrenadeDestination
+  - BigShield
   layers:
   - Default
   - TransparentFX
@@ -34,7 +37,7 @@ TagManager:
   - Hitboxes
   - Bullets
   - Laser
-  - 
+  - Grenade
   - 
   - 
   - 

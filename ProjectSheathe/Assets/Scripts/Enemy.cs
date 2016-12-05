@@ -22,7 +22,11 @@ public class Enemy : MonoBehaviour {
     public bool hitRecently;
     private bool trackPlayer;
     private float rotSpeed = 1f;
-    private GameObject special; // Laser for Light, shield for Lunk
+    public GameObject special; // Laser for Light, shield for Lunk
+    public float slowMod = 0;
+    private List<Explosion> slowFields = new List<Explosion>();
+    private List<BigShield> bigShields = new List<BigShield>();
+    public bool guarded; // Covered by a shield without a player in it
 
     // Line rendering stuff
     public LineRenderer lineRendererComponent;
@@ -33,7 +37,7 @@ public class Enemy : MonoBehaviour {
     public float lineDrawSpeed = 600f;
     //private int timer;
     public bool running;
-    private string type;
+    public string type;
 
     // Laser stuff
     private const float LASER_TIME = 2f; // Time laser is actively dealing damage
@@ -68,6 +72,17 @@ public class Enemy : MonoBehaviour {
             {
                 type = "Lunk";
                 special.SetActive(true);
+            }
+            else if (special.tag == "Grenade")
+            {
+                type = "SLOB";
+                special.SetActive(false);
+            }
+            else if (special.tag == "BigShield")
+            {
+                type = "Guardian";
+                special.SetActive(true);
+                bigShields.Add(special.GetComponent<BigShield>()); // Is behind its own shield
             }
         }
         else if (BulletPrefab.tag == "Rocket") type = "Lock";
@@ -118,7 +133,8 @@ public class Enemy : MonoBehaviour {
                 vecToPlayer = (Player.transform.position - this.transform.position);    //this is correct - the bullet fires on this path and it's directly into the character
                 float angle = Mathf.Atan2(vecToPlayer.y, vecToPlayer.x) * Mathf.Rad2Deg;
                 Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
-                this.transform.rotation = Quaternion.Slerp(transform.rotation, q, Handler.speedMod * Time.deltaTime * 0.9f * rotSpeed); //Quaternion.LookRotation(this.transform.position - Player.transform.position);
+                if (type == "Guardian") this.transform.rotation = Quaternion.Slerp(transform.rotation, q, (Handler.speedMod - slowMod) * Time.deltaTime * 0.1f * rotSpeed);
+                else this.transform.rotation = Quaternion.Slerp(transform.rotation, q, (Handler.speedMod-slowMod) * Time.deltaTime * 0.9f * rotSpeed); //Quaternion.LookRotation(this.transform.position - Player.transform.position);
 
                 // line render
                 origin = this.gameObject.transform;
@@ -132,6 +148,39 @@ public class Enemy : MonoBehaviour {
                 Fire();
                 //Debug.Log("Fire call");
             }
+        }
+        for (int i = 0; i < slowFields.Count; i++)
+        {
+            if (!slowFields[i].isTrigger)
+            {
+                slowFields.RemoveAt(i);
+                i--;
+            }
+        }
+        if (slowMod > 0 && slowFields.Count == 0)
+        {
+            //Debug.Log("unslowed");
+            slowMod = 0;
+        }
+
+        if (bigShields.Count > 0) guarded = true; // Guardian stuff
+        for (int i = 0; i < bigShields.Count; i++)
+        {
+            if (bigShields[i] == null)
+            {
+                bigShields.RemoveAt(i);
+                i--;
+            }
+            else if (bigShields[i].playerInside)
+            {
+                Debug.Log("unguardedInside");
+                guarded = false;
+            }
+        }
+        if (guarded && bigShields.Count == 0)
+        {
+            Debug.Log("unguardedNoShields");
+            guarded = false;
         }
     }
 
@@ -165,6 +214,11 @@ public class Enemy : MonoBehaviour {
             }
             
             lineRendererComponent.enabled = true;
+            if (type == "SLOB") // Flash circle
+            {
+                special.transform.position = pointB;
+                special.SetActive(true);
+            }
             if (currFlashTime > .20)
             {
                 //this.GetComponent<SpriteRenderer>().color = new Color(255, 200, 0); // yellow/gold
@@ -173,18 +227,21 @@ public class Enemy : MonoBehaviour {
                     lineRendererComponent.SetColors(new Color(255, 153, 0, 128 + counter/2), new Color(255, 1153, 0, 128 + counter/2)); // Red + more opaque as charged
                 }
                 else lineRendererComponent.SetColors(new Color(242, 190, 0, 172), new Color(242, 190, 0, 172)); // Yellow
+                if (type == "SLOB") special.GetComponent<SpriteRenderer>().color = new Color(242, 190, 0, 172);
                 lineRendererComponent.SetPosition(1, pointAlongLine);
             }
             else // flash red just before firing
             {
                 //this.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0); // red
                 lineRendererComponent.SetColors(Color.red, Color.black);
+                if (type == "SLOB") special.GetComponent<SpriteRenderer>().color = Color.red;
                 lineRendererComponent.SetPosition(1, pointAlongLine);
                 trackPlayer = false;
             }
         }
         else
         {
+            if (type == "SLOB") special.SetActive(false); // Flash circle as well
             this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255); // white
             lineRendererComponent.enabled = false;
         }
@@ -205,6 +262,7 @@ public class Enemy : MonoBehaviour {
                 if (firing && fireTime <= 0) // End laser
                 {
                     //after attacking, reset color and flags
+                    //Debug.Log("End Laser");
                     special.SetActive(false);
                     this.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
                     attacking = false;
@@ -220,6 +278,7 @@ public class Enemy : MonoBehaviour {
                 }
                 else if (!firing) // Start firing
                 {
+                    //Debug.Log("Fire Laser");
                     firing = true;
                     fireTime = LASER_TIME;
                     special.SetActive(true);
@@ -237,8 +296,12 @@ public class Enemy : MonoBehaviour {
                 GameObject newBullet = (GameObject)Instantiate(BulletPrefab);
                 if (type == "Lock")
                 {
-                    newBullet.GetComponent<Rocket>().Initialize(this.transform.position, Player.transform);  //uses the enemy's last known location of player
-
+                    newBullet.GetComponent<Rocket>().Initialize(this.transform.position, Player.transform);
+                }
+                else if (type == "SLOB")
+                {
+                    special.SetActive(false);
+                    newBullet.GetComponent<Grenade>().Initialize(this.transform.position, Player.transform);
                 }
                 else
                 {
@@ -262,56 +325,74 @@ public class Enemy : MonoBehaviour {
     //Handles collision of enemy with other objects
     void OnTriggerEnter2D(Collider2D col)
     {
-        //if it's a slice hitbox
-        if (col.tag.Contains("SliceHitbox"))
+        if (col.gameObject.layer == 13)
         {
-            //Debug.Log("Hit by slice");
-
-            if (type == "Lunk" && special.activeSelf) // If shield is up
+            if (col.gameObject.GetComponent<Explosion>().canHurtEnemies)
             {
-                special.SetActive(false);
-                this.hitRecently = true;
+                //Debug.Log("Slowed");
+                if (slowMod <= 0) slowMod = col.gameObject.GetComponent<Explosion>().slowFactor;
+                slowFields.Add(col.gameObject.GetComponent<Explosion>());
             }
-            else if (!this.hitRecently)
-            {
-                health--;
-                this.hitRecently = true;
-            }
-
-            return;
         }
 
-        //if a bullet is hitting it
-        if (col.tag == "Bullet" || col.tag == "SlowBullet")
+        if (col.gameObject.tag == "BigShield")
         {
-            //Debug.Log("Bullet is hitting enemy now");
-            if (col.gameObject.GetComponent<Bullet>().CanHurtEnemies)
+            bigShields.Add(col.gameObject.GetComponent<BigShield>());
+        }
+
+        if (!guarded)
+        {
+            //if it's a slice hitbox
+            if (col.tag.Contains("SliceHitbox"))
             {
-                //destroy the bullet and subtract enemy health or do whatever you gotta do
-                if (type == "Lunk" && special.activeSelf)  // If shield is up
+                //Debug.Log("Hit by slice");
+
+                if (type == "Lunk" && special.activeSelf) // If shield is up
                 {
-                    // /Do nothing
+                    special.SetActive(false);
+                    this.hitRecently = true;
                 }
-                else
+                else if (!this.hitRecently)
                 {
                     health--;
+                    this.hitRecently = true;
                 }
-                Destroy(col.gameObject);
-            }
-        }
 
-        //if it's a basic attack hitbox
-        if (col.tag.Contains("BAHitbox"))
-        {
-            if (type == "Lunk" && special.activeSelf) { } // If shield is up
-            else if (!this.hitRecently)
+                return;
+            }
+
+            //if a bullet is hitting it
+            if (col.tag == "Bullet" || col.tag == "SlowBullet")
             {
-                if (Player.GetComponent<Character>().Overclocking) health -= 2;
-                else health--;
-                this.hitRecently = true;
+                //Debug.Log("Bullet is hitting enemy now");
+                if (col.gameObject.GetComponent<Bullet>().CanHurtEnemies)
+                {
+                    //destroy the bullet and subtract enemy health or do whatever you gotta do
+                    if (type == "Lunk" && special.activeSelf)  // If shield is up
+                    {
+                        // /Do nothing
+                    }
+                    else
+                    {
+                        health--;
+                    }
+                    Destroy(col.gameObject);
+                }
             }
 
-            return;
+            //if it's a basic attack hitbox
+            if (col.tag.Contains("BAHitbox"))
+            {
+                if (type == "Lunk" && special.activeSelf) { } // If shield is up
+                else if (!this.hitRecently)
+                {
+                    if (Player.GetComponent<Character>().Overclocking) health -= 2;
+                    else health--;
+                    this.hitRecently = true;
+                }
+
+                return;
+            }
         }
     }
 
@@ -321,6 +402,26 @@ public class Enemy : MonoBehaviour {
         if (other.gameObject.tag == "Enemy")
         {
             this.health = -1;
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "BigShield")
+        {
+            foreach (BigShield s in bigShields)
+            {
+                if (other.GetComponent<BigShield>().id == s.id)
+                {
+                    bigShields.Remove(s);
+                    break;
+                }
+            }
+            if (bigShields.Count == 0)
+            {
+                Debug.Log("unguarded");
+                guarded = false;
+            }
         }
     }
 }

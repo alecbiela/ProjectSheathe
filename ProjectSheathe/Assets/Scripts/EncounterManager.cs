@@ -9,6 +9,8 @@ public class EncounterManager : MonoBehaviour
     public GameObject lockPrefab;  //after you add it here, make sure to head down to the array to include it
     public GameObject lightPrefab;
     public GameObject lunkPrefab;
+    public GameObject slobPrefab;
+    public GameObject guardianPrefab;
 
     List<GameObject> enemies = new List<GameObject>();
     List<int> activeEnemies = new List<int>();
@@ -40,6 +42,8 @@ public class EncounterManager : MonoBehaviour
         enemyPrefabs.Add("lock", lockPrefab);
         enemyPrefabs.Add("light", lightPrefab);
         enemyPrefabs.Add("lunk", lunkPrefab);
+        enemyPrefabs.Add("slob", slobPrefab);
+        enemyPrefabs.Add("guardian", guardianPrefab);
 
 
         Player = GameObject.FindGameObjectWithTag("Player");
@@ -89,7 +93,12 @@ public class EncounterManager : MonoBehaviour
             {
                 //Debug.Log("RIP");
                 UpdateQuadrants(enemies[i].transform.position);
-                GameObject.DestroyObject(enemies[i]);
+                if (enemies[i].GetComponent<Enemy>().type == "Light" || enemies[i].GetComponent<Enemy>().type == "Lunk" || enemies[i].GetComponent<Enemy>().type == "SLOB")
+                {
+                    Destroy(enemies[i].GetComponent<Enemy>().special.gameObject); // Destroy laser or shield as well
+                    enemies[i].GetComponent<Enemy>().special = null;
+                }
+                Destroy(enemies[i]);
                 enemies.RemoveAt(i);
                 PlayerScript.score += 50;
                 break;
@@ -152,16 +161,16 @@ public class EncounterManager : MonoBehaviour
             switch(enemyType)
             {
                 case 0:
-                    CreateEnemy("b451c");
+                    CreateEnemy("guardian");
                     break;
                 case 1:
-                    CreateEnemy("lunk");
+                    CreateEnemy("slob");
                     break;
                 case 2:
-                    CreateEnemy("light");
+                    CreateEnemy("b451c");
                     break;
                 case 3:
-                    CreateEnemy("lock");
+                    CreateEnemy("light");
                     break;
             }
         }

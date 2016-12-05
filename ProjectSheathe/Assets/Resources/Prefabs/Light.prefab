@@ -23,6 +23,7 @@ GameObject:
   - 61: {fileID: 61000013196159160}
   - 114: {fileID: 114000010888501414}
   - 120: {fileID: 120000013409706114}
+  - 50: {fileID: 50000013555440776}
   m_Layer: 9
   m_Name: Light
   m_TagString: Enemy
@@ -32,7 +33,7 @@ GameObject:
   m_IsActive: 1
 --- !u!4 &4000013017386786
 Transform:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
@@ -43,9 +44,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+--- !u!50 &50000013555440776
+Rigidbody2D:
+  serializedVersion: 2
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000010486928228}
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 5
+  m_AngularDrag: 1000
+  m_GravityScale: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!61 &61000013196159160
 BoxCollider2D:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
@@ -59,7 +77,7 @@ BoxCollider2D:
   m_Size: {x: 8.064709, y: 7.8024335}
 --- !u!114 &114000010888501414
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
@@ -71,19 +89,24 @@ MonoBehaviour:
   Player: {fileID: 0}
   health: 3
   stunned: 0
+  unstunned: 0
   secondWind: 0
   BulletPrefab: {fileID: 1000011527268170, guid: 18c943a95c879ac42969a5f5ffd36ceb,
     type: 2}
   force: {x: 0, y: 0, z: 0}
   hitRecently: 0
+  special: {fileID: 0}
+  slowMod: 0
+  guarded: 0
   lineRendererComponent: {fileID: 0}
   origin: {fileID: 0}
   destination: {fileID: 0}
   lineDrawSpeed: 600
   running: 0
+  type: 
 --- !u!120 &120000013409706114
 LineRenderer:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
@@ -125,7 +148,7 @@ LineRenderer:
   m_UseWorldSpace: 1
 --- !u!212 &212000011771433516
 SpriteRenderer:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}

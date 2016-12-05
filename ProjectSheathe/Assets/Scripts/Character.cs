@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Character : MonoBehaviour
 {
@@ -45,9 +46,10 @@ public class Character : MonoBehaviour
     private float oldSpeed;
     private bool hitByLaser; // Tracks if being actively hit by laser
     private int hpHit; // number of times the player has been hit. Used with CHUNK
+    [HideInInspector] public float slowMod = 0;
 
     private int sliceBoxes;
-    public bool slowMovement;
+    [HideInInspector] public bool slowMovement;
     private bool[] inputFlags;
 
     //can look at these elsewhere (perhaps to disregard input?) but can only set in here
@@ -70,6 +72,7 @@ public class Character : MonoBehaviour
     public bool playerHit; // variable that tells the encounter manager the player has been hit
     public bool killStunnedEnemies;
     public int score;
+    private List<Explosion> slowFields = new List<Explosion>();
 
     private void Awake()
     {
@@ -128,7 +131,7 @@ public class Character : MonoBehaviour
         //only move when they are not doing these actions
         if (!Attacking && !Deflecting && !Slicing)
         {   
-            rigidBody.velocity = new Vector2(hMove * maxSpeed, vMove * maxSpeed);
+            rigidBody.velocity = new Vector2(hMove * maxSpeed * (1-slowMod), vMove * maxSpeed * (1-slowMod));
         }
 
         if ((hLook != 0 || vLook != 0) && !Attacking && !Slicing)
@@ -146,7 +149,7 @@ public class Character : MonoBehaviour
     public void keyboardMove(float hMove, float vMove, Vector3 mousePos) // Movement and rotation with keyboard and mouse
     {
         if (!Attacking && !Deflecting && !Slicing)   //only move when they are not doing these actions
-            rigidBody.velocity = new Vector2(hMove * maxSpeed, vMove * maxSpeed);
+            rigidBody.velocity = new Vector2(hMove * maxSpeed * (1-slowMod), vMove * maxSpeed*(1-slowMod));
         Vector3 playerPos = Camera.main.WorldToScreenPoint(rigidBody.transform.position);
         mousePos.x = mousePos.x - playerPos.x;
         mousePos.y = mousePos.y - playerPos.y;
@@ -162,6 +165,19 @@ public class Character : MonoBehaviour
     {
         ProcessInput();
         ExecuteTimedActions();
+        for (int i = 0; i < slowFields.Count; i++)
+        {
+            if (!slowFields[i].isTrigger)
+            {
+                slowFields.RemoveAt(i);
+                i--;
+            }
+        }
+        if (slowMod > 0 && slowFields.Count == 0)
+        {
+            //Debug.Log("unslowed");
+            slowMod = 0;
+        }
     }
 
     private void ProcessInput() // Processes the current input that the character has
@@ -395,6 +411,7 @@ public class Character : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        //Debug.Log("Collide");
         if (other.gameObject.layer == 11) // All bullet types, can use tag for specific actions based on bullet type
         {
             //Debug.Log("Player got hit");
@@ -436,7 +453,7 @@ public class Character : MonoBehaviour
         }
         else if (other.gameObject.layer == 12 && !hitByLaser) // Laser first hit
         {
-            Debug.Log("LASERED");
+            //Debug.Log("LASERED");
             health--;
             hpHit++;
             //Debug.Log(hpHit);
@@ -450,12 +467,48 @@ public class Character : MonoBehaviour
 
             enemyHandler.SecondWind();
         }
+        else if (other.gameObject.layer == 13)
+        {
+            slowFields.Add(other.gameObject.GetComponent<Explosion>());
+            if (!other.gameObject.GetComponent<Explosion>().canHurtEnemies && slowMod <= 0)
+            {
+                //Debug.Log("Slowed");
+                slowMod = other.gameObject.GetComponent<Explosion>().slowFactor;
+            }
+        }
 
+        if (other.gameObject.tag == "BigShield")
+        {
+            Debug.Log("Player in");
+            other.GetComponent<BigShield>().playerInside = true;
+        }
+        
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
         if (other.gameObject.layer == 12) hitByLaser = false;
+        if (other.gameObject.layer == 13)
+        {
+            foreach (Explosion e in slowFields)
+            {
+                if (other.GetComponent<Explosion>().id == e.id)
+                {
+                    slowFields.Remove(e);
+                    break;
+                }
+            }
+            if (slowFields.Count == 0)
+            {
+                //Debug.Log("unslowed");
+                slowMod = 0;
+            }
+        }
+        if (other.gameObject.tag == "BigShield")
+        {
+            Debug.Log("Player out");
+            other.GetComponent<BigShield>().playerInside = false;
+        }
     }
 
 
