@@ -515,7 +515,7 @@ public class Character : MonoBehaviour
             if (health <= 0)
             {
                 health = 0;
-                //Debug.Log("GAME OVER");
+                Debug.Log("GAME OVER");
             }
             hitByLaser = true;
 

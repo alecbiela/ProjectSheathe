@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 5c4373ef144867642b03702f1c8d6389
-timeCreated: 1480976583
+timeCreated: 1480995483
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -64,64 +64,12 @@ TextureImporter:
       name: Deflect_Recovery_Sheet_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 672
-        width: 614
-        height: 556
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: Deflect_Recovery_Sheet_2
-      rect:
-        serializedVersion: 2
-        x: 1263
-        y: 712
-        width: 668
-        height: 513
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: Deflect_Recovery_Sheet_3
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 117
-        width: 637
-        height: 482
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: Deflect_Recovery_Sheet_4
-      rect:
-        serializedVersion: 2
-        x: 651
-        y: 38
-        width: 608
-        height: 549
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: Deflect_Recovery_Sheet_5
-      rect:
-        serializedVersion: 2
-        x: 1446
-        y: 0
-        width: 511
-        height: 633
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 664
+        y: 1428
+        width: 540
+        height: 610
+      alignment: 9
+      pivot: {x: 0.44541478, y: 0.4130211}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -129,12 +77,64 @@ TextureImporter:
       name: Deflect_Recovery_Sheet_1
       rect:
         serializedVersion: 2
-        x: 618
-        y: 673
-        width: 642
-        height: 553
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 679
+        y: 791
+        width: 548
+        height: 613
+      alignment: 9
+      pivot: {x: 0.45159033, y: 0.35574484}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Deflect_Recovery_Sheet_2
+      rect:
+        serializedVersion: 2
+        x: 705
+        y: 116
+        width: 519
+        height: 616
+      alignment: 9
+      pivot: {x: 0.471603, y: 0.31338173}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Deflect_Recovery_Sheet_3
+      rect:
+        serializedVersion: 2
+        x: 131
+        y: 1404
+        width: 480
+        height: 622
+      alignment: 9
+      pivot: {x: 0.51842237, y: 0.32465953}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Deflect_Recovery_Sheet_4
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 785
+        width: 513
+        height: 566
+      alignment: 9
+      pivot: {x: 0.64939165, y: 0.3541815}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Deflect_Recovery_Sheet_5
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 87
+        width: 610
+        height: 468
+      alignment: 9
+      pivot: {x: 0.7464396, y: 0.41182324}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0

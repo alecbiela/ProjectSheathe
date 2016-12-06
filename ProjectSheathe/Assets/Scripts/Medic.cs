@@ -18,8 +18,8 @@ public class Medic : MonoBehaviour {
 	void Update () {
         timer += Time.deltaTime * em.speedMod;
 
-        //fire if longer than 1 sec
-        if(timer >= 1)
+        //fire if longer than some time
+        if(timer >= 4)
         {
             thisMedic.Fire();
             timer = 0;

@@ -85,7 +85,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac68e70f8d4e29d49b58b65743892ea2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletSpeed: 1
+  bulletSpeed: 8
   ExplosionPrefab: {fileID: 1000012712559032, guid: c0c8e4f182fa6e941847f2d7ae5e3958,
     type: 2}
   slowMod: 0

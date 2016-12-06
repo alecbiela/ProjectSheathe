@@ -14,7 +14,9 @@ public class EncounterManager : MonoBehaviour
     public GameObject medicPrefab;
     public GameObject hotBoxPrefab;
 
-    List<GameObject> enemies = new List<GameObject>();
+    List<GameObject> enemies = new List<GameObject>(); // all enemies
+    //List<GameObject> guards = new List<GameObject>(); // only guards
+    //List<GameObject> officers = new List<GameObject>(); // only officers
     List<int> activeEnemies = new List<int>();
     Dictionary<string, GameObject> enemyPrefabs = new Dictionary<string, GameObject>();
     public List<Vector3> stunnedEnemyPositions { get; private set; }
@@ -27,8 +29,11 @@ public class EncounterManager : MonoBehaviour
     public float baseSpeed { get; private set; }
     public float slowSpeed { get; private set; }
     private int maxEnemyNumber;
+    private int maxOfficerNumber;
     private bool hitRecently;
     private const int BASE_ENEMY_COUNT = 5;
+    private const int ABSOLUTE_MAX_GUARD_COUNT = 20;
+    private const int ABSOLUTE_MAX_OFFICER_NUMBER = 4;
     private int extraEnemies;
     private float time = 0;
     private int randomEnemy;
@@ -41,10 +46,12 @@ public class EncounterManager : MonoBehaviour
     void Awake()
     {       
         //add your prefab to the dictionary here
+        // Guards
         enemyPrefabs.Add("b451c", b451cPrefab);
         enemyPrefabs.Add("lock", lockPrefab);
         enemyPrefabs.Add("light", lightPrefab);
         enemyPrefabs.Add("lunk", lunkPrefab);
+        // Officers
         enemyPrefabs.Add("slob", slobPrefab);
         enemyPrefabs.Add("guardian", guardianPrefab);
         enemyPrefabs.Add("medic", medicPrefab);
@@ -58,6 +65,7 @@ public class EncounterManager : MonoBehaviour
         slowSpeed = .3f;
         //Debug.Log("done");
         maxEnemyNumber = BASE_ENEMY_COUNT;
+        maxOfficerNumber = 0;
         extraEnemies = 0;
         quadrantCounts = new int[] { 0, 0, 0, 0 };
     }
@@ -98,6 +106,14 @@ public class EncounterManager : MonoBehaviour
             if (enemies[i].GetComponent<Enemy>().health <= 0)
             {
                 //Debug.Log("RIP");
+                if (enemies[i].GetComponent<Enemy>().rank == "officer")
+                {
+                    PlayerScript.score += 75;
+                }
+                else if (enemies[i].GetComponent<Enemy>().rank == "guard")
+                {
+                    PlayerScript.score += 50;
+                }
                 UpdateQuadrants(enemies[i].transform.position);
                 if (enemies[i].GetComponent<Enemy>().type == "Light" || enemies[i].GetComponent<Enemy>().type == "Lunk" || enemies[i].GetComponent<Enemy>().type == "SLOB")
                 {
@@ -106,7 +122,6 @@ public class EncounterManager : MonoBehaviour
                 }
                 Destroy(enemies[i]);
                 enemies.RemoveAt(i);
-                PlayerScript.score += 50;
                 break;
             }
         }
@@ -129,10 +144,17 @@ public class EncounterManager : MonoBehaviour
         //once we have the list of enemies to kill, actually kill them
         for(int i = (enemiesToKill.Count - 1); i >= 0; i--)
         {
+            if (enemies[i].GetComponent<Enemy>().rank == "officer")
+            {
+                PlayerScript.score += 150;
+            }
+            else if (enemies[i].GetComponent<Enemy>().rank == "guard")
+            {
+                PlayerScript.score += 100;
+            }
             UpdateQuadrants(enemies[enemiesToKill[i]].transform.position);
             GameObject.DestroyObject(enemies[enemiesToKill[i]]);
             enemies.RemoveAt(enemiesToKill[i]);
-            PlayerScript.score += 100;
         }
     }
 
@@ -155,41 +177,75 @@ public class EncounterManager : MonoBehaviour
         }
         //Debug.Log(baseSpeed);
         //Debug.Log(slowSpeed);
+
         // other enemy types
     }
 
     //spawns a new wave of enemies once all have been defeated
     void Spawn()
     {
+        // get rid of all lingering lasers upon spawn
+        GameObject[] lingeringLasers = GameObject.FindGameObjectsWithTag("Laser");
+        if (lingeringLasers.Length != 0)
+        {
+            foreach (GameObject laser in lingeringLasers)
+            {
+                GameObject.DestroyObject(laser);
+                //Debug.Log("Destroyed lingering laser");
+            }
+        }
+
         // reset the chunk or "secondWindCounter"
         secondWindCounter = 0;
 
         //calculates number of enemies to spawn (only does this when needed now, as opposed to every frame)
-        maxEnemyNumber = BASE_ENEMY_COUNT + (int)(PlayerScript.score / 250);
+        maxEnemyNumber = BASE_ENEMY_COUNT + (int)(PlayerScript.score / 450);
 
-        //spawns the required amount of enemies (type is random)
-        for(int i = 0; i < maxEnemyNumber; i++)
+        // spawn officers first but only when the number of officers that should spawn changes, so every score threshold
+        int oldMaxOfficerNumber = maxOfficerNumber;
+        maxOfficerNumber = 0 + (int)(PlayerScript.score / 750); // should really be around 1000
+        if (maxOfficerNumber > ABSOLUTE_MAX_OFFICER_NUMBER) maxOfficerNumber = ABSOLUTE_MAX_OFFICER_NUMBER;
+
+        if(maxOfficerNumber >= ABSOLUTE_MAX_OFFICER_NUMBER || oldMaxOfficerNumber != maxOfficerNumber)
         {
-            int enemyType = rand.Next(0, 2);
+            for (int i = 0; i < maxOfficerNumber; i++)
+            {
+                int officerType = rand.Next(0, 3);
+                switch (officerType)
+                {
+                    case 0:
+                        CreateEnemy("slob");
+                        break;
+                    case 1:
+                        CreateEnemy("medic");
+                        break;
+                    case 2:
+                        CreateEnemy("guardian");
+                        break;
+                    //case 3:
+                        //CreateEnemy("hotbox");
+                        //break;
+                }
+            }
+        }
+
+        //fills the remaining enemy slots with Guards (type is random)
+        for (int i = 0; i < maxEnemyNumber; i++)
+        {
+            int enemyType = rand.Next(0, 4);
             switch(enemyType)
             {
-                //case 0:
-                    //CreateEnemy("guardian");
-                    //break;
-                //case 1:
-                    //CreateEnemy("slob");
-                    //break;
                 case 0:
                     CreateEnemy("b451c");
                     break;
-                //case 3:
-                // CreateEnemy("light");
-                //break;
-                //case 1:
-                //    CreateEnemy("medic");
-                //    break;
                 case 1:
-                    CreateEnemy("hotBox");
+                    CreateEnemy("lunk");
+                    break;
+                case 2:
+                    CreateEnemy("lock");
+                    break;
+                case 3:
+                    CreateEnemy("light");
                     break;
             }
         }

@@ -11,6 +11,7 @@ public class Enemy : MonoBehaviour {
     private int timer = 0;
     private float FLASH_TIME = 1.1666f; // how long the enemy flashes for before they shoot
     private float currFlashTime;
+    private float redFlashTime;
     private System.Random rand = new System.Random();
     private GameObject deflectHitBox;
     public int health;
@@ -29,6 +30,7 @@ public class Enemy : MonoBehaviour {
     private List<BigShield> bigShields = new List<BigShield>();
     public bool guarded; // Covered by a shield without a player in it
     private bool active = true; //this enemy is actively doing its thang
+    public string rank;
 
     // Line rendering stuff
     public LineRenderer lineRendererComponent;
@@ -42,7 +44,7 @@ public class Enemy : MonoBehaviour {
     public string type;
 
     // Laser stuff
-    private const float LASER_TIME = 2f; // Time laser is actively dealing damage
+    private const float LASER_TIME = 2.5f; // Time laser is actively dealing damage
     private float fireTime; // Laser timer and is it firing
     private bool firing;
 
@@ -63,15 +65,17 @@ public class Enemy : MonoBehaviour {
         firing = false;
         unstunned = false;
         fireTime = 0f;
+        redFlashTime = .2f;
         if (BulletPrefab.tag == "Laser")
         {
             type = "Light";
             FLASH_TIME = 2.322222f; // MODIFY CHARGE FOR LASER HERE
+            redFlashTime = .28333f;
             rotSpeed = 100f; // MAKE THIS LOW ENOUGH THAT OVERCLOCK AFFECTS LASER ENEMIES
             special = (GameObject)Instantiate(BulletPrefab);
             special.SetActive(false);
         }
-        else if (this.transform.childCount > 0) // Shield as of now, can also be various other abilities for other types
+        else if (this.transform.childCount > 0) // Various other abilities for other types
         {
             special = this.transform.GetChild(0).gameObject;
             if (special.tag == "Shield")
@@ -104,6 +108,7 @@ public class Enemy : MonoBehaviour {
         else if (BulletPrefab.tag == "Rocket") type = "Lock";
         else type = "B451C";
         currFlashTime = FLASH_TIME;
+        //redFlashTime = .2f;
         origin = this.transform.position;
         destination = GetComponentInParent<Enemy>().Player.transform.position;
         lineRendererComponent = GetComponent<LineRenderer>();
@@ -115,6 +120,14 @@ public class Enemy : MonoBehaviour {
         dist = Vector3.Distance(origin, destination);
         //Debug.Log("Enemy start called");
         hitSpark = GameObject.FindGameObjectWithTag("HitSpark");
+        if(type == "b451c" || type == "lunk" || type == "lock" || type == "light")
+        {
+            rank = "guard";
+        }
+        else
+        {
+            rank = "officer";
+        }
     }
 
     // Update is called once per frame
@@ -178,10 +191,16 @@ public class Enemy : MonoBehaviour {
                 dist = Vector3.Distance(origin, destination);
             }
 
-            if (timer != 0 && type !="HotBox") // fire first at 600 frames
+            if (timer != 0 && type !="HotBox") // fire first at 600 frames// What? Do we still do this?
             {
                 Fire();
                 //Debug.Log("Fire call");
+            }
+            //Debug.Log(vecToPlayer.magnitude);
+            if (type == "Hotbox" && vecToPlayer.magnitude <= 3.5f)
+            {
+                Fire();
+                Debug.Log("You made me ink");
             }
         }
         for (int i = 0; i < slowFields.Count; i++)
@@ -216,6 +235,11 @@ public class Enemy : MonoBehaviour {
         {
             Debug.Log("unguardedNoShields");
             guarded = false;
+        }
+
+        if(type == "SLOB")
+        {
+            this.GetComponent<SpriteRenderer>().color = new Color(0, 255, 0);
         }
     }
 
@@ -260,7 +284,7 @@ public class Enemy : MonoBehaviour {
                 special.transform.position = pointB;
                 special.SetActive(true);
             }
-            if (currFlashTime > .20)
+            if (currFlashTime > redFlashTime)
             {
                 //this.GetComponent<SpriteRenderer>().color = new Color(255, 200, 0); // yellow/gold
                 if (type == "Light")
@@ -302,7 +326,7 @@ public class Enemy : MonoBehaviour {
                 Vector3 pointA = origin;
                 lineRendererComponent.enabled = true;
                 lineRendererComponent.SetWidth(.43f, .43f);
-                lineRendererComponent.SetColors(Color.red, Color.black);
+                lineRendererComponent.SetColors(new Color(255, 0, 0), Color.black);
                 lineRendererComponent.SetPosition(1, (Vector3.Normalize(vecToPlayer) * 1000) + pointA); // Fire solidly in the direction of fire
 
                 if (firing && fireTime <= 0) // End laser

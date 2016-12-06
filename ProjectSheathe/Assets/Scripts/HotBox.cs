@@ -18,7 +18,7 @@ namespace Assets.Scripts
         {
             em = GameObject.FindGameObjectWithTag("EncounterManager").GetComponent<EncounterManager>();
             cooldown = COOLDOWN;
-            active = 0;
+            active = 50;
             thisBox = this.GetComponentInParent<Enemy>();
             Dome = this.transform.GetChild(0).gameObject;
         }
@@ -34,6 +34,7 @@ namespace Assets.Scripts
                 cooldown = COOLDOWN;
                 active = ACTIVE;
                 this.GetComponentInChildren<SpriteRenderer>().color = Color.cyan;
+                Debug.Log("In here");
             }
                 if (active>0)
             {
