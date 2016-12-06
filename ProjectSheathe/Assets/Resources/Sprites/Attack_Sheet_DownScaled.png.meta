@@ -1,0 +1,227 @@
+fileFormatVersion: 2
+guid: 6fffe524fd147774f93071ee8cc1a0e9
+timeCreated: 1480981382
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: Attack_Sheet_DownScaled_0
+    21300002: Attack_Sheet_DownScaled_1
+    21300004: Attack_Sheet_DownScaled_2
+    21300006: Attack_Sheet_DownScaled_3
+    21300008: Attack_Sheet_DownScaled_4
+    21300010: Attack_Sheet_DownScaled_5
+    21300012: Attack_Sheet_DownScaled_6
+    21300014: Attack_Sheet_DownScaled_7
+    21300016: Attack_Sheet_DownScaled_8
+    21300018: Attack_Sheet_DownScaled_9
+    21300020: Attack_Sheet_DownScaled_10
+    21300022: Attack_Sheet_DownScaled_11
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_0
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 1295
+        width: 658
+        height: 800
+      alignment: 9
+      pivot: {x: 0.6179353, y: 0.7425046}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_1
+      rect:
+        serializedVersion: 2
+        x: 756
+        y: 1429
+        width: 751
+        height: 678
+      alignment: 9
+      pivot: {x: 0.6972679, y: 0.68208987}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_2
+      rect:
+        serializedVersion: 2
+        x: 1564
+        y: 1537
+        width: 992
+        height: 607
+      alignment: 9
+      pivot: {x: 0.77735114, y: 0.54648906}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_3
+      rect:
+        serializedVersion: 2
+        x: 2584
+        y: 1454
+        width: 986
+        height: 766
+      alignment: 9
+      pivot: {x: 0.7396877, y: 0.4125073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_4
+      rect:
+        serializedVersion: 2
+        x: 3752
+        y: 1220
+        width: 881
+        height: 1003
+      alignment: 9
+      pivot: {x: 0.72020817, y: 0.29602647}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_5
+      rect:
+        serializedVersion: 2
+        x: 4818
+        y: 1079
+        width: 879
+        height: 1144
+      alignment: 9
+      pivot: {x: 0.7166963, y: 0.2810831}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_6
+      rect:
+        serializedVersion: 2
+        x: 25
+        y: 57
+        width: 1000
+        height: 1236
+      alignment: 9
+      pivot: {x: 0.6481481, y: 0.2517166}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_7
+      rect:
+        serializedVersion: 2
+        x: 1006
+        y: 151
+        width: 1208
+        height: 1235
+      alignment: 9
+      pivot: {x: 0.5379597, y: 0.26008403}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_8
+      rect:
+        serializedVersion: 2
+        x: 2170
+        y: 190
+        width: 1348
+        height: 1127
+      alignment: 9
+      pivot: {x: 0.46859932, y: 0.2715213}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_9
+      rect:
+        serializedVersion: 2
+        x: 3541
+        y: 376
+        width: 993
+        height: 778
+      alignment: 9
+      pivot: {x: 0.22292817, y: 0.3231799}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_10
+      rect:
+        serializedVersion: 2
+        x: 4459
+        y: 37
+        width: 817
+        height: 628
+      alignment: 9
+      pivot: {x: 0.7072368, y: 0.4101316}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Attack_Sheet_DownScaled_11
+      rect:
+        serializedVersion: 2
+        x: 5329
+        y: 123
+        width: 626
+        height: 801
+      alignment: 9
+      pivot: {x: 0.60142523, y: 0.72899073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

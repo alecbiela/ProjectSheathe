@@ -44,7 +44,9 @@ public class Enemy : MonoBehaviour {
     // Laser stuff
     private const float LASER_TIME = 2f; // Time laser is actively dealing damage
     private float fireTime; // Laser timer and is it firing
-    private bool firing; 
+    private bool firing;
+
+    private GameObject hitSpark;
 
     void Start()
     {
@@ -56,6 +58,8 @@ public class Enemy : MonoBehaviour {
         hitRecently = false;
         attacking = false;
         trackPlayer = true;
+        if (type == "HotBox")//the hotbox has no reason to track
+            trackPlayer = false;
         firing = false;
         unstunned = false;
         fireTime = 0f;
@@ -86,6 +90,12 @@ public class Enemy : MonoBehaviour {
                 special.SetActive(true);
                 bigShields.Add(special.GetComponent<BigShield>()); // Is behind its own shield
             }
+            else if(special.tag == "Dome")
+            {
+                type = "HotBox";
+                special.SetActive(false);
+                
+            }
         }
         else if (BulletPrefab.tag == "MedicBullet")
         {
@@ -104,6 +114,7 @@ public class Enemy : MonoBehaviour {
 
         dist = Vector3.Distance(origin, destination);
         //Debug.Log("Enemy start called");
+        hitSpark = GameObject.FindGameObjectWithTag("HitSpark");
     }
 
     // Update is called once per frame
@@ -161,14 +172,13 @@ public class Enemy : MonoBehaviour {
                 Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
                 if (type == "Guardian") this.transform.rotation = Quaternion.Slerp(transform.rotation, q, (Handler.speedMod - slowMod) * Time.deltaTime * 0.1f * rotSpeed);
                 else this.transform.rotation = Quaternion.Slerp(transform.rotation, q, (Handler.speedMod-slowMod) * Time.deltaTime * 0.9f * rotSpeed); //Quaternion.LookRotation(this.transform.position - Player.transform.position);
-
                 // line render
                 origin = this.transform.position;
                 destination = GetComponentInParent<Enemy>().Player.transform.position; // don't update this here if the enemy ever needs to draw a line to somewhere else and the player
                 dist = Vector3.Distance(origin, destination);
             }
 
-            if (timer != 0) // fire first at 600 frames
+            if (timer != 0 && type !="HotBox") // fire first at 600 frames
             {
                 Fire();
                 //Debug.Log("Fire call");
@@ -213,7 +223,11 @@ public class Enemy : MonoBehaviour {
     public void Fire()
     {
         if (!active) return;    //used for medics when no stunned enemies, but could apply to other enemy types later
-
+        if(type == "HotBox")
+        {
+            special.SetActive(true);
+            return;
+        }
         timer++;
         //Debug.Log(timer);
         attacking = true;
@@ -322,6 +336,10 @@ public class Enemy : MonoBehaviour {
                     fireTime -= Time.deltaTime; // Keep firing
                 }
             }
+            else if(type == "HotBox")
+            {
+                special.SetActive(true);
+            }
             else // Or bullet
             {
                 //instantiate a new bullet prefab at this location
@@ -399,7 +417,7 @@ public class Enemy : MonoBehaviour {
                     health--;
                     this.hitRecently = true;
                 }
-
+                hitSpark.GetComponent<ParticleSystem>().Emit(2);
                 return;
             }
 
@@ -432,7 +450,7 @@ public class Enemy : MonoBehaviour {
                     else health--;
                     this.hitRecently = true;
                 }
-
+                hitSpark.GetComponent<ParticleSystem>().Emit(2);
                 return;
             }
         }

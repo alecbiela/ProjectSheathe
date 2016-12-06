@@ -74,6 +74,9 @@ public class Character : MonoBehaviour
     public int score;
     private List<Explosion> slowFields = new List<Explosion>();
 
+    //animation stuff
+    Animator animator;
+  
     private void Awake()
     {
         rigidBody = this.GetComponentInParent<Rigidbody2D>();
@@ -105,7 +108,7 @@ public class Character : MonoBehaviour
         killStunnedEnemies = false;
         score = 0;
         hpHit = 0;
-
+        animator = this.gameObject.GetComponent<Animator>();
         // Populate various arrays of gameobjects with their hitboxes
         // Add by name, so we know which is which
         sliceHitBoxes = new GameObject[6];
@@ -165,6 +168,33 @@ public class Character : MonoBehaviour
     {
         ProcessInput();
         ExecuteTimedActions();
+        
+        if(Deflecting)
+        {
+            if (deflectTimer <= DEFLECT_AFTER && deflectTimer!=0) // If deflect is over, exit anim
+                animator.SetInteger("transitions", 5);
+           
+            else animator.SetInteger("transitions", 4);
+
+        }
+        /*
+        if (Slicing)
+        {
+            animator.SetInteger("transitions", 2);
+        }*/
+        // 
+        if (Attacking)
+        {
+            animator.SetInteger("transitions", 1);
+            //Debug.Log("attacking");
+            //Debug.Log(animator.GetInteger("transitions"));
+        }
+
+        if(!Deflecting && !Attacking)
+        {
+            animator.SetInteger("transitions", 0);
+        }
+        //Debug.Log(animator.GetInteger("transitions"));
         for (int i = 0; i < slowFields.Count; i++)
         {
             if (!slowFields[i].isTrigger)
@@ -203,18 +233,21 @@ public class Character : MonoBehaviour
                         //Debug.Log("Slice");
                         sliceState = true;
                         sliceHoldTime += Time.deltaTime;
+                        //animator.SetInteger("transitions", 2);
                         break;
                     case 1: // Attacking
                         if (sliceState || deflectState || baState) continue;
                         //Debug.Log("Attack");
                         baState = true;
                         baTimer = BASIC_PRELOAD + BASIC_ACTIVE + BASIC_AFTER;
+                        //animator.SetInteger("transitions", 1);
                         break;
                     case 2: // Deflecting
                         if (sliceState || baState || deflectState) continue;
                         //Debug.Log("deflect");
                         deflectState = true;
                         deflectTimer = DEFLECT_PRELOAD + DEFLECT_ACTIVE + DEFLECT_AFTER;
+                        //animator.SetInteger("transitions", 4);
                         break;
                     case 3: // Interacting
                         break;
@@ -294,6 +327,7 @@ public class Character : MonoBehaviour
         if (baTimer <= BASIC_AFTER) // If attack is over, hitboxes go away
         {
             baHitBoxes[2].gameObject.SetActive(false);
+            //animator.SetInteger("transitions", 0);
         }
         else if (baTimer <= (BASIC_ACTIVE + BASIC_AFTER)) // Otherwise, attack (in a basic fashion)
         {
@@ -311,8 +345,9 @@ public class Character : MonoBehaviour
             {
                 baHitBoxes[0].gameObject.SetActive(true);
             }
-
+            
             Attacking = true;
+            //animator.SetInteger("transitions", 1);
         }
 
         if (sliceTimer <= SLICE_AFTER) // If slice is over, hitboxes go away
@@ -321,6 +356,7 @@ public class Character : MonoBehaviour
             {
                 sliceHitBoxes[i].gameObject.SetActive(false);
             }
+            //animator.SetInteger("transitions", 0);
         }
         else if (sliceTimer <= (SLICE_ACTIVE + SLICE_AFTER)) // Otherwise, slice
         {
@@ -337,20 +373,27 @@ public class Character : MonoBehaviour
             maxDashDist = 3;
             slowMovement = false;
             //Debug.Log("Reset speed");
+            //animator.SetInteger("transitions", 3);
         }
 
         if (deflectTimer <= DEFLECT_AFTER) // If deflect is over, hitbox goes away
         {
             deflectHitBox.gameObject.SetActive(false);
+            animator.SetInteger("transitions", 5);
         }
+        
         else if (deflectTimer <= (DEFLECT_ACTIVE + DEFLECT_AFTER))// Otherwise, deflect
         {
             deflectHitBox.gameObject.SetActive(true);
             Deflecting = true;
+            animator.SetInteger("transitions", 5);
         }
 
-        if (sliceState) slowMovement = true;
-
+        if (sliceState)
+        {
+            slowMovement = true;
+           
+        }
         if (!Dashing && dashCooldown > 0) // Increment dash cooldown based on delta time
         {
             dashCooldown -= Time.deltaTime;
@@ -389,6 +432,7 @@ public class Character : MonoBehaviour
         {
             Deflecting = false;
             deflectState = false;
+            animator.SetInteger("transitions", 0);
         }
         if (sliceTimer == 0)
         {
@@ -401,11 +445,14 @@ public class Character : MonoBehaviour
             }
             Slicing = false;
             sliceState = false;
+            //animator.SetInteger("transitions", 0);
         }
         if (baTimer == 0)
         {
+
             Attacking = false;
             baState = false;
+           //animator.SetInteger("transitions", 0);
         }
     }
 
@@ -489,6 +536,11 @@ public class Character : MonoBehaviour
             //Debug.Log("Player in");
             other.GetComponent<BigShield>().playerInside = true;
         }
+        if(other.gameObject.tag == "Dome")
+        {
+            health--;
+            hpHit++;
+        }
         
     }
 
@@ -534,6 +586,7 @@ public class Character : MonoBehaviour
         baHitBoxes[2].gameObject.SetActive(false);
 
         sliceTimer = 0;
+        //animator.SetInteger("transitions", 0);
     }
 
     public void Hitstop(float pauseDelay)

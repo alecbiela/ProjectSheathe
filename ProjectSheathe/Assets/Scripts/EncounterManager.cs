@@ -12,6 +12,7 @@ public class EncounterManager : MonoBehaviour
     public GameObject slobPrefab;
     public GameObject guardianPrefab;
     public GameObject medicPrefab;
+    public GameObject hotBoxPrefab;
 
     List<GameObject> enemies = new List<GameObject>();
     List<int> activeEnemies = new List<int>();
@@ -47,7 +48,7 @@ public class EncounterManager : MonoBehaviour
         enemyPrefabs.Add("slob", slobPrefab);
         enemyPrefabs.Add("guardian", guardianPrefab);
         enemyPrefabs.Add("medic", medicPrefab);
-
+        enemyPrefabs.Add("hotBox", hotBoxPrefab);
 
         Player = GameObject.FindGameObjectWithTag("Player");
         PlayerScript = Player.GetComponent<Character>();
@@ -182,10 +183,13 @@ public class EncounterManager : MonoBehaviour
                     CreateEnemy("b451c");
                     break;
                 //case 3:
-                   // CreateEnemy("light");
-                    //break;
+                // CreateEnemy("light");
+                //break;
+                //case 1:
+                //    CreateEnemy("medic");
+                //    break;
                 case 1:
-                    CreateEnemy("medic");
+                    CreateEnemy("hotBox");
                     break;
             }
         }

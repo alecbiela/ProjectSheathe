@@ -23,6 +23,9 @@ TagManager:
   - Grenade
   - GrenadeDestination
   - BigShield
+  - MedicBullet
+  - Dome
+  - HitSpark
   layers:
   - Default
   - TransparentFX
