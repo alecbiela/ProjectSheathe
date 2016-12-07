@@ -64,7 +64,7 @@ public class Rocket : MonoBehaviour
         //if it's a slice hitbox
         if (col.tag.Contains("SliceHitbox") || col.tag.Contains("BAHitbox"))
         {
-            Debug.Log("Rocket hit");
+            //Debug.Log("Rocket hit");
 
             if (!this.hitRecently)
             {

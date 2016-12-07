@@ -8,6 +8,7 @@ public class Character : MonoBehaviour
     public GameObject[] sliceHitBoxes;//setting all hitboxes to public, so enemyhandler can have access to them -Simon
     public GameObject[] baHitBoxes;//why are these called bahitboxes? basic attack?
     public GameObject deflectHitBox;
+    private GameObject blueScreenGlow;
     private EncounterManager enemyHandler;
 
     Rigidbody2D rigidBody;
@@ -79,6 +80,8 @@ public class Character : MonoBehaviour
   
     private void Awake()
     {
+        blueScreenGlow = GameObject.FindGameObjectWithTag("BlueScreenGlow");
+        blueScreenGlow.SetActive(false);
         rigidBody = this.GetComponentInParent<Rigidbody2D>();
         enemyHandler = GameObject.FindGameObjectWithTag("EncounterManager").GetComponent<EncounterManager>();
         sliceHoldTime = 0;
@@ -406,6 +409,10 @@ public class Character : MonoBehaviour
             enemyHandler.speedMod -= overclockMod; // Slow enemies
             enemyHandler.KillStunnedEnemies();
             //Debug.Log("ZA WARUDO: " + enemyHandler.speedMod);
+            Camera.main.GetComponent<UnityStandardAssets.ImageEffects.NoiseAndScratches>().enabled = true;
+            //Camera.main.GetComponent<UnityStandardAssets.ImageEffects.Grayscale>().enabled = true;
+            blueScreenGlow.SetActive(true);
+            Camera.main.GetComponent<UnityStandardAssets.ImageEffects.VignetteAndChromaticAberration>().enabled = true;
         }
         else if ((!Overclocking && timeSlow) || (Overclocking && overclockTimer <= 0 && timeSlow)) // On end trigger or after ending frames
         {
@@ -420,6 +427,10 @@ public class Character : MonoBehaviour
             overclockTimer = 0;
             overclockCooldown = OVERCLOCK_CD;
             //Debug.Log("WRYYYYYY: " + enemyHandler.speedMod);
+            Camera.main.GetComponent<UnityStandardAssets.ImageEffects.NoiseAndScratches>().enabled = false;
+            //Camera.main.GetComponent<UnityStandardAssets.ImageEffects.Grayscale>().enabled = false;
+            blueScreenGlow.SetActive(false);
+            Camera.main.GetComponent<UnityStandardAssets.ImageEffects.VignetteAndChromaticAberration>().enabled = false;
         }
 
         if (!Overclocking && overclockCooldown > 0) // Increment oveclock cooldown

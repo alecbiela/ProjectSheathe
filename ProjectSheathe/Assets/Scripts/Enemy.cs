@@ -227,17 +227,17 @@ public class Enemy : MonoBehaviour {
             }
             else if (bigShields[i].playerInside)
             {
-                Debug.Log("unguardedInside");
+                //Debug.Log("unguardedInside");
                 guarded = false;
             }
         }
         if (guarded && bigShields.Count == 0)
         {
-            Debug.Log("unguardedNoShields");
+            //Debug.Log("unguardedNoShields");
             guarded = false;
         }
 
-        if(type == "SLOB")
+        if(type == "SLOB" && stunned == false)
         {
             this.GetComponent<SpriteRenderer>().color = new Color(0, 255, 0);
         }
