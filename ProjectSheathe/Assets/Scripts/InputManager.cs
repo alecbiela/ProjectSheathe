@@ -49,7 +49,10 @@ public class InputManager : MonoBehaviour {
         {
             throw new System.ArgumentException("This OS is not supported", "e");
         }
+    }
 
+    void Start()
+    {
         SetInputDevice(controllerType); // Set initial scheme
     }
 
