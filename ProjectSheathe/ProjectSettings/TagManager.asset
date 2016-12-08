@@ -27,6 +27,10 @@ TagManager:
   - Dome
   - HitSpark
   - BlueScreenGlow
+  - PauseMenuObject
+  - kbdControls
+  - x360Controls
+  - ps4Controls
   layers:
   - Default
   - TransparentFX

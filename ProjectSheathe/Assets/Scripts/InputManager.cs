@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class InputManager : MonoBehaviour {
 
     private Character character;
+    private UIHandler UI;
     [SerializeField] private string controllerType = "Keyboard";
     private char osType;
     private bool[] inputFlags;
@@ -20,6 +21,9 @@ public class InputManager : MonoBehaviour {
 
     private void Awake()
     {
+        //get UI script
+        UI = GameObject.Find("Main Camera").GetComponent<UIHandler>();
+
         // INPUT FLAGS, IN ORDER: SLICE[0], ATTACK[1], DEFLECT[2], DASH[3], OVERCLOCK[4], FIRE[5], INTERACT[6]
         inputFlags = new bool[] { false, false, false, false, false, false, false };
 
@@ -46,13 +50,18 @@ public class InputManager : MonoBehaviour {
             throw new System.ArgumentException("This OS is not supported", "e");
         }
 
-        setControlScheme(); // Set initial scheme
+        SetInputDevice(controllerType); // Set initial scheme
     }
 
-
+    //update is called once per frame
     private void Update()
     {
-
+        //Checks for pausing
+        if(Input.GetButtonDown(inputs["Pause"]))
+        {
+            if (UI.IsGamePaused) UI.SetPaused(false);
+            else UI.SetPaused(true);
+        }
 
         if (!inputFlags[0]) // Slice
         {
@@ -153,6 +162,8 @@ public class InputManager : MonoBehaviour {
 
     private void FixedUpdate()
     {
+        if (UI.IsGamePaused) return;
+
         // Read the inputs.
         float hMove = Input.GetAxis(inputs["HorizontalMove"]); // Invert stuff here
         float vMove = Input.GetAxis(inputs["VerticalMove"]);
@@ -189,6 +200,7 @@ public class InputManager : MonoBehaviour {
             inputs.Add("Deflect", "R");
             inputs.Add("Overclock", "SPACE");
             inputs.Add("Interact", "E");
+            inputs.Add("Pause", "P");
         }
         else // Controller (Win and Mac only)
         {
@@ -209,6 +221,7 @@ public class InputManager : MonoBehaviour {
                     inputs.Add("Slice2", "Axis10");
                     inputs.Add("Dash2", "Axis9");
                     inputs.Add("Interact", "Axis7");
+                    inputs.Add("Pause", "Button7");
                 }
                 else if (controllerType == "Xbox360B") 
                 {
@@ -223,6 +236,7 @@ public class InputManager : MonoBehaviour {
                     inputs.Add("Slice2", "Axis10");
                     inputs.Add("Dash2", "Axis9");
                     inputs.Add("Interact", "Button1");
+                    inputs.Add("Pause", "Button7");
                 }
                 else if (controllerType == "PS4A")
                 {
@@ -237,6 +251,7 @@ public class InputManager : MonoBehaviour {
                     inputs.Add("Slice2", "Axis5");
                     inputs.Add("Dash2", "Axis4");
                     inputs.Add("Interact", "Axis8");
+                    inputs.Add("Pause", "Button9");
                 }
                 else // PS4 B
                 {
@@ -251,6 +266,7 @@ public class InputManager : MonoBehaviour {
                     inputs.Add("Slice2", "Axis5");
                     inputs.Add("Dash2", "Axis4");
                     inputs.Add("Interact", "Button2");
+                    inputs.Add("Pause", "Button9");
                 }
             }
             else // Mac, can add linux controller support later if desired
@@ -268,6 +284,7 @@ public class InputManager : MonoBehaviour {
                     inputs.Add("Slice2", "Axis6");
                     inputs.Add("Dash2", "Axis5");
                     inputs.Add("Interact", "Button6");
+                    inputs.Add("Pause", "Button9");
                 }
                 else // Xbox360 B
                 {
@@ -282,6 +299,7 @@ public class InputManager : MonoBehaviour {
                     inputs.Add("Slice2", "Axis6");
                     inputs.Add("Dash2", "Axis5");
                     inputs.Add("Interact", "Button17");
+                    inputs.Add("Pause", "Button9");
                 }
             }
         }
@@ -321,5 +339,13 @@ public class InputManager : MonoBehaviour {
             beforePriorPreviousLatestKey = '0';
             checkIfLatest();
         }
+    }
+    
+    //changes the control scheme on the fly based on the UI buttons
+    public void SetInputDevice(string type)
+    {
+        UI.ChangeControlImages(type.ToLower()[0]);
+        controllerType = type;
+        setControlScheme();
     }
 }
