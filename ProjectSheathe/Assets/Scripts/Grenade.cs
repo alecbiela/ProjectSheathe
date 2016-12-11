@@ -58,7 +58,8 @@ public class Grenade : MonoBehaviour
         {
             CanHurtEnemies = true;
             desiredVelocity *= -1;
-            // Set grenade destination here, or just have it explode on enemies
+            float angle = Mathf.Atan2(desiredVelocity.y, desiredVelocity.x) * Mathf.Rad2Deg;
+            this.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
         //collision w/ Player and Enemies handled in their respective classes
         if (col.gameObject.GetInstanceID() == explosion.GetInstanceID()) // Explode when the hit box is reached

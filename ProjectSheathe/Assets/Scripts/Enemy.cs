@@ -120,7 +120,7 @@ public class Enemy : MonoBehaviour {
         dist = Vector3.Distance(origin, destination);
         //Debug.Log("Enemy start called");
         hitSpark = GameObject.FindGameObjectWithTag("HitSpark");
-        if(type == "b451c" || type == "lunk" || type == "lock" || type == "light")
+        if(type == "B451C" || type == "Lunk" || type == "Lock" || type == "Light")
         {
             rank = "guard";
         }
@@ -138,6 +138,16 @@ public class Enemy : MonoBehaviour {
         if (!secondWind && !unstunned && health <= 1) // stun enemies once their health reaches a certain value
         {
             stunned = true;
+            attacking = false;
+            firing = false;
+            timer = rand.Next(0, 300); //used to stagger each enemy's firing time because they're all spawned at the same time
+            currFlashTime = FLASH_TIME;
+            timer = 0;
+            counter = 0;
+            if (type == "Light" || type == "Lunk" || type == "SLOB")
+            {
+                special.gameObject.SetActive(false); // End laser
+            }
             this.GetComponent<SpriteRenderer>().color = Color.black; // once you go black...
         }
 
@@ -504,7 +514,7 @@ public class Enemy : MonoBehaviour {
             }
             if (bigShields.Count == 0)
             {
-                Debug.Log("unguarded");
+                //Debug.Log("unguarded");
                 guarded = false;
             }
         }

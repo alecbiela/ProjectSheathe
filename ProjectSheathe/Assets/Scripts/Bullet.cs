@@ -55,6 +55,8 @@ public class Bullet : MonoBehaviour {
             }
             CanHurtEnemies = true;
             desiredVelocity *= -1;
+            float angle = Mathf.Atan2(desiredVelocity.y, desiredVelocity.x) * Mathf.Rad2Deg;
+            this.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
         //collision w/ Player and Enemies handled in their respective classes
         if (col.gameObject.layer == 13)

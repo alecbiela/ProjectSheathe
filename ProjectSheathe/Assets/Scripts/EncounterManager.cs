@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.UI;
 
 public class EncounterManager : MonoBehaviour
 {
@@ -39,9 +41,13 @@ public class EncounterManager : MonoBehaviour
     private int randomEnemy;
     private int notStunnedEnemyCount;
     private int stunnedEnemyCount = 0;
-    private int[] quadrantCounts;
+    private Dictionary<int, int> quadrants; // Quadrant id, quadrant count
     private int secondWindCounter = 0;
     System.Random rand2 = new System.Random();
+    [SerializeField] private GameObject[] officerSpawns;
+    private int wave = 0;
+    private Text waveUIText;
+    private GameObject secondWindUIElement;
 
     void Awake()
     {       
@@ -59,6 +65,9 @@ public class EncounterManager : MonoBehaviour
 
         Player = GameObject.FindGameObjectWithTag("Player");
         PlayerScript = Player.GetComponent<Character>();
+        waveUIText = GameObject.FindGameObjectWithTag("WaveElement").GetComponent<Text>();
+        setWave();
+        secondWindUIElement = GameObject.FindGameObjectWithTag("SecondWindElement");
         speedMod = 1f;
         baseSpeed = speedMod;
         //slowSpeed = baseSpeed - PlayerScript.overclockMod;
@@ -67,7 +76,7 @@ public class EncounterManager : MonoBehaviour
         maxEnemyNumber = BASE_ENEMY_COUNT;
         maxOfficerNumber = 0;
         extraEnemies = 0;
-        quadrantCounts = new int[] { 0, 0, 0, 0 };
+        quadrants = new Dictionary<int, int> { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 } };
     }
 
     // Update is called once per frame
@@ -109,10 +118,12 @@ public class EncounterManager : MonoBehaviour
                 if (enemies[i].GetComponent<Enemy>().rank == "officer")
                 {
                     PlayerScript.score += 75;
+                    PlayerScript.setScore();
                 }
                 else if (enemies[i].GetComponent<Enemy>().rank == "guard")
                 {
                     PlayerScript.score += 50;
+                    PlayerScript.setScore();
                 }
                 UpdateQuadrants(enemies[i].transform.position);
                 if (enemies[i].GetComponent<Enemy>().type == "Light" || enemies[i].GetComponent<Enemy>().type == "Lunk" || enemies[i].GetComponent<Enemy>().type == "SLOB")
@@ -147,12 +158,19 @@ public class EncounterManager : MonoBehaviour
             if (enemies[i].GetComponent<Enemy>().rank == "officer")
             {
                 PlayerScript.score += 150;
+                PlayerScript.setScore();
             }
             else if (enemies[i].GetComponent<Enemy>().rank == "guard")
             {
                 PlayerScript.score += 100;
+                PlayerScript.setScore();
             }
             UpdateQuadrants(enemies[enemiesToKill[i]].transform.position);
+            if (enemies[enemiesToKill[i]].GetComponent<Enemy>().type == "Light" || enemies[enemiesToKill[i]].GetComponent<Enemy>().type == "Lunk" || enemies[enemiesToKill[i]].GetComponent<Enemy>().type == "SLOB")
+            {
+                Destroy(enemies[enemiesToKill[i]].GetComponent<Enemy>().special.gameObject); // Destroy laser or shield as well
+                enemies[enemiesToKill[i]].GetComponent<Enemy>().special = null;
+            }
             GameObject.DestroyObject(enemies[enemiesToKill[i]]);
             enemies.RemoveAt(enemiesToKill[i]);
         }
@@ -184,6 +202,10 @@ public class EncounterManager : MonoBehaviour
     //spawns a new wave of enemies once all have been defeated
     void Spawn()
     {
+        for (int i = 0; i < 4; i++)
+        {
+            officerSpawns[i].GetComponent<OfficerSpawnPoint>().filled = false;
+        }
         // get rid of all lingering lasers upon spawn
         GameObject[] lingeringLasers = GameObject.FindGameObjectsWithTag("Laser");
         if (lingeringLasers.Length != 0)
@@ -197,9 +219,14 @@ public class EncounterManager : MonoBehaviour
 
         // reset the chunk or "secondWindCounter"
         secondWindCounter = 0;
+        for (int i = 0; i < 3; i++)
+        {
+            secondWindUIElement.transform.GetChild(i).gameObject.SetActive(true);
+        }
 
-        //calculates number of enemies to spawn (only does this when needed now, as opposed to every frame)
+        //calculates number of enemies to spawn (only does this when needed now, as opposed to every frame) CHANGE THIS SECTION IF MAXENEMY SHOULD BE MORE THAN GUARDS
         maxEnemyNumber = BASE_ENEMY_COUNT + (int)(PlayerScript.score / 450);
+        if (maxEnemyNumber > ABSOLUTE_MAX_GUARD_COUNT) maxEnemyNumber = ABSOLUTE_MAX_GUARD_COUNT;
 
         // spawn officers first but only when the number of officers that should spawn changes, so every score threshold
         int oldMaxOfficerNumber = maxOfficerNumber;
@@ -208,44 +235,66 @@ public class EncounterManager : MonoBehaviour
 
         if(maxOfficerNumber >= ABSOLUTE_MAX_OFFICER_NUMBER || oldMaxOfficerNumber != maxOfficerNumber)
         {
+            //Debug.Log("spawn:" + maxOfficerNumber);
+            int slobs = 0;
+            int medics = 0;
+            int guardians = 0;
+            //int hotboxes = 0;
             for (int i = 0; i < maxOfficerNumber; i++)
             {
                 int officerType = rand.Next(0, 3);
                 switch (officerType)
                 {
                     case 0:
-                        CreateEnemy("slob");
+                    case 3: // REMOVE WHEN HOTBOX IS FIXED
+                        //Debug.Log("slob");
+                        if (slobs >= 4) i--; // CHANGE BACK TO 2 WHEN HOTBOX IS FIXED
+                        else CreateEnemy("slob"); slobs++;
                         break;
                     case 1:
-                        CreateEnemy("medic");
+                        //Debug.Log("medic");
+                        if (medics >= 2) i--;
+                        else CreateEnemy("medic"); medics++;
                         break;
                     case 2:
-                        CreateEnemy("guardian");
+                        //Debug.Log("guardian");
+                        if (guardians >= 2) i--;
+                        else CreateEnemy("guardian"); guardians++;
                         break;
                     //case 3:
-                        //CreateEnemy("hotbox");
+                        //if (hotboxes >= 4) i--;
+                        //else CreateEnemy("hotbox"); hotboxes++;
                         //break;
                 }
             }
         }
 
-        //fills the remaining enemy slots with Guards (type is random)
+        int b451cs = 0;
+        int lights = 0;
+        int locks = 0;
+        int lunks = 0;
+
+        //spawns guards
         for (int i = 0; i < maxEnemyNumber; i++)
         {
             int enemyType = rand.Next(0, 4);
             switch(enemyType)
             {
                 case 0:
-                    CreateEnemy("b451c");
+                    if (b451cs >= 6) i--;
+                    else CreateEnemy("b451c"); b451cs++;
                     break;
                 case 1:
-                    CreateEnemy("lunk");
+                    if (lunks >= 6) i--;
+                    else CreateEnemy("lunk"); lunks++;
                     break;
                 case 2:
-                    CreateEnemy("lock");
+                    if (locks >= 4) i--;
+                    else CreateEnemy("lock"); locks++;
                     break;
                 case 3:
-                    CreateEnemy("light");
+                    if (lights >= 4) i--;
+                    else CreateEnemy("light"); lights++;
                     break;
             }
         }
@@ -254,46 +303,83 @@ public class EncounterManager : MonoBehaviour
         time = rand.Next(2, 4) + 1.1666f;
 
         //if we ever have a wave variable, increment it here
+        wave++;
+        setWave();
+    }
+
+    private void setWave()
+    {
+        waveUIText.text = wave.ToString();
     }
 
     //Instantiates a new Enemy
     //Takes a string for the enemy name (MUST match a Dictionary key for the prefab you want)
     void CreateEnemy(string name)
     {
+        int[] orderedQuads = PopulatedQuadrantOrder();
+        //Debug.Log("Quad Order: " + orderedQuads[0] + "," + orderedQuads[1] + "," + orderedQuads[2] + "," + orderedQuads[3]);
         GameObject E = (GameObject)Instantiate(enemyPrefabs[name]);
         //E.transform.SetParent(this.transform);  //kind of get why this is here, but can it be avoided?
 
-        //finds the quadrant with the least enemies
-        int targetQuadrant = LeastPopulatedQuadrant();
+        int targetQuad;
         Vector2 targetPos = new Vector2();
-
-        //finds a random position for the enemy 
-        switch(targetQuadrant)
+        if (name == "slob" || name == "medic" || name == "guardian" || name == "hotbox")
         {
-            case 0: //Q1, X(0,10) Y(0,8)
-                targetPos.x = (float)(10 * rand.NextDouble());
-                targetPos.y = (float)(8 * rand.NextDouble());
-                break;
-            case 1: //Q2, X(-10,0) Y(0,8)
-                targetPos.x = (float)(10 * rand.NextDouble()) - 10;
-                targetPos.y = (float)(8 * rand.NextDouble());
-                break;
-            case 2: //Q3, X(-10,0) Y(-8,0)
-                targetPos.x = (float)(10 * rand.NextDouble()) - 10;
-                targetPos.y = (float)(8 * rand.NextDouble()) - 8;
-                break;
-            case 3: //Q4, X(0,10) Y(-8,0)
-                targetPos.x = (float)(10 * rand.NextDouble());
-                targetPos.y = (float)(8 * rand.NextDouble()) - 8;
-                break;
-            default:
-                Debug.Log("Target Quadrant index out of bounds.");
-                break;
+            bool positionFilled = false;
+            int i = 0;
+            do // Spawn officer in the most populated quad that is not filled
+            {
+                i++;
+                targetQuad = orderedQuads[orderedQuads.Length - i];
+                positionFilled = officerSpawns[targetQuad].GetComponent<OfficerSpawnPoint>().filled;
+                //Debug.Log("Tried Off Quad:" + (orderedQuads.Length - i) + "filled?:" + positionFilled);
+            } while (positionFilled);
+            targetPos = officerSpawns[targetQuad].transform.position;
+            officerSpawns[targetQuad].GetComponent<OfficerSpawnPoint>().filled = true; // Fill the quad on spawn
+        }
+        else
+        {
+            targetQuad = orderedQuads[0];
+            //Debug.Log("Guard in quad:" + targetQuad);
+
+            //finds a random position for the enemy 
+            switch (targetQuad)
+            {
+                case 0: //Q1, X(0,12) Y(0,8.5)
+                    targetPos.x = (float)(12 * rand.NextDouble());
+                    targetPos.y = (float)(8.5 * rand.NextDouble());
+                    break;
+                case 1: //Q2, X(-12,0) Y(0,8.5)
+                    targetPos.x = (float)(-12 * rand.NextDouble());
+                    targetPos.y = (float)(8.5 * rand.NextDouble());
+                    break;
+                case 2: //Q3, X(-12,0) Y(-8.5,0)
+                    targetPos.x = (float)(-12 * rand.NextDouble());
+                    targetPos.y = (float)(-8.5 * rand.NextDouble());
+                    break;
+                case 3: //Q4, X(0,12) Y(-8.5,0)
+                    targetPos.x = (float)(12 * rand.NextDouble());
+                    targetPos.y = (float)(-8.5 * rand.NextDouble());
+                    break;
+                default:
+                    Debug.Log("Target Quadrant index out of bounds.");
+                    break;
+            }
         }
 
 
-        quadrantCounts[targetQuadrant]++;
+        quadrants[targetQuad]++;
         E.transform.position = targetPos;
+        foreach (GameObject enemy in enemies)
+        {
+            if (E.GetComponent<Collider2D>().IsTouching(enemy.GetComponent<Collider2D>()))  // This is not working, and I'm not sure why
+            {
+                Debug.Log("ECH HALP");
+                DestroyImmediate(E);
+                Respawn(name);
+                return;
+            }
+        }
         E.GetComponent<Enemy>().lineRendererComponent = E.GetComponent<LineRenderer>();
         //E.GetComponent<Enemy>().origin = E.transform;
         //E.GetComponent<Enemy>().destination = Player.transform;
@@ -301,22 +387,17 @@ public class EncounterManager : MonoBehaviour
     }
 
 
-    //returns the lowest-populated quadrant
-    int LeastPopulatedQuadrant()
+    //returns the quadrants in order of population low -> high
+    int[] PopulatedQuadrantOrder()
     {
-        int lpq = 0;
-        int lpqv = quadrantCounts[0];
-
-        for(int i=1; i<4; i++)
+        Debug.Log("Quad Pops: " + quadrants[0] + "," + quadrants[1] + "," + quadrants[2] + "," + quadrants[3]);
+        IEnumerable<KeyValuePair<int, int>> orderedQuadsEnum = quadrants.OrderBy(pair => pair.Value).Take(4); // Order it based on count
+        int[] orderedQuads = { 0, 0, 0, 0 };
+        for (int i = 0; i < 4; i++)
         {
-            if (quadrantCounts[i] < lpqv)
-            {
-                lpqv = quadrantCounts[i];
-                lpq = i;
-            }
+            orderedQuads[i] = orderedQuadsEnum.ElementAt(i).Key; // Get the actual quadrant index
         }
-
-        return lpq;
+        return orderedQuads;
     }
 
     //decrement the quadrant the enemy was in (called when enemy is being destroyed)
@@ -324,13 +405,13 @@ public class EncounterManager : MonoBehaviour
     {
         if(pos.x >= 0)
         {
-            if(pos.y >= 0) { quadrantCounts[0]--; }
-            else { quadrantCounts[3]--; }
+            if(pos.y >= 0) { quadrants[0]--; }
+            else { quadrants[3]--; }
         }
         else
         {
-            if(pos.y >= 0) { quadrantCounts[1]--; }
-            else { quadrantCounts[2]--; }
+            if(pos.y >= 0) { quadrants[1]--; }
+            else { quadrants[2]--; }
         }
     }
 
@@ -386,11 +467,13 @@ public class EncounterManager : MonoBehaviour
     {
         if (secondWindCounter < 2) // 3rd hit second wind
         {
-            secondWindCounter++; // may want to move this to Character.cs in the future since the UI will need both player health and this
+            secondWindUIElement.transform.GetChild(secondWindCounter).gameObject.SetActive(false);
+            secondWindCounter++;
             //Debug.Log("SWC: " + secondWindCounter);
         }
         else
         {
+            secondWindUIElement.transform.GetChild(secondWindCounter).gameObject.SetActive(false);
             Enemy e;
 
             for (int i = 0; i < enemies.Count; i++)
@@ -402,6 +485,10 @@ public class EncounterManager : MonoBehaviour
                 }
             }
             secondWindCounter = 0;
+            for (int i = 0; i < 3; i++)
+            {
+                secondWindUIElement.transform.GetChild(i).gameObject.SetActive(true);
+            }
         }
     }
 

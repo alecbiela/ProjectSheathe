@@ -31,6 +31,12 @@ TagManager:
   - kbdControls
   - x360Controls
   - ps4Controls
+  - HealthElement
+  - ScoreElement
+  - WaveElement
+  - SecondWindElement
+  - OverclockCDElement
+  - ReadyElement
   layers:
   - Default
   - TransparentFX

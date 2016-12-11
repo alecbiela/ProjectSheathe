@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class Character : MonoBehaviour
 {
@@ -74,6 +75,10 @@ public class Character : MonoBehaviour
     public bool killStunnedEnemies;
     public int score;
     private List<Explosion> slowFields = new List<Explosion>();
+    private GameObject healthUIElement;
+    private Text scoreUIText;
+    private Slider overclockCDUISlider;
+    private GameObject overclockReadyUIElement;
 
     //animation stuff
     Animator animator;
@@ -107,9 +112,16 @@ public class Character : MonoBehaviour
         slowMovement = false;
         inputFlags = new bool[] { false, false, false, false, false, false, false }; // INPUT FLAGS, IN ORDER: SLICE[0], ATTACK[1], DEFLECT[2], INTERACT[6], OVERCLOCK[4], FIRE[5], DASH[6]
         health = 9;
+        score = 0;
+        healthUIElement = GameObject.FindGameObjectWithTag("HealthElement");
+        scoreUIText = GameObject.FindGameObjectWithTag("ScoreElement").GetComponent<Text>();
+        overclockCDUISlider = GameObject.FindGameObjectWithTag("OverclockCDElement").GetComponent<Slider>();
+        overclockReadyUIElement = GameObject.FindGameObjectWithTag("ReadyElement");
+        overclockReadyUIElement.SetActive(false);
+        setScore();
+        setHealth();
         playerHit = false;
         killStunnedEnemies = false;
-        score = 0;
         hpHit = 0;
         animator = this.gameObject.GetComponent<Animator>();
         // Populate various arrays of gameobjects with their hitboxes
@@ -211,6 +223,7 @@ public class Character : MonoBehaviour
             //Debug.Log("unslowed");
             slowMod = 0;
         }
+        overclockCDUISlider.value = 20 - (overclockCooldown * 2);
     }
 
     private void ProcessInput() // Processes the current input that the character has
@@ -257,6 +270,7 @@ public class Character : MonoBehaviour
                     case 4: // Overclocking
                         if (!overclockState && overclockCooldown <= 0)
                         {
+                            overclockReadyUIElement.SetActive(false);
                             //Debug.Log("Press");
                             overclockState = true;
                             overclockTimer = OVERCLOCK_PRELOAD + OVERCLOCK_ACTIVE + OVERCLOCK_AFTER;
@@ -437,6 +451,11 @@ public class Character : MonoBehaviour
         {
             overclockCooldown -= Time.deltaTime;
         }
+        else if (!Overclocking && overclockCooldown <= 0)
+        {
+            overclockReadyUIElement.SetActive(true);
+            overclockCooldown = 0;
+        }
 
         // Un-flag any abilities that are not on a timer, allowing the player to perform other actions
         if (deflectTimer == 0)
@@ -467,6 +486,24 @@ public class Character : MonoBehaviour
         }
     }
 
+    private void setHealth()
+    {
+        healthUIElement.GetComponent<Text>().text = health.ToString();
+        if (health > 4) healthUIElement.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().color = new Color(0, 201, 0); // Green
+        else if (health > 3) healthUIElement.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().color = new Color(201, 201, 0); // Yellow
+        else healthUIElement.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().color = new Color(201, 0, 0); // Red
+        if (health <= 0)
+        {
+            health = 0;
+            Debug.Log("GAME OVER");
+        }
+    }
+
+    public void setScore()
+    {
+        scoreUIText.text = "Score  " + score.ToString();
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         //Debug.Log("Collide");
@@ -480,6 +517,7 @@ public class Character : MonoBehaviour
                 //Debug.Log("Collided w/ non-medic bullet");
                 //Debug.Log("Player got hit");
                 health--;
+                setHealth();
                 hpHit++;
                 //Debug.Log(hpHit);
                 Cancel(); // ends active attacks when hit. This may need to be commented out if we can't get the animations to stop too
@@ -503,12 +541,6 @@ public class Character : MonoBehaviour
                 }
                 */
 
-                if (health <= 0)
-                {
-                    health = 0;
-                    //Debug.Log("GAME OVER");
-                }
-
                 enemyHandler.SecondWind();
 
                 //get rid of the bullet that was fired
@@ -520,14 +552,10 @@ public class Character : MonoBehaviour
         {
             //Debug.Log("LASERED");
             health--;
+            setHealth();
             hpHit++;
             //Debug.Log(hpHit);
             Cancel();
-            if (health <= 0)
-            {
-                health = 0;
-                Debug.Log("GAME OVER");
-            }
             hitByLaser = true;
 
             enemyHandler.SecondWind();
@@ -550,6 +578,7 @@ public class Character : MonoBehaviour
         if(other.gameObject.tag == "Dome")
         {
             health--;
+            setHealth();
             hpHit++;
         }
         
@@ -561,6 +590,7 @@ public class Character : MonoBehaviour
         if(other.tag == "MedicBullet")
         {
             health++;
+            setHealth();
             return;
         }
 
@@ -583,7 +613,7 @@ public class Character : MonoBehaviour
         }
         if (other.gameObject.tag == "BigShield")
         {
-            Debug.Log("Player out");
+            //Debug.Log("Player out");
             other.GetComponent<BigShield>().playerInside = false;
         }
     }
