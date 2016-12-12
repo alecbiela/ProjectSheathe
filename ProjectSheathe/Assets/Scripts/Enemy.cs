@@ -49,6 +49,7 @@ public class Enemy : MonoBehaviour {
     private bool firing;
 
     private GameObject hitSpark;
+    private float guardedTime;
 
     void Start()
     {
@@ -66,6 +67,7 @@ public class Enemy : MonoBehaviour {
         unstunned = false;
         fireTime = 0f;
         redFlashTime = .2f;
+        guardedTime = 0.0f;
         if (BulletPrefab.tag == "Laser")
         {
             type = "Light";
@@ -133,6 +135,17 @@ public class Enemy : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        if (type == "Lunk" && hitSpark.GetComponent<Animator>().GetInteger("hitBoxCount") == 7 && guardedTime != 0.0f)
+        {
+            if (Time.time - guardedTime > .01f)
+                hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", 0);
+
+            else
+            {
+                hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", 7);
+                guardedTime = 0.0f;
+            }
+        }
         lineRendererComponent.enabled = false;
         //Debug.Log(health);
         if (!secondWind && !unstunned && health <= 1) // stun enemies once their health reaches a certain value
@@ -477,7 +490,11 @@ public class Enemy : MonoBehaviour {
             //if it's a basic attack hitbox
             if (col.tag.Contains("BAHitbox"))
             {
-                if (type == "Lunk" && special.activeSelf) { } // If shield is up
+                if (type == "Lunk" && special.activeSelf)
+                {
+                    hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", 7);
+                    guardedTime = Time.time;
+                } // If shield is up
                 else if (!this.hitRecently)
                 {
                     if (Player.GetComponent<Character>().Overclocking) health -= 2;
