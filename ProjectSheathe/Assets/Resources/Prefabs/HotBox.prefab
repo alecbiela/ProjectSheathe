@@ -160,6 +160,7 @@ MonoBehaviour:
   special: {fileID: 1000013149814492}
   slowMod: 0
   guarded: 0
+  rank: 
   lineRendererComponent: {fileID: 0}
   origin: {x: 0, y: 0, z: 0}
   destination: {x: 0, y: 0, z: 0}
@@ -281,7 +282,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 8a8258a3b1ea4ac4792cc0ecf34e15d9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b36135aa8d4c0a0498a1df79538b18ed, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 5c4373ef144867642b03702f1c8d6389
-timeCreated: 1480995483
+timeCreated: 1481514185
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -64,10 +64,10 @@ TextureImporter:
       name: Deflect_Recovery_Sheet_0
       rect:
         serializedVersion: 2
-        x: 664
-        y: 1428
-        width: 540
-        height: 610
+        x: 811
+        y: 1778
+        width: 699
+        height: 763
       alignment: 9
       pivot: {x: 0.44541478, y: 0.4130211}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -77,10 +77,10 @@ TextureImporter:
       name: Deflect_Recovery_Sheet_1
       rect:
         serializedVersion: 2
-        x: 679
-        y: 791
-        width: 548
-        height: 613
+        x: 852
+        y: 970
+        width: 644
+        height: 799
       alignment: 9
       pivot: {x: 0.45159033, y: 0.35574484}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -90,10 +90,10 @@ TextureImporter:
       name: Deflect_Recovery_Sheet_2
       rect:
         serializedVersion: 2
-        x: 705
-        y: 116
-        width: 519
-        height: 616
+        x: 854
+        y: 134
+        width: 633
+        height: 775
       alignment: 9
       pivot: {x: 0.471603, y: 0.31338173}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -103,10 +103,10 @@ TextureImporter:
       name: Deflect_Recovery_Sheet_3
       rect:
         serializedVersion: 2
-        x: 131
-        y: 1404
-        width: 480
-        height: 622
+        x: 100
+        y: 1744
+        width: 662
+        height: 797
       alignment: 9
       pivot: {x: 0.51842237, y: 0.32465953}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -116,10 +116,10 @@ TextureImporter:
       name: Deflect_Recovery_Sheet_4
       rect:
         serializedVersion: 2
-        x: 83
-        y: 785
-        width: 513
-        height: 566
+        x: 111
+        y: 963
+        width: 633
+        height: 757
       alignment: 9
       pivot: {x: 0.64939165, y: 0.3541815}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -129,10 +129,10 @@ TextureImporter:
       name: Deflect_Recovery_Sheet_5
       rect:
         serializedVersion: 2
-        x: 33
-        y: 87
-        width: 610
-        height: 468
+        x: 85
+        y: 107
+        width: 708
+        height: 560
       alignment: 9
       pivot: {x: 0.7464396, y: 0.41182324}
       border: {x: 0, y: 0, z: 0, w: 0}

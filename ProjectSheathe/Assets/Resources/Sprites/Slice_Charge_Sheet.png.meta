@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: e2ec508ab4248574fb30ba2db2716f7b
-timeCreated: 1480976602
+timeCreated: 1481521330
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -61,12 +61,12 @@ TextureImporter:
       name: Slice_Charge_Sheet_0
       rect:
         serializedVersion: 2
-        x: 54
-        y: 16
-        width: 382
-        height: 346
+        x: 13
+        y: 2136
+        width: 610
+        height: 684
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -74,12 +74,12 @@ TextureImporter:
       name: Slice_Charge_Sheet_1
       rect:
         serializedVersion: 2
-        x: 438
-        y: 10
-        width: 388
-        height: 344
+        x: 25
+        y: 2818
+        width: 612
+        height: 675
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -87,12 +87,12 @@ TextureImporter:
       name: Slice_Charge_Sheet_2
       rect:
         serializedVersion: 2
-        x: 828
-        y: 18
-        width: 390
-        height: 346
+        x: 22
+        y: 1457
+        width: 620
+        height: 681
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -100,12 +100,12 @@ TextureImporter:
       name: Slice_Charge_Sheet_3
       rect:
         serializedVersion: 2
-        x: 1214
-        y: 14
-        width: 394
-        height: 346
+        x: 18
+        y: 757
+        width: 623
+        height: 696
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -113,12 +113,12 @@ TextureImporter:
       name: Slice_Charge_Sheet_4
       rect:
         serializedVersion: 2
-        x: 1616
-        y: 12
-        width: 408
-        height: 348
+        x: 13
+        y: 31
+        width: 632
+        height: 717
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0

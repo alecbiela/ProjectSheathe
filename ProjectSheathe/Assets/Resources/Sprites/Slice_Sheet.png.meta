@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 79f77a819d10cb34993f264e9972eccf
-timeCreated: 1480976619
+timeCreated: 1481522189
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
@@ -15,6 +15,9 @@ TextureImporter:
     21300016: Slice_Sheet_8
     21300018: Slice_Sheet_9
     21300020: Slice_Sheet_10
+    21300022: Slice_Sheet_11
+    21300024: Slice_Sheet_12
+    21300026: Slice_Sheet_13
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -67,12 +70,12 @@ TextureImporter:
       name: Slice_Sheet_0
       rect:
         serializedVersion: 2
-        x: 10
-        y: 1224
-        width: 326
-        height: 304
+        x: 49
+        y: 2089
+        width: 539
+        height: 578
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -80,10 +83,10 @@ TextureImporter:
       name: Slice_Sheet_1
       rect:
         serializedVersion: 2
-        x: 340
-        y: 1224
-        width: 324
-        height: 304
+        x: 2332
+        y: 2647
+        width: 36
+        height: 5
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -93,10 +96,10 @@ TextureImporter:
       name: Slice_Sheet_2
       rect:
         serializedVersion: 2
-        x: 676
-        y: 1144
-        width: 334
-        height: 378
+        x: 593
+        y: 2232
+        width: 6
+        height: 42
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -106,12 +109,12 @@ TextureImporter:
       name: Slice_Sheet_3
       rect:
         serializedVersion: 2
-        x: 1024
-        y: 1136
-        width: 334
-        height: 378
+        x: 707
+        y: 2077
+        width: 538
+        height: 570
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -119,12 +122,12 @@ TextureImporter:
       name: Slice_Sheet_4
       rect:
         serializedVersion: 2
-        x: 16
-        y: 614
-        width: 334
-        height: 378
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 1267
+        y: 2029
+        width: 667
+        height: 589
+      alignment: 9
+      pivot: {x: 0.6223679, y: 0.42301488}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -132,12 +135,12 @@ TextureImporter:
       name: Slice_Sheet_5
       rect:
         serializedVersion: 2
-        x: 382
-        y: 696
-        width: 334
-        height: 378
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 1939
+        y: 2030
+        width: 666
+        height: 590
+      alignment: 9
+      pivot: {x: 0.5998572, y: 0.3872803}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -145,10 +148,10 @@ TextureImporter:
       name: Slice_Sheet_6
       rect:
         serializedVersion: 2
-        x: 752
-        y: 620
-        width: 334
-        height: 378
+        x: 1189
+        y: 1999
+        width: 14
+        height: 4
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -158,12 +161,12 @@ TextureImporter:
       name: Slice_Sheet_7
       rect:
         serializedVersion: 2
-        x: 1138
-        y: 516
-        width: 334
-        height: 376
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 1295
+        width: 667
+        height: 590
+      alignment: 9
+      pivot: {x: 0.6042393, y: 0.4641345}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -171,12 +174,12 @@ TextureImporter:
       name: Slice_Sheet_8
       rect:
         serializedVersion: 2
-        x: 24
-        y: 56
-        width: 334
-        height: 388
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 662
+        y: 1376
+        width: 667
+        height: 593
+      alignment: 9
+      pivot: {x: 0.6540932, y: 0.43882754}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -184,12 +187,12 @@ TextureImporter:
       name: Slice_Sheet_9
       rect:
         serializedVersion: 2
-        x: 518
-        y: 66
-        width: 308
-        height: 516
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 1326
+        y: 1375
+        width: 669
+        height: 592
+      alignment: 9
+      pivot: {x: 0.6400767, y: 0.423405}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0
@@ -197,12 +200,51 @@ TextureImporter:
       name: Slice_Sheet_10
       rect:
         serializedVersion: 2
-        x: 902
-        y: 22
-        width: 612
-        height: 430
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 2000
+        y: 1341
+        width: 664
+        height: 589
+      alignment: 9
+      pivot: {x: 0.6320264, y: 0.43327954}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Slice_Sheet_11
+      rect:
+        serializedVersion: 2
+        x: 49
+        y: 504
+        width: 686
+        height: 590
+      alignment: 9
+      pivot: {x: 0.6366054, y: 0.43851638}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Slice_Sheet_12
+      rect:
+        serializedVersion: 2
+        x: 808
+        y: 738
+        width: 909
+        height: 545
+      alignment: 9
+      pivot: {x: 0.37362835, y: 0.4944533}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: Slice_Sheet_13
+      rect:
+        serializedVersion: 2
+        x: 1799
+        y: 188
+        width: 758
+        height: 1078
+      alignment: 9
+      pivot: {x: 0.7033904, y: 0.74957496}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       tessellationDetail: 0

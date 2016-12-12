@@ -81,8 +81,11 @@ public class Character : MonoBehaviour
     private GameObject overclockReadyUIElement;
 
     //animation stuff
-    Animator animator;
-  
+    private Animator animator;
+    private int redTimer;
+    private GameObject hitSpark;
+    private int sliceAnimTimer;
+
     private void Awake()
     {
         blueScreenGlow = GameObject.FindGameObjectWithTag("BlueScreenGlow");
@@ -124,6 +127,7 @@ public class Character : MonoBehaviour
         killStunnedEnemies = false;
         hpHit = 0;
         animator = this.gameObject.GetComponent<Animator>();
+        hitSpark = this.transform.GetChild(0).gameObject;
         // Populate various arrays of gameobjects with their hitboxes
         // Add by name, so we know which is which
         sliceHitBoxes = new GameObject[6];
@@ -192,12 +196,23 @@ public class Character : MonoBehaviour
             else animator.SetInteger("transitions", 4);
 
         }
-        /*
-        if (Slicing)
+        
+        if (slowMovement)
         {
             animator.SetInteger("transitions", 2);
-        }*/
+        }/**/
+        
         // 
+        if (Slicing)
+        {
+            animator.SetInteger("transitions", 3);
+            sliceAnimTimer = 10;
+            hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", sliceBoxes+1);
+            Debug.Log(sliceBoxes + 1);
+            //Debug.Log("Slicing");
+        }
+        
+
         if (Attacking)
         {
             animator.SetInteger("transitions", 1);
@@ -205,9 +220,27 @@ public class Character : MonoBehaviour
             //Debug.Log(animator.GetInteger("transitions"));
         }
 
-        if(!Deflecting && !Attacking)
+        if(!Deflecting && !Attacking && !Slicing && !slowMovement)
         {
             animator.SetInteger("transitions", 0);
+           // if(hitSpark.GetComponent<Animator>().GetInteger("hitBoxCount")>0)
+                
+        }
+        if(redTimer>0)
+        {
+            redTimer--;
+            if(redTimer<=0)
+            {
+                this.gameObject.GetComponent<SpriteRenderer>().color = new Color(255, 255, 255);
+            }
+        }
+        if(sliceAnimTimer>0)
+        {
+            sliceAnimTimer--;
+            if(sliceAnimTimer<=0)
+            {
+                hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", 0);
+            }
         }
         //Debug.Log(animator.GetInteger("transitions"));
         for (int i = 0; i < slowFields.Count; i++)
@@ -373,17 +406,16 @@ public class Character : MonoBehaviour
             {
                 sliceHitBoxes[i].gameObject.SetActive(false);
             }
-            //animator.SetInteger("transitions", 0);
+            
         }
         else if (sliceTimer <= (SLICE_ACTIVE + SLICE_AFTER)) // Otherwise, slice
         {
             sliceHitBoxes[0].gameObject.SetActive(true); // Always activate the first box
-
             for (int i = 0; i < sliceBoxes; i++) // Additional hitboxes
             {
                 sliceHitBoxes[i + 1].gameObject.SetActive(true);
             }
-
+            
             Slicing = true;
             maxSpeed = 7f;
             dashRate = .5f;
@@ -409,7 +441,8 @@ public class Character : MonoBehaviour
         if (sliceState)
         {
             slowMovement = true;
-           
+            Debug.Log(sliceState);
+            animator.SetInteger("transitions", 2);
         }
         if (!Dashing && dashCooldown > 0) // Increment dash cooldown based on delta time
         {
@@ -462,7 +495,6 @@ public class Character : MonoBehaviour
         {
             Deflecting = false;
             deflectState = false;
-            animator.SetInteger("transitions", 0);
         }
         if (sliceTimer == 0)
         {
@@ -475,14 +507,13 @@ public class Character : MonoBehaviour
             }
             Slicing = false;
             sliceState = false;
-            //animator.SetInteger("transitions", 0);
         }
         if (baTimer == 0)
         {
 
             Attacking = false;
             baState = false;
-           //animator.SetInteger("transitions", 0);
+
         }
     }
 
@@ -516,6 +547,8 @@ public class Character : MonoBehaviour
             {
                 //Debug.Log("Collided w/ non-medic bullet");
                 //Debug.Log("Player got hit");
+                redTimer = 10;
+                this.gameObject.GetComponent<SpriteRenderer>().color = new Color(255, 0, 0);
                 health--;
                 setHealth();
                 hpHit++;
