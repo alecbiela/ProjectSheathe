@@ -533,6 +533,7 @@ public class Character : MonoBehaviour
         {
             health = 0;
             Debug.Log("GAME OVER");
+            Application.LoadLevel(Application.loadedLevel);
         }
     }
 
