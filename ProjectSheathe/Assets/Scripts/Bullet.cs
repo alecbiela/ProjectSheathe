@@ -51,6 +51,8 @@ public class Bullet : MonoBehaviour {
             if(this.tag == "MedicBullet")
             {
                 GameObject.Find("Player").GetComponent<Character>().health += 2;
+                GameObject.Find("Player").GetComponent<Character>().setHealth();
+                //handler.extraWind = 1;
                 Destroy(this.gameObject);
             }
             CanHurtEnemies = true;

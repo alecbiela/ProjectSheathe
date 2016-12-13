@@ -43,6 +43,7 @@ public class EncounterManager : MonoBehaviour
     private int stunnedEnemyCount = 0;
     private Dictionary<int, int> quadrants; // Quadrant id, quadrant count
     private int secondWindCounter = 0;
+    public int extraWind = 0; // for use in recovering a stock of the second wind counter
     System.Random rand2 = new System.Random();
     [SerializeField] private GameObject[] officerSpawns;
     private int wave = 0;
@@ -82,6 +83,10 @@ public class EncounterManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //secondWindCounter += extraWind;
+        //if (secondWindCounter > 3) secondWindCounter = 3;
+        //extraWind = 0;
+
         //update active enemy list as well as stunned enemy position list
         UpdateEnemyLists();
         if(enemies.Count <= 0) Spawn();
@@ -103,6 +108,11 @@ public class EncounterManager : MonoBehaviour
             if (enemies[i].GetComponent<Enemy>().stunned == true)
             {
                 stunnedEnemyCount++;
+            }
+
+            if(stunnedEnemyCount == enemies.Count && PlayerScript.Overclocking == false) // if all enemies are stunned, give the player Overclock
+            {
+                PlayerScript.overclockCooldown = 0;
             }
             
             // enable enemies to be hit again once the player isn't using basic attack or actively slicing
@@ -189,7 +199,7 @@ public class EncounterManager : MonoBehaviour
             baseSpeed = speedMod;
             slowSpeed = baseSpeed - PlayerScript.overclockMod;
         }
-        if (speedMod > 3.0)
+        if (speedMod > 3.0f)
         {
             speedMod = 3.0f;
         }
@@ -225,12 +235,12 @@ public class EncounterManager : MonoBehaviour
         }
 
         //calculates number of enemies to spawn (only does this when needed now, as opposed to every frame) CHANGE THIS SECTION IF MAXENEMY SHOULD BE MORE THAN GUARDS
-        maxEnemyNumber = BASE_ENEMY_COUNT + (int)(PlayerScript.score / 450);
+        maxEnemyNumber = BASE_ENEMY_COUNT + (int)(PlayerScript.score / 650);
         if (maxEnemyNumber > ABSOLUTE_MAX_GUARD_COUNT) maxEnemyNumber = ABSOLUTE_MAX_GUARD_COUNT;
 
         // spawn officers first but only when the number of officers that should spawn changes, so every score threshold
         int oldMaxOfficerNumber = maxOfficerNumber;
-        maxOfficerNumber = 0 + (int)(PlayerScript.score / 750); // should really be around 1000
+        maxOfficerNumber = 0 + (int)(PlayerScript.score / 1200); // should really be around 1000
         if (maxOfficerNumber > ABSOLUTE_MAX_OFFICER_NUMBER) maxOfficerNumber = ABSOLUTE_MAX_OFFICER_NUMBER;
 
         if(maxOfficerNumber >= ABSOLUTE_MAX_OFFICER_NUMBER || oldMaxOfficerNumber != maxOfficerNumber)
@@ -362,7 +372,7 @@ public class EncounterManager : MonoBehaviour
                     targetPos.y = (float)(-8.5 * rand.NextDouble());
                     break;
                 default:
-                    Debug.Log("Target Quadrant index out of bounds.");
+                    //Debug.Log("Target Quadrant index out of bounds.");
                     break;
             }
         }
@@ -374,7 +384,7 @@ public class EncounterManager : MonoBehaviour
         {
             if (E.GetComponent<Collider2D>().IsTouching(enemy.GetComponent<Collider2D>()))  // This is not working, and I'm not sure why
             {
-                Debug.Log("ECH HALP");
+                //Debug.Log("ECH HALP");
                 DestroyImmediate(E);
                 Respawn(name);
                 return;
@@ -390,7 +400,7 @@ public class EncounterManager : MonoBehaviour
     //returns the quadrants in order of population low -> high
     int[] PopulatedQuadrantOrder()
     {
-        Debug.Log("Quad Pops: " + quadrants[0] + "," + quadrants[1] + "," + quadrants[2] + "," + quadrants[3]);
+        //Debug.Log("Quad Pops: " + quadrants[0] + "," + quadrants[1] + "," + quadrants[2] + "," + quadrants[3]);
         IEnumerable<KeyValuePair<int, int>> orderedQuadsEnum = quadrants.OrderBy(pair => pair.Value).Take(4); // Order it based on count
         int[] orderedQuads = { 0, 0, 0, 0 };
         for (int i = 0; i < 4; i++)

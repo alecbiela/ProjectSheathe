@@ -44,7 +44,7 @@ public class Character : MonoBehaviour
     private float overclockTimer;
     private float currDashDist; // Currently traveled distance of the dash
     private float dashCooldown; // Cooldown timer
-    private float overclockCooldown;
+    public float overclockCooldown;
     private float oldSpeed;
     private bool hitByLaser; // Tracks if being actively hit by laser
     private int hpHit; // number of times the player has been hit. Used with CHUNK
@@ -71,6 +71,7 @@ public class Character : MonoBehaviour
 
     [SerializeField] public int health;
     private bool hitRecently; // variable for future use with attacks that persist in the player's hurtbox
+    private bool hitByMedicBullet;
     public bool playerHit; // variable that tells the encounter manager the player has been hit
     public bool killStunnedEnemies;
     public int score;
@@ -88,6 +89,7 @@ public class Character : MonoBehaviour
 
     private void Awake()
     {
+        hitByMedicBullet = false;
         blueScreenGlow = GameObject.FindGameObjectWithTag("BlueScreenGlow");
         blueScreenGlow.SetActive(false);
         rigidBody = this.GetComponentInParent<Rigidbody2D>();
@@ -208,7 +210,7 @@ public class Character : MonoBehaviour
             animator.SetInteger("transitions", 3);
             sliceAnimTimer = 10;
             hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", sliceBoxes+1);
-            Debug.Log(sliceBoxes + 1);
+            //Debug.Log(sliceBoxes + 1);
             //Debug.Log("Slicing");
         }
         
@@ -441,7 +443,7 @@ public class Character : MonoBehaviour
         if (sliceState)
         {
             slowMovement = true;
-            Debug.Log(sliceState);
+            //Debug.Log(sliceState);
             animator.SetInteger("transitions", 2);
         }
         if (!Dashing && dashCooldown > 0) // Increment dash cooldown based on delta time
@@ -517,8 +519,12 @@ public class Character : MonoBehaviour
         }
     }
 
-    private void setHealth()
+    public void setHealth()
     {
+        if(health > 9) // max health
+        {
+            health = 9;
+        }
         healthUIElement.GetComponent<Text>().text = health.ToString();
         if (health > 4) healthUIElement.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().color = new Color(0, 201, 0); // Green
         else if (health > 3) healthUIElement.transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>().color = new Color(201, 201, 0); // Yellow
@@ -538,7 +544,7 @@ public class Character : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         //Debug.Log("Collide");
-        if (other.gameObject.layer == 11) // All bullet types, can use tag for specific actions based on bullet type
+        if (other.tag != "Grenade" && other.gameObject.layer == 11) // All bullet types, can use tag for specific actions based on bullet type
         {
             //trying to prevent accidental collision w/ basic bullets, not sure what other bullets can be deflected
             if ((other.tag == "Bullet" || other.tag == "SlowBullet") && other.GetComponent<Bullet>().CanHurtEnemies) return;
@@ -578,6 +584,13 @@ public class Character : MonoBehaviour
 
                 //get rid of the bullet that was fired
                 Destroy(other.gameObject);
+            }
+            else if(hitByMedicBullet == false)
+            {
+                health++;
+                setHealth();
+                hpHit++;
+                hitByMedicBullet = true;
             }
             return;
         }
@@ -622,8 +635,7 @@ public class Character : MonoBehaviour
         //if the medic bullet passed through us, give us 1 health
         if(other.tag == "MedicBullet")
         {
-            health++;
-            setHealth();
+            hitByMedicBullet = false;
             return;
         }
 

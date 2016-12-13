@@ -574,7 +574,7 @@ RectTransform:
   m_RootOrder: 1
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -34.75, y: 67.75}
+  m_AnchoredPosition: {x: -34.75, y: 86}
   m_SizeDelta: {x: 150.5, y: 63.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &87001237
@@ -607,9 +607,9 @@ MonoBehaviour:
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
-    m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: 'ROTATE
+    m_VerticalOverflow: 1
+    m_LineSpacing: 0.5
+  m_Text: 'MANUAL ROTATE
 
 '
 --- !u!222 &87001238
@@ -2014,6 +2014,7 @@ MonoBehaviour:
   hotBoxPrefab: {fileID: 1000012341611592, guid: 4505a731dda72f643aa6e79b6db17ac9,
     type: 2}
   speedMod: 4
+  extraWind: 0
   officerSpawns:
   - {fileID: 67794116}
   - {fileID: 1671834109}
@@ -2273,6 +2274,7 @@ MonoBehaviour:
   maxSpeed: 7
   maxDashDist: 3
   dashRate: 0.5
+  overclockCooldown: 0
   slowMod: 0
   slowMovement: 0
   health: 9
@@ -4563,7 +4565,7 @@ ParticleSystem:
   moveWithTransform: 0
   autoRandomSeed: 1
   scalingMode: 1
-  randomSeed: 912790356
+  randomSeed: -1474533023
   InitialModule:
     serializedVersion: 2
     enabled: 1
@@ -7409,7 +7411,7 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 21300000, guid: aeaae6a9442b99f4c981b7c053d99445, type: 3}
+  m_Sprite: {fileID: 21300000, guid: fcd5e8f0c7f19044eb3f93a137c60c8e, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -10727,7 +10729,7 @@ MonoBehaviour:
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
-    m_HorizontalOverflow: 0
+    m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: MOVE
