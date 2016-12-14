@@ -671,8 +671,7 @@ public class Character : MonoBehaviour
         baHitBoxes[0].gameObject.SetActive(false);
         baHitBoxes[1].gameObject.SetActive(false);
         baHitBoxes[2].gameObject.SetActive(false);
-
-        sliceTimer = 0;
+        //sliceState = false;
         //animator.SetInteger("transitions", 0);
     }
 
