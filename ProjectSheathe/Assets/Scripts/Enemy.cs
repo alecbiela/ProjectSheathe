@@ -137,13 +137,15 @@ public class Enemy : MonoBehaviour {
     {
         if (type == "Lunk" && hitSpark.GetComponent<Animator>().GetInteger("hitBoxCount") == 7 && guardedTime != 0.0f)
         {
-            if (Time.time - guardedTime > .01f)
+            if ((Time.time - guardedTime) > (Time.deltaTime))
+            {
                 hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", 0);
-
+                guardedTime = 0.0f;
+            }
             else
             {
                 hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", 7);
-                guardedTime = 0.0f;
+
             }
         }
         lineRendererComponent.enabled = false;

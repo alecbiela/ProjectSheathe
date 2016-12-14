@@ -1,23 +1,23 @@
 fileFormatVersion: 2
 guid: 79f77a819d10cb34993f264e9972eccf
-timeCreated: 1481522189
+timeCreated: 1481745689
 licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: Slice_Sheet_0
     21300002: Slice_Sheet_1
     21300004: Slice_Sheet_2
-    21300006: Slice_Sheet_3
-    21300008: Slice_Sheet_4
-    21300010: Slice_Sheet_5
+    21300006: Slice_Sheet_1
+    21300008: Slice_Sheet_2
+    21300010: Slice_Sheet_3
     21300012: Slice_Sheet_6
-    21300014: Slice_Sheet_7
-    21300016: Slice_Sheet_8
-    21300018: Slice_Sheet_9
-    21300020: Slice_Sheet_10
-    21300022: Slice_Sheet_11
-    21300024: Slice_Sheet_12
-    21300026: Slice_Sheet_13
+    21300014: Slice_Sheet_4
+    21300016: Slice_Sheet_5
+    21300018: Slice_Sheet_6
+    21300020: Slice_Sheet_7
+    21300022: Slice_Sheet_8
+    21300024: Slice_Sheet_9
+    21300026: Slice_Sheet_10
   serializedVersion: 2
   mipmaps:
     mipMapMode: 0
@@ -83,32 +83,6 @@ TextureImporter:
       name: Slice_Sheet_1
       rect:
         serializedVersion: 2
-        x: 2332
-        y: 2647
-        width: 36
-        height: 5
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: Slice_Sheet_2
-      rect:
-        serializedVersion: 2
-        x: 593
-        y: 2232
-        width: 6
-        height: 42
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: Slice_Sheet_3
-      rect:
-        serializedVersion: 2
         x: 707
         y: 2077
         width: 538
@@ -119,7 +93,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Slice_Sheet_4
+      name: Slice_Sheet_2
       rect:
         serializedVersion: 2
         x: 1267
@@ -132,7 +106,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Slice_Sheet_5
+      name: Slice_Sheet_3
       rect:
         serializedVersion: 2
         x: 1939
@@ -145,20 +119,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Slice_Sheet_6
-      rect:
-        serializedVersion: 2
-        x: 1189
-        y: 1999
-        width: 14
-        height: 4
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      tessellationDetail: 0
-    - serializedVersion: 2
-      name: Slice_Sheet_7
+      name: Slice_Sheet_4
       rect:
         serializedVersion: 2
         x: 0
@@ -171,7 +132,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Slice_Sheet_8
+      name: Slice_Sheet_5
       rect:
         serializedVersion: 2
         x: 662
@@ -184,7 +145,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Slice_Sheet_9
+      name: Slice_Sheet_6
       rect:
         serializedVersion: 2
         x: 1326
@@ -197,10 +158,10 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Slice_Sheet_10
+      name: Slice_Sheet_7
       rect:
         serializedVersion: 2
-        x: 2000
+        x: 1995
         y: 1341
         width: 664
         height: 589
@@ -210,7 +171,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Slice_Sheet_11
+      name: Slice_Sheet_8
       rect:
         serializedVersion: 2
         x: 49
@@ -223,7 +184,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Slice_Sheet_12
+      name: Slice_Sheet_9
       rect:
         serializedVersion: 2
         x: 808
@@ -236,7 +197,7 @@ TextureImporter:
       outline: []
       tessellationDetail: 0
     - serializedVersion: 2
-      name: Slice_Sheet_13
+      name: Slice_Sheet_10
       rect:
         serializedVersion: 2
         x: 1799
