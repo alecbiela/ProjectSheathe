@@ -325,6 +325,7 @@ public class Character : MonoBehaviour
                         //Debug.Log("SliceHold");
                         sliceState = 1;
                         sliceHoldTime += Time.deltaTime;
+                        slowMovement = true;
                         //animator.SetInteger("transitions", 2);
                         break;
                     case 1: // Attacking
@@ -361,7 +362,7 @@ public class Character : MonoBehaviour
                     case 5: // Firing
                         break;
                     case 6: // Dashing
-                        if (dashState > 1 && (sliceState > 0 || baState > 1 || deflectState > 1)) // Cancel dash on other actions
+                        if (dashState > 1 && (sliceState > 1 || baState > 1 || deflectState > 1)) // Cancel dash on other actions
                         {
                             //Debug.Log("Cancel");
                             dashState = 1; // Note that canceling dash with actions mapped to mouse buttons DOES NOT WORK on most touchpads because of system-wide accidental input suppression
@@ -369,7 +370,7 @@ public class Character : MonoBehaviour
                             dashCooldown = DASH_CD;
                             transform.GetComponent<SpriteRenderer>().color = Color.white;
                         }
-                        else if (sliceState > 0 || baState > 1 || deflectState > 1) continue; // Do not perform dash while doing other actions
+                        else if (sliceState > 1 || baState > 1 || deflectState > 1) continue; // Do not perform dash while doing other actions
                         else
                         {
                             if (currDashDist == 0 && dashCooldown <= 0 && rigidBody.velocity != Vector2.zero) // Only dash if moving

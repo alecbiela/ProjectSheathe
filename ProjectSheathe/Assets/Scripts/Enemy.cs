@@ -107,7 +107,7 @@ public class Enemy : MonoBehaviour {
     {
         if (hitRecently && Handler.PlayerScript.BAState < 2 && Handler.PlayerScript.SliceState < 2) // Let enemy get hit again if original attack is over
         {
-            Debug.Log("Unhit");
+            //Debug.Log("Unhit");
             hitRecently = false;
         }
         lineRendererComponent.enabled = false;
@@ -175,7 +175,7 @@ public class Enemy : MonoBehaviour {
     // Handles collision of enemy with other objects
     protected virtual void OnTriggerEnter2D(Collider2D col)
     {
-        Debug.Log("Trigger");
+        //Debug.Log("Trigger");
         if (col.gameObject.layer == 13) // Slow grenade
         {
             if (col.gameObject.GetComponent<Explosion>().canHurtEnemies) // Explodes on contact and has field
@@ -203,7 +203,7 @@ public class Enemy : MonoBehaviour {
 
         if (!guarded) // Take the hit if unguarded
         {
-            Debug.Log("Hit"); // FOR SOME REASON THIS METHOD IS NOT BEING TRIGGERED ON BA WHEN ENEMIES ARE STUNNED-- PLZ INVESTIGATE
+            //Debug.Log("Hit"); // FOR SOME REASON THIS METHOD IS NOT BEING TRIGGERED ON BA WHEN ENEMIES ARE STUNNED-- PLZ INVESTIGATE
             if (col.tag.Contains("SliceHitbox")) // Slice
             {
                 if (!hitRecently)
@@ -217,10 +217,10 @@ public class Enemy : MonoBehaviour {
 
             if (col.tag.Contains("BAHitbox")) // Basic Attack
             {
-                Debug.Log("BA Hit");
+                //Debug.Log("BA Hit");
                 if (!hitRecently)
                 {
-                    Debug.Log("Enemy Took Damage");
+                    //Debug.Log("Enemy Took Damage");
                     if (Player.GetComponent<Character>().OverclockState == 4) health -= 2; // If OC active
                     else health--;
                     hitRecently = true;
