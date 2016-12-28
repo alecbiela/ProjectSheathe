@@ -45,6 +45,7 @@ public class Laser : Enemy
             lineRendererComponent.SetWidth(.15f + counter * .005f, .15f + counter * .005f); // Laser gets wider as it charges, and goes off infinitely
             pointAlongLine = direction * 1000;
 
+            lineRendererComponent.enabled = true;
             if (currFlashTime > redFlashTime) // Flash red and get bigger and more opaque
             {
                 lineRendererComponent.SetColors(new Color(255, 153, 0, 128 + counter / 2), new Color(255, 1153, 0, 128 + counter / 2));

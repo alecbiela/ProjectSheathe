@@ -25,7 +25,8 @@ public class B451C : Enemy
             Vector3 direction = Vector3.Normalize(pointB - pointA);
             Vector3 pointAlongLine;
             pointAlongLine = x * direction + pointA; // Get the unit vector in the desired direction, multiply by the desired length and add the starting point.
-            
+
+            lineRendererComponent.enabled = true;
             if (currFlashTime > redFlashTime) // Flash yellow
             {
                 //GetComponent<SpriteRenderer>().color = new Color(255, 200, 0); // yellow/gold

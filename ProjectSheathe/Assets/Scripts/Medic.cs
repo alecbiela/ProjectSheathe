@@ -20,6 +20,7 @@ public class Medic : Enemy {
     public override void Fire()
     {
         if (!isActive) return; // When no stunned enemies
+        base.Fire();
         if (timer % 3 == 0) // Flash on
         {
             counter += 1f;

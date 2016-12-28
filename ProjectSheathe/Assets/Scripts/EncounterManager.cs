@@ -202,16 +202,6 @@ public class EncounterManager : MonoBehaviour
         {
             officerSpawns[i].GetComponent<OfficerSpawnPoint>().filled = false;
         }
-        //// get rid of all lingering lasers upon spawn
-        //GameObject[] lingeringLasers = GameObject.FindGameObjectsWithTag("Laser");
-        //if (lingeringLasers.Length != 0)
-        //{
-        //    foreach (GameObject laser in lingeringLasers)
-        //    {
-        //        GameObject.DestroyObject(laser);
-        //        //Debug.Log("Destroyed lingering laser");
-        //    }
-        //}
 
         // reset the chunk or "secondWindCounter"
         secondWindCounter = 0;
@@ -221,12 +211,12 @@ public class EncounterManager : MonoBehaviour
         }
 
         //calculates number of enemies to spawn (only does this when needed now, as opposed to every frame) CHANGE THIS SECTION IF MAXENEMY SHOULD BE MORE THAN GUARDS
-        maxEnemyNumber = BASE_ENEMY_COUNT + (int)(PlayerScript.score / 650);
+        maxEnemyNumber = BASE_ENEMY_COUNT + (PlayerScript.score / 650);
         if (maxEnemyNumber > ABSOLUTE_MAX_GUARD_COUNT) maxEnemyNumber = ABSOLUTE_MAX_GUARD_COUNT;
 
         // spawn officers first but only when the number of officers that should spawn changes, so every score threshold
         int oldMaxOfficerNumber = maxOfficerNumber;
-        maxOfficerNumber = 0 + (int)(PlayerScript.score / 1200); // should really be around 1000
+        maxOfficerNumber = 0 + (PlayerScript.score / 1200); // should really be around 1000
         if (maxOfficerNumber > ABSOLUTE_MAX_OFFICER_NUMBER) maxOfficerNumber = ABSOLUTE_MAX_OFFICER_NUMBER;
 
         if(maxOfficerNumber >= ABSOLUTE_MAX_OFFICER_NUMBER || oldMaxOfficerNumber != maxOfficerNumber)

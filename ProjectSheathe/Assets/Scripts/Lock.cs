@@ -24,7 +24,8 @@ public class Lock : Enemy
             Vector3 direction = Vector3.Normalize(pointB - pointA);
             Vector3 pointAlongLine;
             pointAlongLine = x * direction + pointA; // Get the unit vector in the desired direction, multiply by the desired length and add the starting point.
-            
+
+            lineRendererComponent.enabled = true;
             if (currFlashTime > redFlashTime) // Flash yellow
             {
                 lineRendererComponent.SetColors(new Color(242, 190, 0, 172), new Color(242, 190, 0, 172)); // Yellow (For basic enemies)

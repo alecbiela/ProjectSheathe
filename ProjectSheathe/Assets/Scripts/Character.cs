@@ -239,11 +239,6 @@ public class Character : MonoBehaviour
 
         }
         
-        if (slowMovement)
-        {
-            animator.SetInteger("transitions", 2);
-        }
-        
         if (sliceState == 3) // Same with the rest of these animations, put it where it goes in timed actions *******************************
         {
             animator.SetInteger("transitions", 3);
@@ -253,7 +248,6 @@ public class Character : MonoBehaviour
             //Debug.Log("Slicing");
         }
         
-
         if (baState == 3)
         {
             animator.SetInteger("transitions", 1);
@@ -262,12 +256,16 @@ public class Character : MonoBehaviour
         }
 
         if(deflectState < 2 && baState < 2 && sliceState < 1 && !slowMovement) // If we have a sprite for charging the slice, make this sS<1 (1=charge) and do another if
-        {
+        { // Why do we care about slowSpeed for this?
             animator.SetInteger("transitions", 0);
            // if(hitSpark.GetComponent<Animator>().GetInteger("hitBoxCount")>0)
-                
         }
-        if(redTimer>0) // What is this ?? ---- ATTN: ANYONE WHO KNOWS THE ANIMATION STUFF
+        if (slowMovement) // Something's wrong with the animations today and I don't know what it is, Something's wrong with our ifs, We're seeing things in a different way, And MJ knows it ain't his, It sure ain't no surprise, HUH. LIVIN IN THE CODE
+        {
+            animator.SetInteger("transitions", 2);
+        }
+
+        if (redTimer>0) // What is this ?? ---- ATTN: ANYONE WHO KNOWS THE ANIMATION STUFF
         {
             redTimer--;
             if(redTimer<=0)
@@ -308,7 +306,7 @@ public class Character : MonoBehaviour
             {
                 if (deflectState > 1 || baState > 1 || sliceState > 1) continue;
                 //Debug.Log("Slice");
-                sliceState = 2;
+                sliceState = 2; // Startup
 
                 sliceBoxes = Mathf.FloorToInt(sliceHoldTime / SLICE_TIMESTEP);
                 if (sliceBoxes > 5) sliceBoxes = 5;
@@ -322,7 +320,7 @@ public class Character : MonoBehaviour
                 {
                     case 0: // Charging Slice (button held)
                         if (deflectState > 1 || baState > 1 || sliceState > 1) continue;
-                        //Debug.Log("SliceHold");
+                        //Debug.Log("SliceHold/LowSpeed");
                         sliceState = 1;
                         sliceHoldTime += Time.deltaTime;
                         slowMovement = true;
@@ -375,7 +373,11 @@ public class Character : MonoBehaviour
                         {
                             if (currDashDist == 0 && dashCooldown <= 0 && rigidBody.velocity != Vector2.zero) // Only dash if moving
                             {
-                                slowMovement = false;
+                                //Debug.Log("Respeed");
+                                slowMovement = false; // Respeed
+                                maxSpeed = 7f; // ******* THESE VALUES SHOULD NOT BE HARD CODED-- Also, move these to a different statement if movement is supposed to come back after releasing the button (active frames)
+                                dashRate = .5f;
+                                maxDashDist = 3;
                                 dashState = 3; // Active
                                 //Debug.Log("Dash");
                                 transform.GetComponent<SpriteRenderer>().color = Color.blue;
@@ -466,10 +468,9 @@ public class Character : MonoBehaviour
             sliceTimer = 0;
             if (slowMovement == true) // ***** SHOULD NOT BE HARD CODED, TRY TO USE SPEED MOD OR HAVE A SET OF VARS
             {
-                maxSpeed = 2f;
+                maxSpeed = 2f; // While unspeeded
                 dashRate = .3f;
                 maxDashDist = 2;
-                //Debug.Log("Lowered speed");
             }
             if (sliceState > 1) sliceState = 0; // No cooldown on slice
         }
@@ -484,7 +485,6 @@ public class Character : MonoBehaviour
                 {
                     sliceHitBoxes[i].gameObject.SetActive(false);
                 }
-
             }
             else if (sliceTimer <= (SLICE_ACTIVE + SLICE_RECOVERY)) // Active frames
             {
@@ -494,7 +494,7 @@ public class Character : MonoBehaviour
                     sliceHitBoxes[i + 1].gameObject.SetActive(true);
                 }
                 sliceState = 3; // Active
-                slowMovement = false;
+                slowMovement = false; // Respeed
                 maxSpeed = 7f; // ******* THESE VALUES SHOULD NOT BE HARD CODED-- Also, move these to a different statement if movement is supposed to come back after releasing the button (active frames)
                 dashRate = .5f;
                 maxDashDist = 3;

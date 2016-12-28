@@ -13,7 +13,7 @@ public class SLOB : Enemy
         rank = "Officer";
 
         grenadeWarning = transform.GetChild(0).gameObject;
-        grenadeWarning.SetActive(true);
+        grenadeWarning.SetActive(false);
     }
 
     protected override void Stun()
@@ -24,6 +24,7 @@ public class SLOB : Enemy
 
     public override void Fire()
     {
+        base.Fire();
         if (timer % 3 == 0) // Flash on
         {
             counter += 1f;

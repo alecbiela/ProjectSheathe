@@ -89,10 +89,9 @@ public class Enemy : MonoBehaviour {
         GetComponent<SpriteRenderer>().color = Color.white;
         // Override to give the enemy class its special attributes if they have been lost.
     }
-
-    // Called when the enemy is going to fire a bullet
-    public virtual void Fire() // It's more code to do it this way, but it's the faster and is 5x more readable
-    {
+    
+    public virtual void Fire() // Fires a bullet or flashes the warning
+    {   // It's more code to do it this way, but it's slightly faster and is 5x more readable
         timer++; // Alternatively we could repeat these two lines in every inherited Fire() and put the basic fire here to be completely overridden by all but 3 enemies
         currFlashTime = currFlashTime - Time.deltaTime;
     }
@@ -116,8 +115,6 @@ public class Enemy : MonoBehaviour {
         {
             Stun();
         }
-
-        //Looking for bullet movement?  It's in the bullet script now!
 
         if (stunState != 2)
         {
@@ -197,7 +194,7 @@ public class Enemy : MonoBehaviour {
             // Call secondwind here as desired
             health = (health >= MAX_HEALTH) ? MAX_HEALTH : (health + 1); // If topped off, don't add any
             stunState = 1; // Secondwinded
-            DestroyImmediate(col.gameObject);
+            Destroy(col.gameObject);
             return;
         }
 
@@ -235,7 +232,7 @@ public class Enemy : MonoBehaviour {
                 {
                     // Destroy the bullet and subtract enemy health or do whatever you gotta do
                     health--;
-                    DestroyImmediate(col.gameObject);
+                    Destroy(col.gameObject);
                 }
             }
         }
