@@ -23,7 +23,7 @@ GameObject:
   - 61: {fileID: 61000010382421982}
   - 50: {fileID: 50000010624753390}
   - 114: {fileID: 114000013653166600}
-  m_Layer: 11
+  m_Layer: 14
   m_Name: Medic_Bullet
   m_TagString: MedicBullet
   m_Icon: {fileID: 0}

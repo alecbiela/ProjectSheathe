@@ -21,9 +21,9 @@ GameObject:
   - 4: {fileID: 4000010950310306}
   - 212: {fileID: 212000011855466614}
   - 61: {fileID: 61000011188137976}
-  - 114: {fileID: 114000013914977814}
   - 120: {fileID: 120000011494582608}
   - 50: {fileID: 50000013411745148}
+  - 114: {fileID: 114000012625213284}
   m_Layer: 9
   m_Name: Guardian
   m_TagString: Enemy
@@ -57,7 +57,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000012591825258}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.426332, y: 3.662145, z: 0}
+  m_LocalPosition: {x: -0.97057724, y: -4.1173983, z: 0}
   m_LocalScale: {x: 0.63, y: 0.63, z: 0.63}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -152,7 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerInside: 0
   id: 0
---- !u!114 &114000013914977814
+--- !u!114 &114000012625213284
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -160,29 +160,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1000012591825258}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec6d4d9cf8aca5f46b8b5cf576247710, type: 3}
+  m_Script: {fileID: 11500000, guid: 8fa46839145675f4382f9119ce59c7bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: {fileID: 0}
-  health: 3
+  health: 0
   MAX_HEALTH: 3
-  stunned: 0
-  unstunned: 0
-  secondWind: 0
-  BulletPrefab: {fileID: 1000010294456066, guid: f6e35da97fc23624390de68bc1a85016,
-    type: 2}
-  force: {x: 0, y: 0, z: 0}
+  stunState: 0
   hitRecently: 0
-  special: {fileID: 0}
   slowMod: 0
   guarded: 0
+  BulletPrefab: {fileID: 1000010294456066, guid: f6e35da97fc23624390de68bc1a85016,
+    type: 2}
+  type: 
   rank: 
   lineRendererComponent: {fileID: 0}
-  origin: {x: 0, y: 0, z: 0}
-  destination: {x: 0, y: 0, z: 0}
-  lineDrawSpeed: 600
-  running: 0
-  type: 
+  bigShield: {fileID: 0}
 --- !u!120 &120000011494582608
 LineRenderer:
   m_ObjectHideFlags: 1

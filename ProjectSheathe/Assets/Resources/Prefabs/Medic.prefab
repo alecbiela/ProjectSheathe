@@ -21,7 +21,6 @@ GameObject:
   - 4: {fileID: 4000013017386786}
   - 212: {fileID: 212000011771433516}
   - 61: {fileID: 61000013196159160}
-  - 114: {fileID: 114000010888501414}
   - 120: {fileID: 120000013409706114}
   - 50: {fileID: 50000010047129106}
   - 114: {fileID: 114000010071595202}
@@ -39,7 +38,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000010486928228}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.9043427, y: -1.5952287, z: 0}
+  m_LocalPosition: {x: 6.1221495, y: -4.1361156, z: 0}
   m_LocalScale: {x: 0.63222283, y: 0.6322234, z: 0.6322234}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
@@ -87,37 +86,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ed7ec410130d8747b211f70c273f317, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &114000010888501414
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000010486928228}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec6d4d9cf8aca5f46b8b5cf576247710, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Player: {fileID: 0}
-  health: 3
+  health: 0
   MAX_HEALTH: 3
-  stunned: 0
-  unstunned: 0
-  secondWind: 0
-  BulletPrefab: {fileID: 1000010294456066, guid: f575482cad01e4c46bc626dc15700eed,
-    type: 2}
-  force: {x: 0, y: 0, z: 0}
+  stunState: 0
   hitRecently: 0
-  special: {fileID: 0}
   slowMod: 0
   guarded: 0
+  BulletPrefab: {fileID: 1000010294456066, guid: f575482cad01e4c46bc626dc15700eed,
+    type: 2}
+  type: 
   rank: 
   lineRendererComponent: {fileID: 0}
-  origin: {x: 0, y: 0, z: 0}
-  destination: {x: 0, y: 0, z: 0}
-  lineDrawSpeed: 600
-  running: 0
-  type: 
 --- !u!120 &120000013409706114
 LineRenderer:
   m_ObjectHideFlags: 1

@@ -6,18 +6,18 @@ using UnityEngine.UI;
 
 public class EncounterManager : MonoBehaviour
 {
-    //PREFABS
-    public GameObject b451cPrefab;
-    public GameObject lockPrefab;  //after you add it here, make sure to head down to the array to include it
-    public GameObject lightPrefab;
-    public GameObject lunkPrefab;
-    public GameObject slobPrefab;
-    public GameObject guardianPrefab;
-    public GameObject medicPrefab;
-    public GameObject hotBoxPrefab;
+    /* Prefabs */
+    public GameObject B451CPrefab;
+    public GameObject LockPrefab;
+    public GameObject LightPrefab;
+    public GameObject LunkPrefab;
+    public GameObject SLOBPrefab;
+    public GameObject GuardianPrefab;
+    public GameObject MedicPrefab;
+    public GameObject HotBoxPrefab;
 
-    List<GameObject> enemies = new List<GameObject>(); // all enemies
-    //List<GameObject> guards = new List<GameObject>(); // only guards
+    List<GameObject> enemies = new List<GameObject>(); // All enemies
+    //List<GameObject> Guards = new List<GameObject>(); // only Guards
     //List<GameObject> officers = new List<GameObject>(); // only officers
     List<int> activeEnemies = new List<int>();
     Dictionary<string, GameObject> enemyPrefabs = new Dictionary<string, GameObject>();
@@ -26,17 +26,15 @@ public class EncounterManager : MonoBehaviour
     // Use this for initialization
     System.Random rand = new System.Random();
     private GameObject Player;
-    private Character PlayerScript;
+    [HideInInspector] public Character PlayerScript;
     [SerializeField] public float speedMod; // Enemy and bullet speed modifier
     public float baseSpeed { get; private set; }
     public float slowSpeed { get; private set; }
     private int maxEnemyNumber;
     private int maxOfficerNumber;
-    private bool hitRecently;
     private const int BASE_ENEMY_COUNT = 5;
     private const int ABSOLUTE_MAX_GUARD_COUNT = 20;
     private const int ABSOLUTE_MAX_OFFICER_NUMBER = 4;
-    private int extraEnemies;
     private float time = 0;
     private int randomEnemy;
     private int notStunnedEnemyCount;
@@ -54,15 +52,15 @@ public class EncounterManager : MonoBehaviour
     {       
         //add your prefab to the dictionary here
         // Guards
-        enemyPrefabs.Add("b451c", b451cPrefab);
-        enemyPrefabs.Add("lock", lockPrefab);
-        enemyPrefabs.Add("light", lightPrefab);
-        enemyPrefabs.Add("lunk", lunkPrefab);
+        enemyPrefabs.Add("B451C", B451CPrefab);
+        enemyPrefabs.Add("Lock", LockPrefab);
+        enemyPrefabs.Add("Light", LightPrefab);
+        enemyPrefabs.Add("Lunk", LunkPrefab);
         // Officers
-        enemyPrefabs.Add("slob", slobPrefab);
-        enemyPrefabs.Add("guardian", guardianPrefab);
-        enemyPrefabs.Add("medic", medicPrefab);
-        enemyPrefabs.Add("hotBox", hotBoxPrefab);
+        enemyPrefabs.Add("SLOB", SLOBPrefab);
+        enemyPrefabs.Add("Guardian", GuardianPrefab);
+        enemyPrefabs.Add("Medic", MedicPrefab);
+        enemyPrefabs.Add("HotBox", HotBoxPrefab);
 
         Player = GameObject.FindGameObjectWithTag("Player");
         PlayerScript = Player.GetComponent<Character>();
@@ -76,7 +74,6 @@ public class EncounterManager : MonoBehaviour
         //Debug.Log("done");
         maxEnemyNumber = BASE_ENEMY_COUNT;
         maxOfficerNumber = 0;
-        extraEnemies = 0;
         quadrants = new Dictionary<int, int> { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 } };
     }
 
@@ -105,42 +102,35 @@ public class EncounterManager : MonoBehaviour
         {
             
             // count stunned enemies
-            if (enemies[i].GetComponent<Enemy>().stunned == true)
+            if (enemies[i].GetComponent<Enemy>().stunState == 2)
             {
                 stunnedEnemyCount++;
             }
 
-            if(stunnedEnemyCount == enemies.Count && PlayerScript.Overclocking == false) // if all enemies are stunned, give the player Overclock
+            if(stunnedEnemyCount == enemies.Count && PlayerScript.OverclockState < 2) // If all enemies are stunned, give the player Overclock
             {
-                PlayerScript.overclockCooldown = 0;
+                PlayerScript.resetOverclock();
             }
             
             // enable enemies to be hit again once the player isn't using basic attack or actively slicing
-            if (PlayerScript.Attacking == false && PlayerScript.Slicing == false)
-            {
-                enemies[i].GetComponent<Enemy>().hitRecently = false;
-            }
+
 
             // kill enemies if at 0 health or lower
             if (enemies[i].GetComponent<Enemy>().health <= 0)
             {
                 //Debug.Log("RIP");
-                if (enemies[i].GetComponent<Enemy>().rank == "officer")
+                if (enemies[i].GetComponent<Enemy>().rank == "Officer")
                 {
                     PlayerScript.score += 75;
                     PlayerScript.setScore();
                 }
-                else if (enemies[i].GetComponent<Enemy>().rank == "guard")
+                else if (enemies[i].GetComponent<Enemy>().rank == "Guard")
                 {
                     PlayerScript.score += 50;
                     PlayerScript.setScore();
                 }
                 UpdateQuadrants(enemies[i].transform.position);
-                if (enemies[i].GetComponent<Enemy>().type == "Light" || enemies[i].GetComponent<Enemy>().type == "Lunk" || enemies[i].GetComponent<Enemy>().type == "SLOB")
-                {
-                    Destroy(enemies[i].GetComponent<Enemy>().special.gameObject); // Destroy laser or shield as well
-                    enemies[i].GetComponent<Enemy>().special = null;
-                }
+                enemies[i].GetComponent<Enemy>().Destructor();
                 Destroy(enemies[i]);
                 enemies.RemoveAt(i);
                 break;
@@ -156,7 +146,7 @@ public class EncounterManager : MonoBehaviour
         //find out which enemies we should kill
         for(int i=0; i<enemies.Count; i++)
         {
-            if(enemies[i].GetComponent<Enemy>().stunned)
+            if(enemies[i].GetComponent<Enemy>().stunState == 2)
             {
                 enemiesToKill.Add(i);
             }
@@ -165,23 +155,19 @@ public class EncounterManager : MonoBehaviour
         //once we have the list of enemies to kill, actually kill them
         for(int i = (enemiesToKill.Count - 1); i >= 0; i--)
         {
-            if (enemies[i].GetComponent<Enemy>().rank == "officer")
+            if (enemies[i].GetComponent<Enemy>().rank == "Officer")
             {
                 PlayerScript.score += 150;
                 PlayerScript.setScore();
             }
-            else if (enemies[i].GetComponent<Enemy>().rank == "guard")
+            else if (enemies[i].GetComponent<Enemy>().rank == "Guard")
             {
                 PlayerScript.score += 100;
                 PlayerScript.setScore();
             }
             UpdateQuadrants(enemies[enemiesToKill[i]].transform.position);
-            if (enemies[enemiesToKill[i]].GetComponent<Enemy>().type == "Light" || enemies[enemiesToKill[i]].GetComponent<Enemy>().type == "Lunk" || enemies[enemiesToKill[i]].GetComponent<Enemy>().type == "SLOB")
-            {
-                Destroy(enemies[enemiesToKill[i]].GetComponent<Enemy>().special.gameObject); // Destroy laser or shield as well
-                enemies[enemiesToKill[i]].GetComponent<Enemy>().special = null;
-            }
-            GameObject.DestroyObject(enemies[enemiesToKill[i]]);
+            enemies[enemiesToKill[i]].GetComponent<Enemy>().Destructor();
+            Destroy(enemies[enemiesToKill[i]]);
             enemies.RemoveAt(enemiesToKill[i]);
         }
     }
@@ -190,7 +176,7 @@ public class EncounterManager : MonoBehaviour
     void DynamicDifficulty()
     {
         // faster enemies
-        if (PlayerScript.Overclocking == false && speedMod < 3.0)
+        if (PlayerScript.OverclockState < 2 && speedMod < 3.0)
         {
             //float speedBonus = Mathf.Floor(PlayerScript.score / 1200);
             //speedMod = 1 + .1f * Mathf.Floor(PlayerScript.score / 1200); // this should probably scale by stunned enemy count, not score // the second this gets incremented once, it hits max
@@ -216,16 +202,16 @@ public class EncounterManager : MonoBehaviour
         {
             officerSpawns[i].GetComponent<OfficerSpawnPoint>().filled = false;
         }
-        // get rid of all lingering lasers upon spawn
-        GameObject[] lingeringLasers = GameObject.FindGameObjectsWithTag("Laser");
-        if (lingeringLasers.Length != 0)
-        {
-            foreach (GameObject laser in lingeringLasers)
-            {
-                GameObject.DestroyObject(laser);
-                //Debug.Log("Destroyed lingering laser");
-            }
-        }
+        //// get rid of all lingering lasers upon spawn
+        //GameObject[] lingeringLasers = GameObject.FindGameObjectsWithTag("Laser");
+        //if (lingeringLasers.Length != 0)
+        //{
+        //    foreach (GameObject laser in lingeringLasers)
+        //    {
+        //        GameObject.DestroyObject(laser);
+        //        //Debug.Log("Destroyed lingering laser");
+        //    }
+        //}
 
         // reset the chunk or "secondWindCounter"
         secondWindCounter = 0;
@@ -246,65 +232,65 @@ public class EncounterManager : MonoBehaviour
         if(maxOfficerNumber >= ABSOLUTE_MAX_OFFICER_NUMBER || oldMaxOfficerNumber != maxOfficerNumber)
         {
             //Debug.Log("spawn:" + maxOfficerNumber);
-            int slobs = 0;
-            int medics = 0;
-            int guardians = 0;
-            //int hotboxes = 0;
+            int SLOBs = 0;
+            int Medics = 0;
+            int Guardians = 0;
+            //int HotBoxes = 0;
             for (int i = 0; i < maxOfficerNumber; i++)
             {
                 int officerType = rand.Next(0, 3);
                 switch (officerType)
                 {
                     case 0:
-                    case 3: // REMOVE WHEN HOTBOX IS FIXED
-                        //Debug.Log("slob");
-                        if (slobs >= 4) i--; // CHANGE BACK TO 2 WHEN HOTBOX IS FIXED
-                        else CreateEnemy("slob"); slobs++;
+                    case 3: // REMOVE WHEN HotBox IS FIXED
+                        //Debug.Log("SLOB");
+                        if (SLOBs >= 4) i--; // CHANGE BACK TO 2 WHEN HotBox IS FIXED
+                        else CreateEnemy("SLOB"); SLOBs++;
                         break;
                     case 1:
-                        //Debug.Log("medic");
-                        if (medics >= 2) i--;
-                        else CreateEnemy("medic"); medics++;
+                        //Debug.Log("Medic");
+                        if (Medics >= 2) i--;
+                        else CreateEnemy("Medic"); Medics++;
                         break;
                     case 2:
-                        //Debug.Log("guardian");
-                        if (guardians >= 2) i--;
-                        else CreateEnemy("guardian"); guardians++;
+                        //Debug.Log("Guardian");
+                        if (Guardians >= 2) i--;
+                        else CreateEnemy("Guardian"); Guardians++;
                         break;
                     //case 3:
-                        //if (hotboxes >= 4) i--;
-                        //else CreateEnemy("hotbox"); hotboxes++;
+                        //if (HotBoxes >= 4) i--;
+                        //else CreateEnemy("HotBox"); HotBoxes++;
                         //break;
                 }
             }
         }
 
-        int b451cs = 0;
-        int lights = 0;
-        int locks = 0;
-        int lunks = 0;
+        int B451Cs = 0;
+        int Lights = 0;
+        int Locks = 0;
+        int Lunks = 0;
 
-        //spawns guards
+        //spawns Guards
         for (int i = 0; i < maxEnemyNumber; i++)
         {
             int enemyType = rand.Next(0, 4);
             switch(enemyType)
             {
                 case 0:
-                    if (b451cs >= 6) i--;
-                    else CreateEnemy("b451c"); b451cs++;
+                    if (B451Cs >= 6) i--;
+                    else CreateEnemy("B451C"); B451Cs++;
                     break;
                 case 1:
-                    if (lunks >= 6) i--;
-                    else CreateEnemy("lunk"); lunks++;
+                    if (Lunks >= 6) i--;
+                    else CreateEnemy("Lunk"); Lunks++;
                     break;
                 case 2:
-                    if (locks >= 4) i--;
-                    else CreateEnemy("lock"); locks++;
+                    if (Locks >= 4) i--;
+                    else CreateEnemy("Lock"); Locks++;
                     break;
                 case 3:
-                    if (lights >= 4) i--;
-                    else CreateEnemy("light"); lights++;
+                    if (Lights >= 4) i--;
+                    else CreateEnemy("Light"); Lights++;
                     break;
             }
         }
@@ -333,7 +319,7 @@ public class EncounterManager : MonoBehaviour
 
         int targetQuad;
         Vector2 targetPos = new Vector2();
-        if (name == "slob" || name == "medic" || name == "guardian" || name == "hotbox")
+        if (name == "SLOB" || name == "Medic" || name == "Guardian" || name == "HotBox")
         {
             bool positionFilled = false;
             int i = 0;
@@ -384,8 +370,8 @@ public class EncounterManager : MonoBehaviour
         {
             if (E.GetComponent<Collider2D>().IsTouching(enemy.GetComponent<Collider2D>()))  // This is not working, and I'm not sure why
             {
-                //Debug.Log("ECH HALP");
-                DestroyImmediate(E);
+                Debug.Log("ECH HALP");
+                Destroy(E);
                 Respawn(name);
                 return;
             }
@@ -489,9 +475,9 @@ public class EncounterManager : MonoBehaviour
             for (int i = 0; i < enemies.Count; i++)
             {
                 e = enemies[i].GetComponent<Enemy>();
-                if (e.stunned)
+                if (e.stunState == 2) // Is stunned
                 {
-                    e.secondWind = true;
+                    e.SecondWind();
                 }
             }
             secondWindCounter = 0;
@@ -512,9 +498,9 @@ public class EncounterManager : MonoBehaviour
         //if stunned, add positions to stunned enemies list, otherwise they are active
         for (int i = 0; i < enemies.Count; i++)
         {
-            //if we wanted to get all damaged enemies, not just stunned (for medics),
+            //if we wanted to get all damaged enemies, not just stunned (for Medics),
             //we check HERE based on health, and not stunned flag
-            if (!enemies[i].GetComponent<Enemy>().stunned)
+            if (enemies[i].GetComponent<Enemy>().stunState != 2) // Not stunned
             {
                 if(enemies[i].GetComponent<Enemy>().type != "Medic")
                     activeIndicies.Add(i);

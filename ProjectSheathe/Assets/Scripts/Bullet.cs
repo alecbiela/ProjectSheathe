@@ -15,7 +15,7 @@ public class Bullet : MonoBehaviour {
     public void Initialize(Vector3 pos, Vector3 vectorToPlayer)
     {
         handler = GameObject.FindGameObjectWithTag("EncounterManager").GetComponent<EncounterManager>();
-        this.transform.position = pos;
+        transform.position = pos;
         CanHurtEnemies = false;
 
         //calculate desired path
@@ -23,13 +23,13 @@ public class Bullet : MonoBehaviour {
         desiredVelocity.Normalize();
         desiredVelocity *= bulletSpeed;
         float angle = Mathf.Atan2(desiredVelocity.y, desiredVelocity.x) * Mathf.Rad2Deg;
-        this.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }
 
     //Phyxed Update for Physics
     void FixedUpdate()
     {
-        this.transform.position += desiredVelocity * (handler.speedMod-slowMod) * Time.deltaTime;
+        transform.position += desiredVelocity * (handler.speedMod-slowMod) * Time.deltaTime;
         for (int i = 0; i < slowFields.Count; i++)
         {
             if (!slowFields[i].isTrigger)
@@ -48,17 +48,17 @@ public class Bullet : MonoBehaviour {
         if(col.tag == "DeflectHitbox" && !CanHurtEnemies)
         {
             //if it's a medic bullet, give the player 2 health (any better way to do this?)
-            if(this.tag == "MedicBullet")
+            if(tag == "MedicBullet")
             {
-                GameObject.Find("Player").GetComponent<Character>().health += 2;
-                GameObject.Find("Player").GetComponent<Character>().setHealth();
+                col.gameObject.GetComponent<Character>().health += 2;
+                col.gameObject.GetComponent<Character>().setHealth();
                 //handler.extraWind = 1;
-                Destroy(this.gameObject);
+                Destroy(gameObject);
             }
             CanHurtEnemies = true;
             desiredVelocity *= -1;
             float angle = Mathf.Atan2(desiredVelocity.y, desiredVelocity.x) * Mathf.Rad2Deg;
-            this.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
         //collision w/ Player and Enemies handled in their respective classes
         if (col.gameObject.layer == 13)
@@ -72,7 +72,7 @@ public class Bullet : MonoBehaviour {
         //goes out of bounds
         if (col.tag == "Boundary")
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
 

@@ -12,10 +12,7 @@ public class InputManager : MonoBehaviour {
     private bool initialRTrigger = true; // True until trigger has been pressed, expressly for 360 on mac
     private bool initialLTrigger = true;
     private bool overclockAxisInUse = false; // Toggle, not hold
-    private char beforePriorPreviousLatestKey; // Nice
-    private char priorPreviousLatestKey;
-    private char previousLatestKey;
-    private char latestKey;
+    private char[] latestKeys = { '0', '0', '0', '0' }; // 0
 
     private Dictionary<string, string> inputs = new Dictionary<string, string>();
 
@@ -130,31 +127,19 @@ public class InputManager : MonoBehaviour {
         {
             if (Input.GetButtonDown(inputs["HorizontalMove"]) && Input.GetAxisRaw(inputs["HorizontalMove"]) > 0) // D
             {
-                beforePriorPreviousLatestKey = priorPreviousLatestKey;
-                priorPreviousLatestKey = previousLatestKey;
-                previousLatestKey = latestKey;
-                latestKey = 'd';
+                pushKey('d');
             }
             if (Input.GetButtonDown(inputs["HorizontalMove"]) && Input.GetAxisRaw(inputs["HorizontalMove"]) < 0) // A, set the latest key
             {
-                beforePriorPreviousLatestKey = priorPreviousLatestKey;
-                priorPreviousLatestKey = previousLatestKey;
-                previousLatestKey = latestKey;
-                latestKey = 'a';
+                pushKey('a');
             }
             if (Input.GetButtonDown(inputs["VerticalMove"]) && Input.GetAxisRaw(inputs["VerticalMove"]) > 0) // W
             {
-                beforePriorPreviousLatestKey = priorPreviousLatestKey;
-                priorPreviousLatestKey = previousLatestKey;
-                previousLatestKey = latestKey;
-                latestKey = 'w';
+                pushKey('w');
             }
             if (Input.GetButtonDown(inputs["VerticalMove"]) && Input.GetAxisRaw(inputs["VerticalMove"]) < 0) // S
             {
-                beforePriorPreviousLatestKey = priorPreviousLatestKey;
-                priorPreviousLatestKey = previousLatestKey;
-                previousLatestKey = latestKey;
-                latestKey = 's';
+                pushKey('s');
             }
 
             checkIfLatest(); // Check if latestKey is valid
@@ -310,38 +295,34 @@ public class InputManager : MonoBehaviour {
 
     private void checkIfLatest() // Runs until the latest key is either nothing or is being pressed
     {
-        if (latestKey == 'd' && !(Input.GetButton(inputs["HorizontalMove"]) && Input.GetAxisRaw(inputs["HorizontalMove"]) > 0)) // D, this is still cross platform, just using key chars for clarity
+        if (latestKeys[0] == 'd' && !(Input.GetButton(inputs["HorizontalMove"]) && Input.GetAxisRaw(inputs["HorizontalMove"]) > 0)) // D, this is still cross platform, just using key chars for clarity
         {
-            latestKey = previousLatestKey;
-            previousLatestKey = priorPreviousLatestKey;
-            priorPreviousLatestKey = beforePriorPreviousLatestKey;
-            beforePriorPreviousLatestKey = '0';
+            pushKey('0');
             checkIfLatest();
         }
-        if (latestKey == 'a' && !(Input.GetButton(inputs["HorizontalMove"]) && Input.GetAxisRaw(inputs["HorizontalMove"]) < 0)) // A, set the latest key
+        if (latestKeys[0] == 'a' && !(Input.GetButton(inputs["HorizontalMove"]) && Input.GetAxisRaw(inputs["HorizontalMove"]) < 0)) // A, set the latest key
         {
-            latestKey = previousLatestKey;
-            previousLatestKey = priorPreviousLatestKey;
-            priorPreviousLatestKey = beforePriorPreviousLatestKey;
-            beforePriorPreviousLatestKey = '0';
+            pushKey('0');
             checkIfLatest();
         }
-        if (latestKey == 'w' && !(Input.GetButton(inputs["VerticalMove"]) && Input.GetAxisRaw(inputs["VerticalMove"]) > 0)) // W
+        if (latestKeys[0] == 'w' && !(Input.GetButton(inputs["VerticalMove"]) && Input.GetAxisRaw(inputs["VerticalMove"]) > 0)) // W
         {
-            latestKey = previousLatestKey;
-            previousLatestKey = priorPreviousLatestKey;
-            priorPreviousLatestKey = beforePriorPreviousLatestKey;
-            beforePriorPreviousLatestKey = '0';
+            pushKey('0');
             checkIfLatest();
         }
-        if (latestKey == 's' && !(Input.GetButton(inputs["VerticalMove"]) && Input.GetAxisRaw(inputs["VerticalMove"]) < 0)) // S
+        if (latestKeys[0] == 's' && !(Input.GetButton(inputs["VerticalMove"]) && Input.GetAxisRaw(inputs["VerticalMove"]) < 0)) // S
         {
-            latestKey = previousLatestKey;
-            previousLatestKey = priorPreviousLatestKey;
-            priorPreviousLatestKey = beforePriorPreviousLatestKey;
-            beforePriorPreviousLatestKey = '0';
+            pushKey('0');
             checkIfLatest();
         }
+    }
+
+    private void pushKey(char val) // Pushes a key into the latestKeys array
+    {
+        latestKeys[3] = latestKeys[2];
+        latestKeys[2] = latestKeys[1];
+        latestKeys[1] = latestKeys[0];
+        latestKeys[0] = val;
     }
     
     //changes the control scheme on the fly based on the UI buttons

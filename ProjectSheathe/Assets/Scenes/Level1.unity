@@ -2000,19 +2000,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ea3cc6db34ec904b823f4b27c6cefe7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  b451cPrefab: {fileID: 1000010486928228, guid: bdb1e977583592f459a548869bdd0103,
+  B451CPrefab: {fileID: 1000010486928228, guid: bdb1e977583592f459a548869bdd0103,
     type: 2}
-  lockPrefab: {fileID: 1000010486928228, guid: 53d9b813513c1ae478a236d3f309bf02, type: 2}
-  lightPrefab: {fileID: 1000010486928228, guid: cafdfae690dd875428b8593579a1941e,
+  LockPrefab: {fileID: 1000010486928228, guid: 53d9b813513c1ae478a236d3f309bf02, type: 2}
+  LightPrefab: {fileID: 1000010486928228, guid: cafdfae690dd875428b8593579a1941e,
     type: 2}
-  lunkPrefab: {fileID: 1000010486928228, guid: 6cea6633e37f3a247947928e7a826d58, type: 2}
-  slobPrefab: {fileID: 1000014094969076, guid: 91a22dc5f914a2b4bad8bc91f2c5e6de, type: 2}
-  guardianPrefab: {fileID: 1000012591825258, guid: 83705f8ddb82857438a3995b4571b743,
+  LunkPrefab: {fileID: 1000010486928228, guid: 6cea6633e37f3a247947928e7a826d58, type: 2}
+  SLOBPrefab: {fileID: 1000014094969076, guid: 91a22dc5f914a2b4bad8bc91f2c5e6de, type: 2}
+  GuardianPrefab: {fileID: 1000012591825258, guid: 83705f8ddb82857438a3995b4571b743,
     type: 2}
-  medicPrefab: {fileID: 1000010486928228, guid: 8a6594cf694cf284db82fc82b6b7ae31,
+  MedicPrefab: {fileID: 1000010486928228, guid: 8a6594cf694cf284db82fc82b6b7ae31,
     type: 2}
-  hotBoxPrefab: {fileID: 1000012341611592, guid: 4505a731dda72f643aa6e79b6db17ac9,
+  HotBoxPrefab: {fileID: 1000012341611592, guid: 4505a731dda72f643aa6e79b6db17ac9,
     type: 2}
+  PlayerScript: {fileID: 0}
   speedMod: 4
   extraWind: 0
   officerSpawns:
@@ -2268,19 +2269,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec1144e9b6819cb4eab9fc57182ad8d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sliceHitBoxes: []
-  baHitBoxes: []
-  deflectHitBox: {fileID: 0}
-  maxSpeed: 7
-  maxDashDist: 3
-  dashRate: 0.5
-  overclockCooldown: 0
-  slowMod: 0
-  slowMovement: 0
   health: 9
   playerHit: 0
-  killStunnedEnemies: 0
   score: 0
+  slowMod: 0
+  slowMovement: 0
+  baHitBoxes: []
+  sliceHitBoxes: []
+  deflectHitBox: {fileID: 0}
+  killStunnedEnemies: 0
 --- !u!61 &448848516
 BoxCollider2D:
   m_ObjectHideFlags: 0

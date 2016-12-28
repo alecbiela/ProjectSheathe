@@ -37,9 +37,9 @@ GameObject:
   - 4: {fileID: 4000011802329180}
   - 212: {fileID: 212000012491407756}
   - 61: {fileID: 61000010930477636}
-  - 114: {fileID: 114000012933827634}
   - 120: {fileID: 120000014232530094}
   - 50: {fileID: 50000012972218808}
+  - 114: {fileID: 114000010377766862}
   m_Layer: 9
   m_Name: SLOB
   m_TagString: Enemy
@@ -54,7 +54,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000014094969076}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.555466, y: 1.2, z: 0}
+  m_LocalPosition: {x: 10.75365, y: -4.9713044, z: 0}
   m_LocalScale: {x: 0.632, y: 0.632, z: 0.632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
@@ -105,7 +105,7 @@ BoxCollider2D:
   m_Offset: {x: -0.015133544, y: -0.08609024}
   serializedVersion: 2
   m_Size: {x: 2.94033, y: 2.3485806}
---- !u!114 &114000012933827634
+--- !u!114 &114000010377766862
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -113,29 +113,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 1000014094969076}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec6d4d9cf8aca5f46b8b5cf576247710, type: 3}
+  m_Script: {fileID: 11500000, guid: feb213f5ccdc61446b6c0ee8c66576e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Player: {fileID: 0}
-  health: 3
+  health: 0
   MAX_HEALTH: 3
-  stunned: 0
-  unstunned: 0
-  secondWind: 0
-  BulletPrefab: {fileID: 1000010282373296, guid: 1961e28a46c991d4c854cace6f2a5030,
-    type: 2}
-  force: {x: 0, y: 0, z: 0}
+  stunState: 0
   hitRecently: 0
-  special: {fileID: 0}
   slowMod: 0
   guarded: 0
+  BulletPrefab: {fileID: 1000010282373296, guid: 1961e28a46c991d4c854cace6f2a5030,
+    type: 2}
+  type: 
   rank: 
   lineRendererComponent: {fileID: 0}
-  origin: {x: 0, y: 0, z: 0}
-  destination: {x: 0, y: 0, z: 0}
-  lineDrawSpeed: 600
-  running: 0
-  type: 
+  grenadeWarning: {fileID: 0}
 --- !u!120 &120000014232530094
 LineRenderer:
   m_ObjectHideFlags: 1
