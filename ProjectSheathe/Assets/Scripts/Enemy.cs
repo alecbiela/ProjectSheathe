@@ -50,7 +50,7 @@ public class Enemy : MonoBehaviour {
         /* Other Objects */
         Player = GameObject.FindGameObjectWithTag("Player");
         Handler = GameObject.FindGameObjectWithTag("EncounterManager").GetComponent<EncounterManager>();
-        hitSpark = GameObject.FindGameObjectWithTag("HitSpark");
+        hitSpark = GameObject.FindGameObjectWithTag("HitSpark"); // Particle system
 
         /* Movement and Health */
         health = MAX_HEALTH;
@@ -189,12 +189,14 @@ public class Enemy : MonoBehaviour {
             return;
         }
         
-        if(col.gameObject.tag == "MedicBullet" && stunState != 2) // Medic bullets heal and apply second wind
+        if(col.gameObject.tag == "MedicBullet" && stunState == 2) // Medic bullets heal and apply second wind // used to be stunState != 2
         {
             // Call secondwind here as desired
             health = (health >= MAX_HEALTH) ? MAX_HEALTH : (health + 1); // If topped off, don't add any
-            stunState = 1; // Secondwinded
+            //stunState = 1; // Secondwinded
+            SecondWind();
             Destroy(col.gameObject);
+            //Debug.Log("Medic bullet received by enemy");
             return;
         }
 

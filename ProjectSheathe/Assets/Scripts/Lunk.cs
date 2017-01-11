@@ -126,7 +126,7 @@ public class Lunk : Enemy
         {
             health = (health >= MAX_HEALTH) ? MAX_HEALTH : (health + 1); // If topped off, don't add any
             stunState = 1; // Secondwinded
-            DestroyImmediate(col.gameObject);
+            Destroy(col.gameObject);
             return;
         }
 
@@ -178,7 +178,7 @@ public class Lunk : Enemy
                     {
                         health--;
                     }
-                    DestroyImmediate(col.gameObject);
+                    Destroy(col.gameObject);
                 }
             }
         }

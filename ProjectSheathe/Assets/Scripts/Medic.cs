@@ -19,9 +19,11 @@ public class Medic : Enemy {
 
     public override void Fire()
     {
+        //Debug.Log("Fire called");
         if (!isActive) return; // When no stunned enemies
         base.Fire();
-        if (timer % 3 == 0) // Flash on
+        //Debug.Log("Timer: " + timer); // the timer isn't being incremented properly // it is somehow becoming a decimal
+        if ((int)timer % 3 == 0) // Flash on
         {
             counter += 1f;
             float x = Mathf.Lerp(0, dist, counter);
@@ -32,6 +34,7 @@ public class Medic : Enemy {
             pointAlongLine = x * direction + pointA; // Get the unit vector in the desired direction, multiply by the desired length and add the starting point.
             
             lineRendererComponent.enabled = true;
+            //Debug.Log("Flash time: " + currFlashTime); // currFlashTime keeps getting reset
             if (currFlashTime > redFlashTime) // Flash yellow
             {
                 lineRendererComponent.SetColors(new Color(0, 155, 0, 172), new Color(0, 155, 0, 172));  //Medics flash green
@@ -50,18 +53,21 @@ public class Medic : Enemy {
             GetComponent<SpriteRenderer>().color = new Color(255, 255, 255); // white
             lineRendererComponent.enabled = false;
         }
-        
+
+        //Debug.Log(currFlashTime); // currFlashTime keeps getting reset
         if (currFlashTime <= 0) // Fire when ready
         {
-                GameObject newBullet = (GameObject)Instantiate(BulletPrefab); // Instantiate a new bullet to fire
-                newBullet.GetComponent<Bullet>().Initialize(transform.position, vecToPlayer);  // Uses the location of another enemy to heal
-            
-                GetComponent<SpriteRenderer>().color = new Color(255, 255, 255); // After attacking, reset color and flags
-                trackPlayer = true;
+            GameObject newBullet = (GameObject)Instantiate(BulletPrefab); // Instantiate a new bullet to fire
+            newBullet.GetComponent<Bullet>().Initialize(transform.position, vecToPlayer);  // Uses the location of another enemy to heal
+            //Debug.Log("Bullet fired");
+            lineRendererComponent.enabled = false;
 
-                //timer = rand.Next(0, 300); //used to stagger each enemy's firing time because they're all spawned at the same time
-                currFlashTime = FLASH_TIME;
-                timer = 0;
+            //GetComponent<SpriteRenderer>().color = new Color(255, 255, 255); // After attacking, reset color and flags
+            trackPlayer = true;
+
+            //timer = rand.Next(0, 300); //used to stagger each enemy's firing time because they're all spawned at the same time
+            currFlashTime = FLASH_TIME;
+            timer = 0;
         }
     }
 
@@ -74,10 +80,11 @@ public class Medic : Enemy {
         timer += Time.deltaTime * Handler.speedMod;
 
         //fire if longer than some time
-        if(timer >= 4)
+        if (timer >= 4) // used to be (timer >= 4)
         {
+            //Debug.Log("reset timer");
             Fire();
-            timer = 0;
+            //timer = 0;
         }
 
         if (trackPlayer)
@@ -88,7 +95,7 @@ public class Medic : Enemy {
             {
                 isActive = true;
 
-                Vector3 randomStunnedEnemy = Handler.stunnedEnemyPositions[rand.Next(Handler.stunnedEnemyPositions.Count)];
+                Vector3 randomStunnedEnemy = Handler.stunnedEnemyPositions[rand.Next(Handler.stunnedEnemyPositions.Count)]; // not random since the Medics activate on the same frame
                 vecToPlayer = (randomStunnedEnemy - transform.position);    //this is correct - the bullet fires on this path and it's directly into the character
                 float angle = Mathf.Atan2(vecToPlayer.y, vecToPlayer.x) * Mathf.Rad2Deg;
                 Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);

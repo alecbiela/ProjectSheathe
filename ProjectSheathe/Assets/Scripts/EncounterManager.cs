@@ -31,6 +31,10 @@ public class EncounterManager : MonoBehaviour
     public float baseSpeed { get; private set; }
     public float slowSpeed { get; private set; }
     private int maxEnemyNumber;
+    private int basicMax;
+    private int lunkMax;
+    private int lockMax;
+    private int lightMax;
     private int maxOfficerNumber;
     private const int BASE_ENEMY_COUNT = 5;
     private const int ABSOLUTE_MAX_GUARD_COUNT = 20;
@@ -46,6 +50,7 @@ public class EncounterManager : MonoBehaviour
     [SerializeField] private GameObject[] officerSpawns;
     private int wave = 0;
     private Text waveUIText;
+    private Text hintUIText;
     private GameObject secondWindUIElement;
 
     void Awake()
@@ -65,6 +70,7 @@ public class EncounterManager : MonoBehaviour
         Player = GameObject.FindGameObjectWithTag("Player");
         PlayerScript = Player.GetComponent<Character>();
         waveUIText = GameObject.FindGameObjectWithTag("WaveElement").GetComponent<Text>();
+        hintUIText = GameObject.FindGameObjectWithTag("Hint").GetComponent<Text>();
         setWave();
         secondWindUIElement = GameObject.FindGameObjectWithTag("SecondWindElement");
         speedMod = 1f;
@@ -73,6 +79,10 @@ public class EncounterManager : MonoBehaviour
         slowSpeed = .3f;
         //Debug.Log("done");
         maxEnemyNumber = BASE_ENEMY_COUNT;
+        basicMax = 6;
+        lunkMax = 6;
+        lockMax = 4;
+        lightMax = 4;
         maxOfficerNumber = 0;
         quadrants = new Dictionary<int, int> { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 } };
     }
@@ -198,6 +208,13 @@ public class EncounterManager : MonoBehaviour
     //spawns a new wave of enemies once all have been defeated
     void Spawn()
     {
+        //increment wave
+        wave++;
+        setWave();
+
+        // reset hints
+        hintUIText.text = "";
+        
         for (int i = 0; i < 4; i++)
         {
             officerSpawns[i].GetComponent<OfficerSpawnPoint>().filled = false;
@@ -211,7 +228,8 @@ public class EncounterManager : MonoBehaviour
         }
 
         //calculates number of enemies to spawn (only does this when needed now, as opposed to every frame) CHANGE THIS SECTION IF MAXENEMY SHOULD BE MORE THAN GUARDS
-        maxEnemyNumber = BASE_ENEMY_COUNT + (PlayerScript.score / 650);
+        //maxEnemyNumber = BASE_ENEMY_COUNT + (PlayerScript.score / 650);
+        if(wave > 3) maxEnemyNumber += 2;
         if (maxEnemyNumber > ABSOLUTE_MAX_GUARD_COUNT) maxEnemyNumber = ABSOLUTE_MAX_GUARD_COUNT;
 
         // spawn officers first but only when the number of officers that should spawn changes, so every score threshold
@@ -261,36 +279,84 @@ public class EncounterManager : MonoBehaviour
         int Lunks = 0;
 
         //spawns Guards
-        for (int i = 0; i < maxEnemyNumber; i++)
+        if (wave > 4)
         {
-            int enemyType = rand.Next(0, 4);
-            switch(enemyType)
+            for (int i = 0; i < maxEnemyNumber; i++)
             {
-                case 0:
-                    if (B451Cs >= 6) i--;
-                    else CreateEnemy("B451C"); B451Cs++;
-                    break;
-                case 1:
-                    if (Lunks >= 6) i--;
-                    else CreateEnemy("Lunk"); Lunks++;
-                    break;
-                case 2:
-                    if (Locks >= 4) i--;
-                    else CreateEnemy("Lock"); Locks++;
-                    break;
-                case 3:
-                    if (Lights >= 4) i--;
-                    else CreateEnemy("Light"); Lights++;
-                    break;
+                int enemyType = rand.Next(0, 4);
+                switch (enemyType)
+                {
+                    case 0:
+                        if (B451Cs >= basicMax) i--; // 6 max
+                        else CreateEnemy("B451C"); B451Cs++;
+                        break;
+                    case 1:
+                        if (Lunks >= lunkMax) i--; // 6 max
+                        else CreateEnemy("Lunk"); Lunks++;
+                        break;
+                    case 2:
+                        if (Locks >= lockMax) i--; // 4 max
+                        else CreateEnemy("Lock"); Locks++;
+                        break;
+                    case 3:
+                        if (Lights >= lightMax) i--; // 4 max
+                        else CreateEnemy("Light"); Lights++;
+                        break;
+                }
             }
         }
-
+        else
+        {
+            // should probably make this its own method later
+            FirstWaves();
+        }
         //update attack time so that enemies do not attack immediately
         time = rand.Next(2, 4) + 1.1666f;
+    }
 
-        //if we ever have a wave variable, increment it here
-        wave++;
-        setWave();
+    private void FirstWaves() // sets up the first 4 waves and makes 1 less enemy each time because the game spawns one less than what I want each time and I don't know why
+    {
+        switch (wave)
+        {
+            case 1:
+                //Debug.Log("Wave spawn 1");
+                for (int x = 0; x <= 4; x++)
+                {
+                    CreateEnemy("B451C");
+                }
+                //GameObject.Find("DamageHint").SetActive(true);
+                hintUIText.text = "Attack, Slice, or Deflect bullets to damage enemies!";
+                break;
+            case 2:
+                //Debug.Log("Wave spawn 2");
+                CreateEnemy("B451C");
+                CreateEnemy("B451C");
+                CreateEnemy("B451C");
+                CreateEnemy("Lunk");
+                CreateEnemy("Lunk");
+                hintUIText.text = "Slice heavy enemies to break their purple shields!";
+                break;
+            case 3:
+                //Debug.Log("Wave spawn 3");
+                CreateEnemy("B451C");
+                CreateEnemy("B451C");
+                CreateEnemy("Lunk"); 
+                CreateEnemy("Lock"); 
+                CreateEnemy("Lock");   
+                hintUIText.text = "Hit enemy undeflectable rockets to destroy them!";
+                break;
+            case 4:
+                //Debug.Log("Wave spawn 4");
+                CreateEnemy("B451C");
+                CreateEnemy("B451C");
+                CreateEnemy("Lunk");
+                CreateEnemy("Lunk");
+                CreateEnemy("Lock");
+                CreateEnemy("Light");
+                CreateEnemy("Light");
+                hintUIText.text = "Dash to avoid enemy lasers!";
+                break;
+        }
     }
 
     private void setWave()

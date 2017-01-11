@@ -198,6 +198,9 @@ public class Character : MonoBehaviour
 
     private void Update()
     {
+        //Debug.Log("Slice timer: " + sliceTimer);
+        //Debug.Log("BA timer: " + baTimer);
+        //Debug.Log("Deflect timer: " + deflectTimer);
         ProcessInput();
         ExecuteTimedActions();
         // Enum for BA state: 0=inactive, 1=cooldown, 2=startup, 3=active, 4=recovery
@@ -243,7 +246,7 @@ public class Character : MonoBehaviour
         {
             animator.SetInteger("transitions", 3);
             sliceAnimTimer = 10;
-            hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", sliceBoxes+1);
+            //hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", sliceBoxes+1);
             //Debug.Log(sliceBoxes + 1);
             //Debug.Log("Slicing");
         }
@@ -262,7 +265,7 @@ public class Character : MonoBehaviour
         }
         if (slowMovement) // Something's wrong with the animations today and I don't know what it is, Something's wrong with our ifs, We're seeing things in a different way, And MJ knows it ain't his, It sure ain't no surprise, HUH. LIVIN IN THE CODE
         {
-            animator.SetInteger("transitions", 2);
+            //animator.SetInteger("transitions", 2);
         }
 
         if (redTimer>0) // What is this ?? ---- ATTN: ANYONE WHO KNOWS THE ANIMATION STUFF
@@ -324,7 +327,7 @@ public class Character : MonoBehaviour
                         sliceState = 1;
                         sliceHoldTime += Time.deltaTime;
                         slowMovement = true;
-                        //animator.SetInteger("transitions", 2);
+                        animator.SetInteger("transitions", 2);
                         break;
                     case 1: // Attacking
                         if (sliceState > 0 || deflectState > 1 || baState > 1) continue;
@@ -493,6 +496,7 @@ public class Character : MonoBehaviour
                 {
                     sliceHitBoxes[i + 1].gameObject.SetActive(true);
                 }
+                hitSpark.GetComponent<Animator>().SetInteger("hitBoxCount", sliceBoxes + 1);
                 sliceState = 3; // Active
                 slowMovement = false; // Respeed
                 maxSpeed = 7f; // ******* THESE VALUES SHOULD NOT BE HARD CODED-- Also, move these to a different statement if movement is supposed to come back after releasing the button (active frames)
@@ -505,7 +509,7 @@ public class Character : MonoBehaviour
             if (sliceState < 4) // During active and startup
             {
                 //Debug.Log(sliceState);
-                animator.SetInteger("transitions", 2);
+                //animator.SetInteger("transitions", 2);
             }
         }
 

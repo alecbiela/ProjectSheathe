@@ -10,6 +10,7 @@ public class Bullet : MonoBehaviour {
     private Vector3 desiredVelocity;
     public float slowMod = 0;
     private List<Explosion> slowFields = new List<Explosion>();
+    private GameObject player;
 
     //called by the enemy that is firing to make a new bullet
     public void Initialize(Vector3 pos, Vector3 vectorToPlayer)
@@ -17,6 +18,7 @@ public class Bullet : MonoBehaviour {
         handler = GameObject.FindGameObjectWithTag("EncounterManager").GetComponent<EncounterManager>();
         transform.position = pos;
         CanHurtEnemies = false;
+        player = GameObject.FindGameObjectWithTag("Player");
 
         //calculate desired path
         desiredVelocity = vectorToPlayer;
@@ -50,8 +52,10 @@ public class Bullet : MonoBehaviour {
             //if it's a medic bullet, give the player 2 health (any better way to do this?)
             if(tag == "MedicBullet")
             {
-                col.gameObject.GetComponent<Character>().health += 2;
-                col.gameObject.GetComponent<Character>().setHealth();
+                //col.gameObject.GetComponentInParent<Character>().health += 2; // let's check our code before we replace other people's code, mmkay?
+                //col.gameObject.GetComponentInParent<Character>().setHealth();
+                player.GetComponent<Character>().health += 2;
+                player.GetComponent<Character>().setHealth();
                 //handler.extraWind = 1;
                 Destroy(gameObject);
             }

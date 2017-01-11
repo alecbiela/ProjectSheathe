@@ -37,6 +37,7 @@ TagManager:
   - SecondWindElement
   - OverclockCDElement
   - ReadyElement
+  - Hint
   layers:
   - Default
   - TransparentFX
