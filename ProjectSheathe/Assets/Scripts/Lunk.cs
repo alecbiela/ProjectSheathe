@@ -122,10 +122,10 @@ public class Lunk : Enemy
             return;
         }
 
-        if (col.gameObject.tag == "MedicBullet" && stunState != 2) // Medic bullets heal and apply second wind
+        if (col.gameObject.tag == "MedicBullet" && stunState == 2) // Medic bullets heal and apply second wind ONLY to stunned enemies
         {
             health = (health >= MAX_HEALTH) ? MAX_HEALTH : (health + 1); // If topped off, don't add any
-            stunState = 1; // Secondwinded
+            SecondWind();
             Destroy(col.gameObject);
             return;
         }

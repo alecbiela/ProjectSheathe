@@ -324,7 +324,6 @@ public class EncounterManager : MonoBehaviour
                 {
                     CreateEnemy("B451C");
                 }
-                //GameObject.Find("DamageHint").SetActive(true);
                 hintUIText.text = "Attack, Slice, or Deflect bullets to damage enemies!";
                 break;
             case 2:

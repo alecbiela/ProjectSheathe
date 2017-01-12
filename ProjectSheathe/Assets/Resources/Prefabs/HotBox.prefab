@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 4000012224483642}
   - 212: {fileID: 212000011756122414}
-  - 114: {fileID: 114000011818917668}
   - 61: {fileID: 61000012183486886}
   - 50: {fileID: 50000013702305214}
   - 58: {fileID: 58000013095124470}
@@ -58,7 +57,7 @@ Transform:
   m_GameObject: {fileID: 1000013149814492}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4, y: 4, z: 1}
+  m_LocalScale: {x: 5.5482593, y: 5.5482607, z: 1.3870652}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 4000012224483642}
@@ -70,8 +69,8 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1000012341611592}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.4195557, y: -2.503701, z: -0.66015625}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.5950699, y: -5.062516, z: -0.66015625}
+  m_LocalScale: {x: 0.64579356, y: 0.6457936, z: 0.71754855}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 4000011362801094}
@@ -136,27 +135,6 @@ BoxCollider2D:
   m_Offset: {x: 0.012635105, y: 0.039397415}
   serializedVersion: 2
   m_Size: {x: 1.5, y: 1.5}
---- !u!114 &114000011818917668
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012341611592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e1aaa3ce243ee484586da7bc4a3f12d7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  health: 0
-  MAX_HEALTH: 0
-  stunState: 0
-  hitRecently: 0
-  slowMod: 0
-  guarded: 0
-  BulletPrefab: {fileID: 0}
-  type: 
-  rank: 
-  lineRendererComponent: {fileID: 0}
 --- !u!114 &114000012075776196
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -174,8 +152,7 @@ MonoBehaviour:
   hitRecently: 0
   slowMod: 0
   guarded: 0
-  BulletPrefab: {fileID: 1000010294456066, guid: f6e35da97fc23624390de68bc1a85016,
-    type: 2}
+  BulletPrefab: {fileID: 0, guid: f6e35da97fc23624390de68bc1a85016, type: 2}
   type: 
   rank: 
   lineRendererComponent: {fileID: 0}

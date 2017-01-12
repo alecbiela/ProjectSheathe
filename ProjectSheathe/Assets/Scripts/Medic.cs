@@ -72,41 +72,51 @@ public class Medic : Enemy {
     }
 
     // Update is called once per frame
-    protected override void Update() {
+    protected override void Update()
+    {
+        lineRendererComponent.enabled = false;
+        //Debug.Log(health);
+        if (stunState == 0 && health <= 1) // Stun enemies once their health reaches a certain value if they have never been stunned
+        {
+            Stun();
+        }
         if (hitRecently && Handler.PlayerScript.BAState < 2 && Handler.PlayerScript.SliceState < 2) // Let enemy get hit again if original attack is over
         {
             hitRecently = false;
         }
-        timer += Time.deltaTime * Handler.speedMod;
 
-        //fire if longer than some time
-        if (timer >= 4) // used to be (timer >= 4)
+        if (stunState != 2)
         {
-            //Debug.Log("reset timer");
-            Fire();
-            //timer = 0;
-        }
-
-        if (trackPlayer)
-        {
-            //get a random stunned enemy
-            List<Vector3> positions = Handler.stunnedEnemyPositions;
-            if (positions.Count != 0)
+            timer += Time.deltaTime * Handler.speedMod;
+            //fire if longer than some time
+            if (timer >= 4) // used to be (timer >= 4)
             {
-                isActive = true;
-
-                Vector3 randomStunnedEnemy = Handler.stunnedEnemyPositions[rand.Next(Handler.stunnedEnemyPositions.Count)]; // not random since the Medics activate on the same frame
-                vecToPlayer = (randomStunnedEnemy - transform.position);    //this is correct - the bullet fires on this path and it's directly into the character
-                float angle = Mathf.Atan2(vecToPlayer.y, vecToPlayer.x) * Mathf.Rad2Deg;
-                Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
-                transform.rotation = Quaternion.Slerp(transform.rotation, q, (Handler.speedMod - slowMod) * Time.deltaTime * 0.9f * rotSpeed);
-
-                // line render
-                origin = transform.position;
-                destination = randomStunnedEnemy;
-                dist = Vector3.Distance(origin, destination);
+                //Debug.Log("reset timer");
+                Fire();
+                //timer = 0;
             }
-            else isActive = false;
+
+            if (trackPlayer)
+            {
+                //get a random stunned enemy
+                List<Vector3> positions = Handler.stunnedEnemyPositions;
+                if (positions.Count != 0)
+                {
+                    isActive = true;
+
+                    Vector3 randomStunnedEnemy = Handler.stunnedEnemyPositions[rand.Next(Handler.stunnedEnemyPositions.Count)]; // not random since the Medics activate on the same frame
+                    vecToPlayer = (randomStunnedEnemy - transform.position);    //this is correct - the bullet fires on this path and it's directly into the character
+                    float angle = Mathf.Atan2(vecToPlayer.y, vecToPlayer.x) * Mathf.Rad2Deg;
+                    Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, q, (Handler.speedMod - slowMod) * Time.deltaTime * 0.9f * rotSpeed);
+
+                    // line render
+                    origin = transform.position;
+                    destination = randomStunnedEnemy;
+                    dist = Vector3.Distance(origin, destination);
+                }
+                else isActive = false;
+            }
         }
     }
 }
